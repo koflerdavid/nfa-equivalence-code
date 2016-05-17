@@ -2,14 +2,17 @@ module Data.Dfa
   (
     Dfa(..),
     accepted,
-    complete,
+    buildDfa,
     runDfa,
     transformToIntegerStates
   ) where
 
 import Control.Monad
 import Control.Monad.Trans.RWS.Strict
+import Data.Map.Strict (Map)
 import qualified Data.Map.Strict as M
+import Data.Set (Set)
+import qualified Data.Set as S
 
 data Dfa q c =
   Dfa { dfaAlphabet :: [c]
@@ -20,12 +23,19 @@ data Dfa q c =
       }
       deriving (Eq, Show)
 
-complete :: (Ord c, Ord q) => q -> Dfa q c -> Dfa q c
-complete defaultState dfa =
-  let transitionTable = M.fromList (dfaTransitionFunction dfa)
-      defaultTransitions = [((q, c), defaultState) | q <- dfaStates dfa, c <- dfaAlphabet dfa]
-      table = M.union transitionTable (M.fromList defaultTransitions)
-  in dfa { dfaTransitionFunction = M.toList table }
+buildDfa :: (Ord c, Ord q) => q -> [q] -> q -> [((q, c), q)] -> Dfa q c
+buildDfa initialState finalStates errorState transitions =
+  let statesFromTransitions = S.unions $ map (\((q, _c), q') -> S.fromList [q, q']) transitions
+      otherStates = S.fromList $ initialState : errorState : finalStates
+      states = statesFromTransitions `S.union` otherStates
+      alphabet = S.fromList $ map (\((_q, c), _q') -> c) transitions
+      transitions' = complete errorState alphabet states (M.fromList transitions)
+  in Dfa (S.toList alphabet) (S.toList states) initialState finalStates (M.toList transitions')
+
+complete :: (Ord c, Ord q) => q -> Set c -> Set q -> Map (q, c) q -> Map (q, c) q
+complete errorState alphabet states transitionTable =
+  let defaultTransitions = [((q, c), errorState) | q <- S.elems states, c <- S.elems alphabet]
+  in M.union transitionTable (M.fromList defaultTransitions)
 
 runDfa :: (Ord c, Ord q) => Dfa q c -> [c] -> Either String q
 runDfa dfa input =

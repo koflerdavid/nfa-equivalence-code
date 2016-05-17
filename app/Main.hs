@@ -8,7 +8,7 @@ import Algorithm.RegexCompiler
 
 main :: IO ()
 main = do
-  let dfa = complete 3 $ (Dfa "ab" [0,1,2,3] 0 [2] [((0,'a'), 1), ((1, 'b'), 2), ((2, 'a'), 1)]) :: Dfa Int Char
+  let dfa = buildDfa 0 [2] 3 [((0,'a'), 1), ((1, 'b'), 2), ((2, 'a'), 1)] :: Dfa Int Char
   putStrLn $ show (runDfa dfa "ab")
   putStrLn $ show (runDfa dfa "aba")
   putStrLn $ show (runDfa dfa "abb")
