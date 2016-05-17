@@ -15,11 +15,11 @@ import Data.Set (Set)
 import qualified Data.Set as S
 
 data Dfa q c =
-  Dfa { dfaAlphabet :: [c]
-      , dfaStates :: [q]
+  Dfa { dfaAlphabet :: Set c
+      , dfaStates :: Set q
       , dfaInitialState :: q
-      , dfaFinalStates :: [q]
-      , dfaTransitionFunction :: [((q, c), q)]
+      , dfaFinalStates :: Set q
+      , dfaTransitionFunction :: Map (q, c) q
       }
       deriving (Eq, Show)
 
@@ -30,7 +30,7 @@ buildDfa initialState finalStates errorState transitions =
       states = statesFromTransitions `S.union` otherStates
       alphabet = S.fromList $ map (\((_q, c), _q') -> c) transitions
       transitions' = complete errorState alphabet states (M.fromList transitions)
-  in Dfa (S.toList alphabet) (S.toList states) initialState finalStates (M.toList transitions')
+  in Dfa alphabet states initialState (S.fromList finalStates) transitions'
 
 complete :: (Ord c, Ord q) => q -> Set c -> Set q -> Map (q, c) q -> Map (q, c) q
 complete errorState alphabet states transitionTable =
@@ -39,7 +39,7 @@ complete errorState alphabet states transitionTable =
 
 runDfa :: (Ord c, Ord q) => Dfa q c -> [c] -> Either String q
 runDfa dfa input =
-  let transitionTable = M.fromList (dfaTransitionFunction dfa)
+  let transitionTable = dfaTransitionFunction dfa
   in case execRWS (forM_ input dfaStep) transitionTable (Just (dfaInitialState dfa)) of
     (Nothing, _) -> Left "Encountered an undefined state transition"
     (Just q, _) -> Right q
@@ -57,13 +57,18 @@ dfaStep c = do
     q <- maybeQ
     M.lookup (q, c) table
 
-transformToIntegerStates :: Ord q => Dfa q c -> (Dfa Int c, [(Int, q)])
+transformToIntegerStates :: (Ord q, Ord c) => Dfa q c -> (Dfa Int c, [(Int, q)])
 transformToIntegerStates dfa =
-  let mapping = M.fromList $ zip (dfaStates dfa) ([0..] :: [Int])
+  -- Choose numbers for the states
+  let mapping = M.fromList $ zip (S.toList $ dfaStates dfa) ([0..] :: [Int])
+      -- Define a function to transform the transition
+      transitions = M.map ((M.!) mapping) $ M.mapKeys (\(q, c) -> (mapping M.! q, c)) (dfaTransitionFunction dfa)
       replaceStates ((q, c), q') = ((mapping M.! q, c), mapping M.! q')
+      --newMappings = M.elems $ M.mapWithKey (curry replaceStates) (dfaTransitionFunction dfa)
   in (Dfa { dfaAlphabet = dfaAlphabet dfa
-          , dfaStates = M.elems mapping
+          , dfaStates = S.fromList $ M.elems mapping
           , dfaInitialState = mapping M.! dfaInitialState dfa
-          , dfaFinalStates = map ((M.!) mapping) (dfaFinalStates dfa)
-          , dfaTransitionFunction = map replaceStates (dfaTransitionFunction dfa)
-         }, zip [0..] (dfaStates dfa))
+          , dfaFinalStates = S.map ((M.!) mapping) (dfaFinalStates dfa)
+          -- Transform the transitions and combine them to a new Map
+          , dfaTransitionFunction = transitions
+         }, map (\(a,b) -> (b, a)) (M.toList mapping))

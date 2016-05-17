@@ -4,6 +4,7 @@
 module Main where
 
 import Data.Dfa
+import qualified Data.EquivalenceRelation as Eqr
 import Data.Nfa
 import Data.Regex
 
@@ -12,7 +13,7 @@ import Options.Generic
 import Algorithm.RegexCompiler
 import Algorithm.AutomataEquivalence
 
-data Action = DfaNfaTest | EquivalenceTest
+data Action = DfaNfaTest | EquivalenceTest | Eqr
             deriving (Generic, Show)
 
 instance ParseRecord Action
@@ -46,5 +47,12 @@ main = do
       checkEqual dfa1 "dfa1" dfa2 "dfa2"
       checkEqual dfa1 "dfa1" dfa3 "dfa3"
 
+    Eqr -> do
+      putStrLn $ show (Eqr.empty :: Eqr.Eqr Int)
+
 checkEqual :: (Ord q, Ord c) => Dfa q c -> String -> Dfa q c -> String -> IO ()
-checkEqual dfa1 name1 dfa2 name2 = putStrLn $ name1 ++ " and " ++ name2 ++ (if dfa1 `dfaEquivalentHkNaive` dfa2 then " are equal" else " are not equal")
+checkEqual dfa1 name1 dfa2 name2 = do
+    putStrLn $ name1 ++ " and " ++ name2 ++ (getResult dfa1 dfa2 $ dfa1 `dfaEquivalentHkNaive` dfa2)
+    putStrLn $ name1 ++ " and " ++ name2 ++ (getResult dfa1 dfa2 $ dfa1 `dfaEquivalentHk` dfa2)
+
+  where getResult dfa1 dfa2 r = if r then " are equal" else " are not equal"

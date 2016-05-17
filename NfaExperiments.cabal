@@ -19,6 +19,7 @@ library
   exposed-modules:     Algorithm.AutomataEquivalence
                      , Algorithm.RegexCompiler
                      , Data.Dfa
+                     , Data.EquivalenceRelation
                      , Data.Nfa
                      , Data.Regex
   build-depends:       base >= 4.7 && < 5
