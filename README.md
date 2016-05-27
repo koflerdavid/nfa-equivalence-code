@@ -13,9 +13,8 @@ set of packages available. Also, it ensures that there is a sandbox, ensuring th
 globally installed packages do not disturb this project.
 
 To build the code install `stack` first. For that, go to
-()[the install instructions] and follow them. Then run
+[the install instructions](http://docs.haskellstack.org/en/stable/README/#how-to-install) and follow them. Then run
 
-    $ cd NfaExperiments
     $ stack setup
     $ stack build
 
