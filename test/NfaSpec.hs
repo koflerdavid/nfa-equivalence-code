@@ -21,7 +21,7 @@ spec = do
   describe "runNfa" $ do
     it "accepts the empty string, \"a\", \"b\" and \"ab\"" $ do
       forM_ ["", "a", "b", "ab"] $ \input -> do
-        fmap (accepted nfa . fromList) (runNfa nfa input) `shouldBe` Right True
+        (nfa `accepts` runNfa nfa input) `shouldBe` True
 
     it "does not accept \"d\"" $ do
-      fmap (accepted nfa . fromList) (runNfa nfa "d") `shouldNotBe` Right True
+      (nfa `accepts` runNfa nfa "d") `shouldBe` False

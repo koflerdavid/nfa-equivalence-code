@@ -4,7 +4,7 @@ module Data.Nfa
   (
     Nfa(..)
     , runNfa
-    , accepted
+    , accepts
   ) where
 
 import Control.Monad
@@ -21,22 +21,20 @@ data Nfa q c =
       }
       deriving (Eq, Show)
 
-runNfa :: (Ord c, Ord q, Show c, Show q) => Nfa q c -> [c] -> Either String [q]
+runNfa :: (Ord c, Ord q, Show c, Show q) => Nfa q c -> [c] -> [q]
 runNfa nfa input =
   let table = transitionTable nfa
       initialStates = S.fromList (nfaInitialStates nfa)
       clInitialStates = closure table initialStates
       finalStates = fst $ execRWS (forM_ input nfaStep) table clInitialStates
-  --in error $ show clInitialStates
-  in if S.null finalStates then Left "Encountered an undefined state transition"
-                           else Right . S.toList $ finalStates
+  in S.toList $ finalStates
 
 transitionTable :: (Ord q, Ord c) => Nfa q c -> Transitions q c
 transitionTable nfa = S.union `M.fromListWith` transitions
   where transitions = map (\ (q_and_c, states) -> (q_and_c, S.fromList states)) (nfaTransitionFunction nfa)
 
-accepted :: Ord q => Nfa q c -> S.Set q -> Bool
-accepted nfa possibleStates = not . S.null $ S.fromList (nfaFinalStates nfa) `S.intersection` possibleStates
+accepts :: Ord q => Nfa q c -> [q] -> Bool
+accepts nfa possibleStates = not . S.null $ S.fromList (nfaFinalStates nfa) `S.intersection` S.fromList possibleStates
 
 type Transitions q c = M.Map (q, Maybe c) (S.Set q)
 type NfaState q c a = RWS (Transitions q c) () (S.Set q) a
