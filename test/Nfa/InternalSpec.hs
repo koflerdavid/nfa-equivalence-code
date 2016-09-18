@@ -13,26 +13,27 @@ main = hspec spec
 spec :: Spec
 spec = do
   describe "nfaStep'ping" $ do
-    let (initialState, nextState, otherState) = (0, 1, 2)
-        transitions = transitionTable [((initialState, Just 'a'), [nextState]),
-                                       ((initialState, Nothing), [otherState])]
+    let (firstState, secondState, thirdState, fourthState) = (1, 2, 3, 4)
+        transitions = transitionTable [((firstState, Just 'a'), [secondState]),
+                                       ((firstState, Nothing), [thirdState]),
+                                       ((thirdState, Just 'c'), [fourthState])]
 
     it "should be possible to do an 'a' step" $ do
-      execRWS (nfaStep 'a') transitions (singleton initialState) `shouldBe` (singleton nextState, ())
-
-    it "should be possible to do an epsilon-step" $ do
-      step transitions (singleton initialState) Nothing `shouldBe` fromList [initialState, otherState]
+      execRWS (nfaStep 'a') transitions (singleton firstState) `shouldBe` (singleton secondState, ())
 
     it "should not be possible to do a 'b' step" $ do
-      execRWS (nfaStep 'b') transitions (singleton initialState) `shouldBe` (empty, ())
+      execRWS (nfaStep 'b') transitions (singleton firstState) `shouldBe` (empty, ())
+
+    it "should be possible to do a 'c' step (via the third state)" $ do
+      execRWS (nfaStep 'c') transitions (singleton firstState) `shouldBe` (singleton fourthState, ())
 
   describe "step" $ do
     let (firstState, secondState, thirdState) = (0, 1, 2)
         transitions = transitionTable [((firstState, Just 'a'), [secondState]),
                                        ((firstState, Nothing), [thirdState])]
 
-    it "should step from 0 with 'a' to 1" $ do
-      step transitions (singleton firstState) (Just 'a') `shouldBe` singleton thirdState
+    it "should go from firstState with 'a' to secondState" $ do
+      step transitions (singleton firstState) (Just 'a') `shouldBe` singleton secondState
 
   describe "closure" $ do
     let (firstState, secondState, thirdState) = (1, 2, 3)

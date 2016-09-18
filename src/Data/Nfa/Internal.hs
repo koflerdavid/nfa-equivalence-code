@@ -11,11 +11,13 @@ transitionTable :: Ord c => [((Int, Maybe c), [Int])] -> Transitions c
 transitionTable nfaTransitionFunction = S.union `M.fromListWith` transitions
   where transitions = map (\ (q_and_c, states) -> (q_and_c, S.fromList states)) nfaTransitionFunction
 
+-- This function should update the state and also consider the epsilon closure
 nfaStep :: Ord c => c -> NfaState c ()
 nfaStep c = do
   table <- ask
-  modify (\qs -> closure table $ step table qs (Just c))
+  modify (\qs -> closure table $ step table (closure table qs) (Just c))
 
+-- This function is just supposed to query the table
 step :: Ord c => Transitions c -> S.Set Int -> Maybe c -> S.Set Int
 step table qs c = mergeMap (\q -> M.findWithDefault S.empty (q, c) table) qs
 
