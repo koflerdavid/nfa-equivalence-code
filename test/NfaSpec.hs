@@ -13,7 +13,7 @@ import Data.Set (fromList)
 main :: IO ()
 main = hspec spec
 
-nfa :: Nfa Int Char
+nfa :: Nfa Char
 nfa = compileRegex (Asterisk (Alternative [Atom 'a', Atom 'b']))
 
 spec :: Spec
