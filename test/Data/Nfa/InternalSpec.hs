@@ -1,4 +1,4 @@
-module Nfa.InternalSpec (main, spec) where
+module Data.Nfa.InternalSpec (main, spec) where
 
 import Control.Monad.Trans.RWS.Strict
 import Data.Nfa.Internal

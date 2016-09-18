@@ -1,4 +1,4 @@
-module DfaSpec (main, spec) where
+module Data.DfaSpec (main, spec) where
 
 import Test.Hspec
 import Test.QuickCheck

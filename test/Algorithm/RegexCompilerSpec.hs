@@ -1,4 +1,4 @@
-module RegexCompilerSpec (main, spec) where
+module Algorithm.RegexCompilerSpec (main, spec) where
 
 import Test.Hspec
 import Test.QuickCheck

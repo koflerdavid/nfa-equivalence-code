@@ -1,4 +1,4 @@
-module NfaSpec (main, spec) where
+module Data.NfaSpec (main, spec) where
 
 import Control.Monad (forM_)
 import Test.Hspec
