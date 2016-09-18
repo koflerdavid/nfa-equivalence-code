@@ -21,8 +21,8 @@ spec = do
   describe "runDfa" $ do
     it "accepts \"ab\" and \"abab\"" $ do
       forM_ ["ab", "abab"] $ \input -> do
-        runDfa dfa input `shouldBe` Right 2
+        dfa `accepts` runDfa dfa input `shouldBe` True
 
     it "does not accept the empty string, \"aba\", \"abb\" and \"aabbaa\"" $ do
       forM_ ["", "aba", "abb", "aabbaa"] $ \input -> do
-        runDfa dfa input `shouldNotBe` Right 2
+        dfa `accepts` runDfa dfa input `shouldBe` False

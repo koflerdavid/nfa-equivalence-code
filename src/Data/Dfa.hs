@@ -1,7 +1,7 @@
 module Data.Dfa
   (
     Dfa(..),
-    accepted,
+    accepts,
     buildDfa,
     runDfa,
   ) where
@@ -30,15 +30,15 @@ buildDfa initialState finalStates transitions =
       errorState = succ (IS.findMax states)
   in Dfa alphabet states initialState (IS.fromList finalStates) errorState (M.fromList transitions)
 
-runDfa :: Ord c => Dfa c -> [c] -> Either String Int
+runDfa :: Ord c => Dfa c -> [c] -> Int
 runDfa dfa input =
   let transitionTable = dfaTransitionFunction dfa
   in case execRWS (forM_ input dfaStep) transitionTable (Just (dfaInitialState dfa)) of
-    (Nothing, _) -> Left "Encountered an undefined state transition"
-    (Just q, _) -> Right q
+    (Nothing, _) -> dfaErrorState dfa
+    (Just q, _) -> q
 
-accepted :: Dfa c -> Int -> Bool
-accepted dfa q = q `IS.member` dfaFinalStates dfa
+accepts :: Dfa c -> Int -> Bool
+accepts dfa q = q `IS.member` dfaFinalStates dfa
 
 type Transitions c = (M.Map (Int, c) Int)
 type DfaState c a = RWS (Transitions c) () (Maybe Int) a
