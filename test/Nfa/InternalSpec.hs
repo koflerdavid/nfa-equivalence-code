@@ -2,7 +2,7 @@ module Nfa.InternalSpec (main, spec) where
 
 import Control.Monad.Trans.RWS.Strict
 import Data.Nfa.Internal
-import Data.Set
+import Data.IntSet
 
 import Test.Hspec
 import Test.QuickCheck

@@ -10,7 +10,7 @@ module Data.Nfa
 import Control.Monad
 import Control.Monad.Trans.RWS.Strict
 import qualified Data.Map.Strict as M
-import qualified Data.Set as S
+import qualified Data.IntSet as IS
 
 import Data.Nfa.Internal
 
@@ -26,10 +26,10 @@ data Nfa c =
 runNfa :: (Ord c, Show c) => Nfa c -> [c] -> [Int]
 runNfa nfa input =
   let table = transitionTable (nfaTransitionFunction nfa)
-      initialStates = S.fromList (nfaInitialStates nfa)
+      initialStates = IS.fromList (nfaInitialStates nfa)
       clInitialStates = closure table initialStates
       finalStates = fst $ execRWS (forM_ input nfaStep) table clInitialStates
-  in S.toList $ finalStates
+  in IS.toList $ finalStates
 
 accepts :: Nfa c -> [Int] -> Bool
-accepts nfa possibleStates = not . S.null $ S.fromList (nfaFinalStates nfa) `S.intersection` S.fromList possibleStates
+accepts nfa possibleStates = not . IS.null $ IS.fromList (nfaFinalStates nfa) `IS.intersection` IS.fromList possibleStates
