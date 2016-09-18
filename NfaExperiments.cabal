@@ -48,7 +48,8 @@ test-suite NfaExperiments-test
                      , NfaExperiments
                      , containers
                      , transformers
-  other-modules:       Algorithm.RegexCompilerSpec
+  other-modules:       Algorithm.AutomataEquivalenceSpec
+                     , Algorithm.RegexCompilerSpec
                      , Data.DfaSpec
                      , Data.NfaSpec
                      , Data.Nfa.InternalSpec
