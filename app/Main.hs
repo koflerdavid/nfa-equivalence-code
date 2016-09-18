@@ -24,14 +24,13 @@ main = do
 
   case action of
     DfaNfaTest -> do
-      let dfa = buildDfa 0 [2] 3 [((0,'a'), 1), ((1, 'b'), 2), ((2, 'a'), 1)] :: Dfa Char
+      let dfa = buildDfa 0 [2] [((0,'a'), 1), ((1, 'b'), 2), ((2, 'a'), 1)] :: Dfa Char
       putStrLn $ show (runDfa dfa "ab")
       putStrLn $ show (runDfa dfa "aba")
       putStrLn $ show (runDfa dfa "abb")
       putStrLn $ show (runDfa dfa "abab")
       putStrLn $ show (runDfa dfa "aabbaa")
       putStrLn $ show (runDfa dfa "")
-      putStrLn $ show (dfa == (fst . transformToIntegerStates) dfa)
 
       let nfa = compileRegex (Asterisk (Alternative [Atom 'a', Atom 'b']))
       putStrLn $ show nfa
@@ -41,9 +40,9 @@ main = do
       putStrLn $ show (runNfa nfa "ab")
       putStrLn $ show (runNfa nfa "")
     EquivalenceTest -> do
-      let dfa1 = buildDfa 0 [1, 2] 3 [((0, 'a'), 1), ((0, 'b'), 1), ((1, 'a'), 2), ((1, 'b'), 2), ((2, 'a'), 2), ((2, 'b'), 2)] :: Dfa Char
-          dfa2 = buildDfa 0 [1, 2] 3 [((0, 'a'), 1), ((0, 'b'), 2), ((1, 'a'), 2), ((1, 'b'), 2), ((2, 'a'), 1), ((2, 'b'), 1)] :: Dfa Char
-          dfa3 = buildDfa 0 [1] 2 [((0, 'a'), 1), ((0, 'b'), 2)] :: Dfa Char
+      let dfa1 = buildDfa 0 [1, 2] [((0, 'a'), 1), ((0, 'b'), 1), ((1, 'a'), 2), ((1, 'b'), 2), ((2, 'a'), 2), ((2, 'b'), 2)] :: Dfa Char
+          dfa2 = buildDfa 0 [1, 2] [((0, 'a'), 1), ((0, 'b'), 2), ((1, 'a'), 2), ((1, 'b'), 2), ((2, 'a'), 1), ((2, 'b'), 1)] :: Dfa Char
+          dfa3 = buildDfa 0 [1] [((0, 'a'), 1), ((0, 'b'), 2)] :: Dfa Char
       checkEqual dfa1 "dfa1" dfa2 "dfa2"
       checkEqual dfa1 "dfa1" dfa3 "dfa3"
 

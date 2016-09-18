@@ -14,7 +14,7 @@ startState = 0
 acceptingState = 2
 
 dfa :: Dfa Char
-dfa = buildDfa startState [acceptingState] 3 [((0, 'a'), 1), ((1, 'b'), 2), ((2, 'a'), 1)]
+dfa = buildDfa startState [acceptingState] [((0, 'a'), 1), ((1, 'b'), 2), ((2, 'a'), 1)]
 
 spec :: Spec
 spec = do
