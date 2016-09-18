@@ -1,6 +1,8 @@
 *.lhs.tex
 /.idea
 
+/ideaHaskellLib
+
 # Created by https://www.gitignore.io/api/haskell,latex,linux,intellij,git
 
 ### LaTeX ###
