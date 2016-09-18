@@ -5,9 +5,8 @@ module Algorithm.AutomataEquivalence where
 import Data.Dfa
 import qualified Data.EquivalenceRelation as Eqr
 
-import Data.Map (Map)
+import qualified Data.IntSet as IS
 import qualified Data.Map as M
-import Data.Set (Set)
 import qualified Data.Set as S
 
 import Data.Sequence (Seq, ViewL(..), (><))
@@ -18,7 +17,7 @@ import qualified Data.Sequence as Seq
 -- can still always be modified to operate on the same input alphabet.
 -- Also, the algorithm was originally written to calculate the equalivalence
 -- of two states of the <strong>same</strong> automata, which renders this point moot anyways.
-dfaEquivalentHkNaive :: (Ord q, Ord c) => Dfa q c -> Dfa q c -> Bool
+dfaEquivalentHkNaive :: Ord c => Dfa c -> Dfa c -> Bool
 dfaEquivalentHkNaive dfa1 dfa2
   | dfaAlphabet dfa1 /= dfaAlphabet dfa2 = False
 
@@ -26,7 +25,7 @@ dfaEquivalentHkNaive dfa1 dfa2
       where check _ EmptyL = True
             check bisim (pair@(x,y) :< ps)
               | pair `S.member` bisim = check bisim (Seq.viewl ps)
-              | (x `elem` dfaFinalStates dfa1) /= (y `elem` dfaFinalStates dfa2) = False
+              | (x `IS.member` dfaFinalStates dfa1) /= (y `IS.member` dfaFinalStates dfa2) = False
               | otherwise = check ((x, y) `S.insert` bisim) (Seq.viewl $ Seq.fromList todo >< ps)
                   where todo = [(transitionsDfa1 M.! (x, c), transitionsDfa2 M.! (y, c)) | c <- alphabet]
 
@@ -34,7 +33,7 @@ dfaEquivalentHkNaive dfa1 dfa2
             transitionsDfa1 = dfaTransitionFunction dfa1
             transitionsDfa2 = dfaTransitionFunction dfa2
 
-dfaEquivalentHk :: (Ord q, Ord c) => Dfa q c -> Dfa q c -> Bool
+dfaEquivalentHk :: Ord c => Dfa c -> Dfa c -> Bool
 dfaEquivalentHk dfa1 dfa2
   | dfaAlphabet dfa1 /= dfaAlphabet dfa2 = False
 
@@ -42,7 +41,7 @@ dfaEquivalentHk dfa1 dfa2
       where check _ EmptyL = True
             check bisim (pair@(x,y) :< ps)
               | bisim `Eqr.contains` pair = check bisim (Seq.viewl ps)
-              | (x `elem` dfaFinalStates dfa1) /= (y `elem` dfaFinalStates dfa2) = False
+              | (x `IS.member` dfaFinalStates dfa1) /= (y `IS.member` dfaFinalStates dfa2) = False
               | otherwise = check ((x, y) `Eqr.insert` bisim) (Seq.viewl $ Seq.fromList todo >< ps)
                   where todo = [(transitionsDfa1 M.! (x, c), transitionsDfa2 M.! (y, c)) | c <- alphabet]
 

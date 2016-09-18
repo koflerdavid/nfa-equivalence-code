@@ -13,7 +13,7 @@ main = hspec spec
 startState = 0
 acceptingState = 2
 
-dfa :: Dfa Int Char
+dfa :: Dfa Char
 dfa = buildDfa startState [acceptingState] 3 [((0, 'a'), 1), ((1, 'b'), 2), ((2, 'a'), 1)]
 
 spec :: Spec

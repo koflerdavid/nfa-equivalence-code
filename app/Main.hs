@@ -24,7 +24,7 @@ main = do
 
   case action of
     DfaNfaTest -> do
-      let dfa = buildDfa 0 [2] 3 [((0,'a'), 1), ((1, 'b'), 2), ((2, 'a'), 1)] :: Dfa Int Char
+      let dfa = buildDfa 0 [2] 3 [((0,'a'), 1), ((1, 'b'), 2), ((2, 'a'), 1)] :: Dfa Char
       putStrLn $ show (runDfa dfa "ab")
       putStrLn $ show (runDfa dfa "aba")
       putStrLn $ show (runDfa dfa "abb")
@@ -41,16 +41,16 @@ main = do
       putStrLn $ show (runNfa nfa "ab")
       putStrLn $ show (runNfa nfa "")
     EquivalenceTest -> do
-      let dfa1 = buildDfa 0 [1, 2] 3 [((0, 'a'), 1), ((0, 'b'), 1), ((1, 'a'), 2), ((1, 'b'), 2), ((2, 'a'), 2), ((2, 'b'), 2)] :: Dfa Int Char
-          dfa2 = buildDfa 0 [1, 2] 3 [((0, 'a'), 1), ((0, 'b'), 2), ((1, 'a'), 2), ((1, 'b'), 2), ((2, 'a'), 1), ((2, 'b'), 1)] :: Dfa Int Char
-          dfa3 = buildDfa 0 [1] 2 [((0, 'a'), 1), ((0, 'b'), 2)] :: Dfa Int Char
+      let dfa1 = buildDfa 0 [1, 2] 3 [((0, 'a'), 1), ((0, 'b'), 1), ((1, 'a'), 2), ((1, 'b'), 2), ((2, 'a'), 2), ((2, 'b'), 2)] :: Dfa Char
+          dfa2 = buildDfa 0 [1, 2] 3 [((0, 'a'), 1), ((0, 'b'), 2), ((1, 'a'), 2), ((1, 'b'), 2), ((2, 'a'), 1), ((2, 'b'), 1)] :: Dfa Char
+          dfa3 = buildDfa 0 [1] 2 [((0, 'a'), 1), ((0, 'b'), 2)] :: Dfa Char
       checkEqual dfa1 "dfa1" dfa2 "dfa2"
       checkEqual dfa1 "dfa1" dfa3 "dfa3"
 
     Eqr -> do
       putStrLn $ show (Eqr.empty :: Eqr.Eqr Int)
 
-checkEqual :: (Ord q, Ord c) => Dfa q c -> String -> Dfa q c -> String -> IO ()
+checkEqual :: Ord c => Dfa c -> String -> Dfa c -> String -> IO ()
 checkEqual dfa1 name1 dfa2 name2 = do
     putStrLn $ name1 ++ " and " ++ name2 ++ (getResult dfa1 dfa2 $ dfa1 `dfaEquivalentHkNaive` dfa2)
     putStrLn $ name1 ++ " and " ++ name2 ++ (getResult dfa1 dfa2 $ dfa1 `dfaEquivalentHk` dfa2)
