@@ -20,7 +20,7 @@ step :: Ord c => Transitions c -> S.Set Int -> Maybe c -> S.Set Int
 step table qs c = mergeMap (\q -> M.findWithDefault S.empty (q, c) table) qs
 
 closure :: Ord c => (Transitions c) -> S.Set Int -> S.Set Int
-closure transitions states = computeClosure states S.empty
+closure transitions states = computeClosure states states
     where computeClosure current visited =
             let epsilonReachable = mergeMap (getEpsilonReachableStates transitions) current
                 visited' = visited `S.union` epsilonReachable
