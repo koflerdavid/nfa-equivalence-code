@@ -33,3 +33,23 @@ spec = do
             dfa2 = buildDfa firstState [firstState, secondState] [((firstState, 'a'), secondState),
                                                                   ((secondState, 'a'), firstState)]
         dfaEquivalent dfa1 dfa2 `shouldBe` True
+
+      it "should prove that the DFA expansions of two equivalent NFAs are equal" $ do
+        let dfa1 = buildDfa 1 [2, 4, 5, 6] [((1, 'a'), 2), ((2, 'a'), 3),
+                                            ((3, 'a'), 4), ((4, 'a'), 5),
+                                            ((5, 'a'), 6), ((6, 'a'), 6)]
+        let dfa2 = buildDfa 1 [2, 4] [((1, 'a'), 2), ((2, 'a'), 3),
+                                      ((3, 'a'), 4), ((4, 'a'), 4)]
+
+        dfaEquivalent dfa1 dfa2 `shouldBe` True
+
+      it "should prove that " $ do
+        let dfa1 = buildDfa 1 [2, 3] [((1, 'a'), 2), ((1, 'b'), 3),
+                                      ((2, 'a'), 3), ((2, 'b'), 3),
+                                      ((3, 'a'), 2), ((3, 'b'), 2)]
+
+            dfa2 = buildDfa 1 [2, 3] [((1, 'a'), 2), ((1, 'b'), 2),
+                                      ((2, 'a'), 3), ((2, 'b'), 3),
+                                      ((3, 'a'), 3), ((3, 'b'), 3)]
+
+        dfaEquivalent dfa1 dfa2 `shouldBe` True
