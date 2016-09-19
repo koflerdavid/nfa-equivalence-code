@@ -1,10 +1,10 @@
-module Algorithm.AutomataEquivalenceSpec (main, spec) where
+module Algorithm.DfaEquivalenceSpec (main, spec) where
 
 import Control.Monad (forM_)
 import Test.Hspec
 import Test.QuickCheck
 
-import Algorithm.AutomataEquivalence
+import Algorithm.DfaEquivalence
 import Data.Dfa
 
 main :: IO ()

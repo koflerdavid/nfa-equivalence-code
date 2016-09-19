@@ -11,7 +11,7 @@ import Data.Regex
 import Options.Generic
 
 import Algorithm.RegexCompiler
-import Algorithm.AutomataEquivalence
+import Algorithm.DfaEquivalence
 
 data Action = DfaNfaTest | EquivalenceTest | Eqr
             deriving (Generic, Show)

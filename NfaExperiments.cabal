@@ -16,7 +16,7 @@ cabal-version:       >=1.22
 library
   hs-source-dirs:      src
   ghc-options:         -Wall
-  exposed-modules:     Algorithm.AutomataEquivalence
+  exposed-modules:     Algorithm.DfaEquivalence
                      , Algorithm.RegexCompiler
                      , Data.Dfa
                      , Data.EquivalenceRelation
@@ -48,7 +48,7 @@ test-suite NfaExperiments-test
                      , NfaExperiments
                      , containers
                      , transformers
-  other-modules:       Algorithm.AutomataEquivalenceSpec
+  other-modules:       Algorithm.DfaEquivalenceSpec
                      , Algorithm.RegexCompilerSpec
                      , Data.DfaSpec
                      , Data.NfaSpec

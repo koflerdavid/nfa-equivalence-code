@@ -1,6 +1,6 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 
-module Algorithm.AutomataEquivalence where
+module Algorithm.DfaEquivalence where
 
 import Data.Dfa
 import qualified Data.EquivalenceRelation as Eqr
