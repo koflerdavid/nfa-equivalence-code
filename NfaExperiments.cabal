@@ -48,11 +48,13 @@ test-suite NfaExperiments-test
                      , NfaExperiments
                      , containers
                      , transformers
+                     , equivalence
   other-modules:       Algorithm.DfaEquivalenceSpec
                      , Algorithm.RegexCompilerSpec
                      , Data.DfaSpec
                      , Data.NfaSpec
                      , Data.Nfa.InternalSpec
+                     , Data.EquivalenceSpec
   ghc-options:         -threaded -rtsopts -with-rtsopts=-N
   default-language:    Haskell2010
 
