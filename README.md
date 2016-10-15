@@ -1,6 +1,8 @@
 Checking Equivalence of Nondeterministic Finite Automata
 ========================================================
 
+[![CircleCI](https://circleci.com/gh/koflerdavid/nfa-equivalence-code/tree/master.svg?style=svg)](https://circleci.com/gh/koflerdavid/nfa-equivalence-code/tree/master)
+
 This project contains the re-implementations of the algorithms in Haskell, as
 well as the technical report that can be generated out of it, in case somebody
 wants to read it.
