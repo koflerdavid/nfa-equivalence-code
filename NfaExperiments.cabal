@@ -19,13 +19,13 @@ library
   exposed-modules:     Algorithm.DfaEquivalence
                      , Algorithm.RegexCompiler
                      , Data.Dfa
-                     , Data.EquivalenceRelation
                      , Data.Nfa
                      , Data.Regex
                      , Data.Nfa.Internal
   build-depends:       base >= 4.7 && < 5
                      , containers
                      , transformers
+                     , equivalence
   default-language:    Haskell2010
 
 executable NfaExperiments-exe

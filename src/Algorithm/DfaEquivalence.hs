@@ -3,7 +3,7 @@
 module Algorithm.DfaEquivalence where
 
 import Data.Dfa
-import qualified Data.EquivalenceRelation as Eqr
+import Data.Equivalence.Monad
 
 import qualified Data.IntSet as IS
 import qualified Data.Map as M
@@ -37,13 +37,17 @@ dfaEquivalentHk :: Ord c => Dfa c -> Dfa c -> Bool
 dfaEquivalentHk dfa1 dfa2
   | dfaAlphabet dfa1 /= dfaAlphabet dfa2 = False
 
-  | otherwise = check Eqr.empty (Seq.viewl $ Seq.singleton (dfaInitialState dfa1, dfaInitialState dfa2))
-      where check _ EmptyL = True
-            check bisim (pair@(x,y) :< ps)
-              | bisim `Eqr.contains` pair = check bisim (Seq.viewl ps)
-              | (x `IS.member` dfaFinalStates dfa1) /= (y `IS.member` dfaFinalStates dfa2) = False
-              | otherwise = check ((x, y) `Eqr.insert` bisim) (Seq.viewl $ Seq.fromList todo >< ps)
-                  where todo = [(transitionsDfa1 M.! (x, c), transitionsDfa2 M.! (y, c)) | c <- alphabet]
+  | otherwise = runEquivM' $ check (Seq.viewl $ Seq.singleton initialPair)
+      where initialPair = (dfaInitialState dfa1, dfaInitialState dfa2)
+
+            check :: ViewL (Int, Int) -> EquivM' s Int Bool
+            check EmptyL = return True
+            check (pair@(x,y) :< ps) = do
+              alreadyEqual <- equivalent x y
+              if alreadyEqual then check (Seq.viewl ps)
+              else if (x `IS.member` dfaFinalStates dfa1) /= (y `IS.member` dfaFinalStates dfa2) then return False
+              else equate x y >> check (Seq.viewl $ Seq.fromList todo >< ps)
+                where todo = [(transitionsDfa1 M.! (x, c), transitionsDfa2 M.! (y, c)) | c <- alphabet]
 
             alphabet = S.toList (dfaAlphabet dfa1) -- We already know this is the same for dfa2
             transitionsDfa1 = dfaTransitionFunction dfa1
