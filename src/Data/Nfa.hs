@@ -9,7 +9,6 @@ module Data.Nfa
 
 import Control.Monad
 import Control.Monad.Trans.RWS.Strict
-import qualified Data.Map.Strict as M
 import qualified Data.IntSet as IS
 
 import Data.Nfa.Internal
