@@ -28,7 +28,8 @@ buildDfa initialState finalStates transitions =
       statesFromTransitions = IS.unions $ Prelude.map (\((q, _c), q') -> IS.fromList [q, q']) transitions
       states = initialState `IS.insert` statesFromTransitions `IS.union` IS.fromList finalStates
       errorState = succ (IS.findMax states)
-  in Dfa alphabet states initialState (IS.fromList finalStates) errorState (M.fromList transitions)
+      states' = errorState `IS.insert` states
+  in Dfa alphabet states' initialState (IS.fromList finalStates) errorState (M.fromList transitions)
 
 runDfa :: Ord c => Dfa c -> [c] -> Int
 runDfa dfa input =
