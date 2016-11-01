@@ -19,20 +19,20 @@ spec = do
         let (startState, acceptingState) = (0, 1)
             dfa1 = buildDfa startState [acceptingState] [((startState, 'a'), acceptingState), ((startState, 'b'), acceptingState)]
             dfa2 = buildDfa startState [acceptingState] [((startState, 'a'), acceptingState)]
-        dfaEquivalent dfa1 dfa2 `shouldBe` False
+        dfaEquivalent dfa1 dfa2 `shouldBe` Right False
 
       it "should prove that isomorphic versions of a+ are the same" $ do
         let (firstState, secondState) = (0, 1)
             dfa1 = buildDfa firstState [secondState] [((firstState, 'a'), secondState), ((secondState, 'a'), secondState)]
             dfa2 = buildDfa secondState [firstState] [((secondState, 'a'), firstState), ((firstState, 'a'), firstState)]
-        dfaEquivalent dfa1 dfa2 `shouldBe` True
+        dfaEquivalent dfa1 dfa2 `shouldBe` Right True
 
       it "should prove that two simple automata with only accepting states are equal" $ do
         let (firstState, secondState) = (0, 1)
             dfa1 = buildDfa firstState [firstState] [((firstState, 'a'), firstState)]
             dfa2 = buildDfa firstState [firstState, secondState] [((firstState, 'a'), secondState),
                                                                   ((secondState, 'a'), firstState)]
-        dfaEquivalent dfa1 dfa2 `shouldBe` True
+        dfaEquivalent dfa1 dfa2 `shouldBe` Right True
 
       it "should prove that the DFA expansions of two equivalent NFAs are equal" $ do
         let dfa1 = buildDfa 1 [2, 4, 5, 6] [((1, 'a'), 2), ((2, 'a'), 3),
@@ -41,7 +41,7 @@ spec = do
         let dfa2 = buildDfa 1 [2, 4] [((1, 'a'), 2), ((2, 'a'), 3),
                                       ((3, 'a'), 4), ((4, 'a'), 4)]
 
-        dfaEquivalent dfa1 dfa2 `shouldBe` True
+        dfaEquivalent dfa1 dfa2 `shouldBe` Right True
 
       it "should prove that " $ do
         let dfa1 = buildDfa 1 [2, 3] [((1, 'a'), 2), ((1, 'b'), 3),
@@ -52,4 +52,23 @@ spec = do
                                       ((2, 'a'), 3), ((2, 'b'), 3),
                                       ((3, 'a'), 3), ((3, 'b'), 3)]
 
-        dfaEquivalent dfa1 dfa2 `shouldBe` True
+        dfaEquivalent dfa1 dfa2 `shouldBe` Right True
+
+  forM_ [("dfaStatesEquivalentHkNaive", dfaStatesEquivalentHkNaive), ("dfaStatesEquivalentHk", dfaStatesEquivalentHk)] $ \(name, dfaStatesEquivalent) ->
+    describe name $ do
+
+      it "should tell apart accepting and error states" $
+        let dfa = buildDfa 1 [1] []
+            in dfaStatesEquivalent dfa 1 (dfaErrorState dfa) `shouldBe` Right False
+
+      it "should not tell apart the error state and a custom error state" $
+        let dfa = buildDfa 1 [] []
+            in dfaStatesEquivalent dfa 1 (dfaErrorState dfa) `shouldBe` Right True
+
+      it "should tell apart a state accepting {a} and a state accepting {b}" $
+        let dfa = buildDfa 1 [2, 4] [((1, 'a'), 2), ((3, 'b'), 4)]
+            in dfaStatesEquivalent dfa 1 3 `shouldBe` Right False
+
+      it "should not tell apart two states both accepting {a}" $
+        let dfa = buildDfa 1 [2, 4] [((1, 'a'), 2), ((3, 'a'), 4)]
+            in dfaStatesEquivalent dfa 1 3 `shouldBe` Right True

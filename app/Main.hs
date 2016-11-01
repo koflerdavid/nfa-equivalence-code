@@ -1,5 +1,6 @@
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE OverloadedStrings #-}
+
 module Main where
 
 
@@ -14,10 +15,10 @@ import Algorithm.DfaEquivalence
 import Algorithm.HkntToDfa
 import Language.Automata.HkntParser
 
-
-data Action = DfaEquivalence (Maybe String)
-            | NfaEquivalence (Maybe String)
-            deriving (Generic, Show)
+data Action
+  = DfaEquivalence (Maybe String)
+  | NfaEquivalence (Maybe String)
+  deriving (Generic,Show)
 
 instance ParseRecord Action
 
@@ -25,18 +26,24 @@ instance ParseRecord Action
 main :: IO ()
 main = do
   command <- getRecord "automata equivalence"
-
   case command of
     NfaEquivalence _ -> printErrorAndExit "Checking NFA equivalence is not supported yet."
     DfaEquivalence filename -> do
       dfa <- parseInput filename
-      let equivalent = dfaEquivalentHk dfa dfa
-      putStrLn (show equivalent)
-      if equivalent then exitSuccess else exitWith (ExitFailure 1)
+      let result =
+            dfaStatesEquivalentHk dfa
+                                  (dfaInitialState dfa)
+                                  (dfaInitialState dfa)
+      case result of
+        Left (NotDfaState s) -> printErrorAndExit $ "The following is not a DFA state: " ++ show s
+        Right equivalent ->
+          do putStrLn (show equivalent)
+             if equivalent
+                then exitSuccess
+                else exitWith (ExitFailure 1)
 
 parseInput :: Maybe String -> IO (Dfa Char)
-parseInput = maybe (parseInput' stdin) $ \ file ->
-    withFile file ReadMode parseInput'
+parseInput = maybe (parseInput' stdin) $ \file -> withFile file ReadMode parseInput'
   where
     parseInput' :: Handle -> IO (Dfa Char)
     parseInput' stream = do
