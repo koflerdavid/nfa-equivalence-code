@@ -42,9 +42,9 @@ accepts :: Dfa c -> Int -> Bool
 accepts dfa q = q `IS.member` dfaFinalStates dfa
 
 type Transitions c = (M.Map (Int, c) Int)
-type DfaState c a = RWS (Transitions c) () (Maybe Int) a
+type DfaExecutionState c a = RWS (Transitions c) () (Maybe Int) a
 
-dfaStep :: Ord c => c -> DfaState c ()
+dfaStep :: Ord c => c -> DfaExecutionState c ()
 dfaStep c = do
   table <- ask
   RWS.modify $ \maybeQ -> do
