@@ -27,8 +27,7 @@ spec = do
 
 cases = [
   ("accept: a b", Dfa {
-        dfaAlphabet = S.empty
-      , dfaStates = IS.fromList [0, 1, 2, 3]
+        dfaStates = IS.fromList [0, 1, 2, 3]
       , dfaInitialState = 2
       , dfaFinalStates = IS.fromList [0, 1]
       , dfaErrorState = 3
