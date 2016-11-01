@@ -1,13 +1,14 @@
 module Data.DfaSpec (main, spec) where
 
 
+import Control.Monad (forM_)
 import Data.IntSet as IS
+import Data.Set as Set
+
 import Test.Hspec
 import Test.QuickCheck
 
 import Data.Dfa
-
-import Control.Monad (forM_)
 
 
 main :: IO ()
@@ -31,6 +32,9 @@ spec = do
       dfaInitialState dfa `shouldSatisfy` (`IS.member` dfaStates dfa)
       dfaErrorState dfa `shouldSatisfy` (`IS.member` dfaStates dfa)
 
+  describe "dfaAlphabet" $ do
+    it "the alphabet of the sample DFA should be {'a','b'}" $ do
+      dfaAlphabet dfa `shouldBe` Set.fromList ['a', 'b']
 
 startState = 0
 acceptingState = 2
