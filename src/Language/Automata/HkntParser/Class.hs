@@ -9,12 +9,12 @@ type Transition = (String, Char, String)
 data Operation = Inclusion | Equivalence
     deriving (Enum, Eq, Show)
 
-type Check = ([String], Operation, [String])
+type Check s = ([s], Operation, [s])
 
 data Result =
     Result { resTransitions :: [Transition]
            , resAcceptingStates :: [String]
-           , resChecks :: [Check]
+           , resChecks :: [Check String]
     }
     deriving (Eq, Show)
 

@@ -9,7 +9,7 @@ import Data.Dfa
 
 type Transition s c = (s, c, s)
 
-compileHkntToDfa :: (Ord s, Ord c) => [Transition s c] -> [s] -> Either String (Dfa c)
+compileHkntToDfa :: (Ord s, Ord c) => [Transition s c] -> [s] -> Either String (Dfa c, M.Map s Int)
 compileHkntToDfa transitions acceptingStates = do
   let
     transitionStates = nub $ concatMap (\(s, _, d) -> [s, d]) transitions
@@ -25,7 +25,7 @@ compileHkntToDfa transitions acceptingStates = do
       else head transitionStates `M.lookup` stateNumbers'
   acceptingStates' <- maybe (Left "Error translating accepting states") return $ do
     mapM (`M.lookup` stateNumbers') (nub acceptingStates)
-  return $ buildDfa initialState acceptingStates' transitions'
+  return (buildDfa initialState acceptingStates' transitions', stateNumbers')
 
 
 -- | This function looks up the origin and destination states and makes the transition suitable for the DFA builder.

@@ -21,11 +21,11 @@ transition = do
 acceptingStates :: Parsec [(SourcePos, Token)] () [String]
 acceptingStates = option [] $ acceptKeyword *> colonToken *> many1 identifier <* newlineToken
 
-checks :: Parsec [(SourcePos, Token)] () [Check]
+checks :: Parsec [(SourcePos, Token)] () [Check String]
 checks = check `sepEndBy` newlineToken
 --checks = (:[]) <$> check
 
-check :: Parsec [(SourcePos, Token)] () Check
+check :: Parsec [(SourcePos, Token)] () (Check String)
 check = checkKeyword *> colonToken *> ((,,) <$> many1 identifier <*> operation <*> many1 identifier)
   where
     operation = equalsOperator *> pure Equivalence <|> greaterEqualsOperator *> pure Inclusion

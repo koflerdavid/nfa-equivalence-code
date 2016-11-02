@@ -22,7 +22,7 @@ spec = do
           where
             compiledDfa input = do
               Result transitions acceptingStates _ <- parseHknt input
-              compileHkntToDfa transitions acceptingStates
+              fmap fst $ compileHkntToDfa transitions acceptingStates
 
 
 cases = [
