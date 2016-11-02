@@ -43,7 +43,7 @@ main = do
         state1' <- translateState stateMapping state1
         state2' <- translateState stateMapping state2
         let result =
-              dfaStatesEquivalentHk dfa state1' state2'
+              dfaStatesEquivalentHk dfa (Just state1') (Just state2')
         case result of
           Left (NotDfaState s) -> printErrorAndExit $ "The following is not a DFA state: " ++ show s
           Right equivalent ->

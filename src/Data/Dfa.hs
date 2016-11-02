@@ -1,61 +1,90 @@
 module Data.Dfa
   (
-    Dfa(..)
-  , accepts
-  , buildDfa
-  , runDfa
+    Dfa
+  , DfaState
   , dfaAlphabet
+  , dfaStates
+  , dfaAcceptingStates
+  , dfaErrorState
+  , dfaTransitions
+  , dfaAccepts
+  , buildDfa
+  , buildDfaUnsafe
+  , translateDfaStates
   , dfaStep
+  , runDfa
   ) where
 
-import Control.Monad
-import Control.Monad.Trans.RWS.Strict as RWS
-import Data.IntSet as IS
-import Data.Map as M
-import Data.Set as Set
+import qualified Data.Foldable as Foldable
+import qualified Data.IntSet as ISet
+import qualified Data.Map as Map
+import qualified Data.Set as Set
+
+type DfaState = Maybe Int
 
 data Dfa c =
-  Dfa { dfaStates :: IntSet
-      , dfaInitialState :: Int
-      , dfaFinalStates :: IntSet
-      , dfaErrorState :: Int
-      , dfaTransitionFunction :: Map (Int, c) Int
-      }
+  Dfa ISet.IntSet (Map.Map (Int, c) Int)
       deriving (Eq, Show)
-
-buildDfa :: Ord c => Int -> [Int] -> [((Int, c), Int)] -> Dfa c
-buildDfa initialState finalStates transitions =
-  let statesFromTransitions = IS.unions $ Prelude.map (\((q, _c), q') -> IS.fromList [q, q']) transitions
-      states = initialState `IS.insert` statesFromTransitions `IS.union` IS.fromList finalStates
-      errorState = succ (IS.findMax states)
-      states' = errorState `IS.insert` states
-  in Dfa states' initialState (IS.fromList finalStates) errorState (M.fromList transitions)
-
-runDfa :: Ord c => Dfa c -> [c] -> Int
-runDfa dfa input =
-  let transitionTable = dfaTransitionFunction dfa
-  in case execRWS (forM_ input step) transitionTable (Just (dfaInitialState dfa)) of
-    (Nothing, _) -> dfaErrorState dfa
-    (Just q, _) -> q
-
-accepts :: Dfa c -> Int -> Bool
-accepts dfa q = q `IS.member` dfaFinalStates dfa
-
-type Transitions c = (M.Map (Int, c) Int)
-type DfaExecutionState c a = RWS (Transitions c) () (Maybe Int) a
-
-step :: Ord c => c -> DfaExecutionState c ()
-step c = do
-  table <- ask
-  RWS.modify $ \maybeQ -> do
-    q <- maybeQ
-    M.lookup (q, c) table
 
 -- | Computes the alphabet of the DFA.
 -- This is the set of all characters for which any transition is defined.
-dfaAlphabet :: (Ord c) => Dfa c -> Set c
-dfaAlphabet = Set.map snd . keysSet . dfaTransitionFunction
+dfaAlphabet :: (Ord c) => Dfa c -> Set.Set c
+dfaAlphabet (Dfa _ transitions) = Set.map snd . Map.keysSet $ transitions
 
-dfaStep :: (Ord c) => Dfa c -> (Int, c) -> Int
-dfaStep dfa state_and_input =
-    M.findWithDefault (dfaErrorState dfa) state_and_input (dfaTransitionFunction dfa)
+-- | Computes the states used by this DFA. This is the set of all accepting states and the states
+-- which take part in any transition. /The error state will not be returned/
+dfaStates :: Dfa c -> ISet.IntSet
+dfaStates (Dfa acceptingStates transitions) = acceptingStates' `ISet.union` transitionStates
+    where
+        acceptingStates' = acceptingStates
+        transitionStates = Map.foldMapWithKey comb transitions
+        comb (p, _) q = ISet.fromList [p, q]
+
+dfaAcceptingStates :: Dfa c -> ISet.IntSet
+dfaAcceptingStates (Dfa acceptingStates _) = acceptingStates
+
+dfaErrorState :: Maybe Int
+dfaErrorState = Nothing
+
+dfaTransitions :: (Ord c) => Dfa c -> Map.Map (Int, c) Int
+dfaTransitions (Dfa _ transitions) = transitions
+
+dfaAccepts :: Dfa c -> DfaState -> Bool
+dfaAccepts _ Nothing = False
+dfaAccepts (Dfa acceptingStates _) (Just q) = q `ISet.member` acceptingStates
+
+-- | This function builds a DFA and returns the initial state. This is a convenience to explicitly
+-- start the DFA from the initial state, allowing it to be treated uniformly with other states.
+-- The function will return Nothing if there are overlapping transitions.
+buildDfa :: Ord c => [Int] -> [((Int, c), Int)] -> Maybe (Dfa c)
+buildDfa finalStates transitions =
+    let transitionMap =
+            Map.fromList transitions
+        dfa =
+            Dfa (ISet.fromList finalStates) transitionMap
+    in if Map.size transitionMap < length transitions
+           then Nothing
+           else Just dfa
+
+buildDfaUnsafe :: Ord c => [Int] -> [((Int, c), Int)] -> Dfa c
+buildDfaUnsafe finalStates transitions =
+    let transitionMap =
+            Map.fromList transitions
+    in Dfa (ISet.fromList finalStates) transitionMap
+
+-- | Adds the given number to all states of the given automata.
+translateDfaStates :: (Ord c) => Dfa c -> Int -> Dfa c
+translateDfaStates (Dfa acceptingStates transitions) offset =
+    let acceptingStates' =
+            ISet.map (+ offset) acceptingStates
+        transitions' =
+            Map.map (+ offset) . Map.mapKeys (\ (q, c) -> (q + offset, c)) $ transitions
+    in Dfa acceptingStates' transitions'
+
+runDfa :: (Ord c, Foldable t) => Dfa c -> DfaState -> t c -> DfaState
+runDfa dfa = Foldable.foldl (dfaStep dfa)
+
+dfaStep :: (Ord c) => Dfa c -> DfaState -> c -> DfaState
+dfaStep _ Nothing _ = dfaErrorState
+dfaStep (Dfa _ transitions) (Just state) input =
+    Map.lookup (state, input) transitions

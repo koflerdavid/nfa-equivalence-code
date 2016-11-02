@@ -3,6 +3,7 @@ module Algorithm.AutomataMergeSpec (main, spec) where
 import Control.Monad (forM_)
 import Data.IntSet as ISet
 import Data.Map as Map
+import Data.Maybe (fromJust)
 
 import Test.Hspec
 import Test.QuickCheck
@@ -24,7 +25,7 @@ samples :: [(Dfa Char, Dfa Char, Dfa Char)]
 samples = [sample1]
 
 sample1 = (
-    buildDfa 0 [1] [((0, 'a'), 1)],
-    buildDfa 0 [0] [((0, 'a'), 0), ((0, 'b'), 1)],
-    Dfa (ISet.fromList [0..4]) 0 (ISet.fromList [1, 3]) 2 $
-        Map.fromList [((0, 'a'), 1), ((3, 'a'), 3), ((3, 'b'), 4)])
+    fromJust $ buildDfa [1] [((0, 'a'), 1)],
+    fromJust $ buildDfa [0] [((0, 'a'), 0), ((0, 'b'), 1)],
+    fromJust $ buildDfa [1, 2] [((0, 'a'), 1), ((2, 'a'), 2), ((2, 'b'), 3)]
+    )

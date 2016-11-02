@@ -26,11 +26,5 @@ spec = do
 
 
 cases = [
-  ("accept: a b", Dfa {
-        dfaStates = IS.fromList [0, 1, 2, 3]
-      , dfaInitialState = 2
-      , dfaFinalStates = IS.fromList [0, 1]
-      , dfaErrorState = 3
-      , dfaTransitionFunction = M.empty
-      } )
-  ]
+        ("accept: a b", buildDfaUnsafe [0, 1] [])
+    ]
