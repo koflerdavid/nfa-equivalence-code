@@ -18,8 +18,8 @@ library
   ghc-options:         -Wall
   exposed-modules:     Algorithm.AutomataMerge
                      , Algorithm.DfaEquivalence
-                     , Algorithm.HkntToDfa
-                     , Algorithm.RegexCompiler
+                     , Compiler.Hknt
+                     , Compiler.Regex
                      , Data.Dfa
                      , Data.Nfa
                      , Data.Regex
@@ -61,8 +61,8 @@ test-suite NfaExperiments-test
                      , transformers
   other-modules:       Algorithm.AutomataMergeSpec
                      , Algorithm.DfaEquivalenceSpec
-                     , Algorithm.HkntToDfaSpec
-                     , Algorithm.RegexCompilerSpec
+                     , Compiler.HkntSpec
+                     , Compiler.RegexSpec
                      , Data.DfaSpec
                      , Data.NfaSpec
                      , Data.Nfa.InternalSpec

@@ -1,4 +1,4 @@
-module Algorithm.HkntToDfa where
+module Compiler.Hknt where
 
 
 import Data.List

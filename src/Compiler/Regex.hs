@@ -1,4 +1,4 @@
-module Algorithm.RegexCompiler
+module Compiler.Regex
   (
     compileRegex
   ) where

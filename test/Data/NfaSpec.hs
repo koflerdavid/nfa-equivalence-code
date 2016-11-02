@@ -6,7 +6,7 @@ import Test.QuickCheck
 
 import Data.Nfa
 import Data.Regex
-import Algorithm.RegexCompiler
+import Compiler.Regex
 
 main :: IO ()
 main = hspec spec

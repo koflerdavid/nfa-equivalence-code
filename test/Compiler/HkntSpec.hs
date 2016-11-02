@@ -1,6 +1,6 @@
-module Algorithm.HkntToDfaSpec (main, spec) where
+module Compiler.HkntSpec (main, spec) where
 
-import Algorithm.HkntToDfa
+import Compiler.Hknt
 import Data.Dfa
 import Language.Automata.HkntParser
 

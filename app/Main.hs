@@ -15,7 +15,7 @@ import System.Exit
 import System.IO
 
 import Algorithm.DfaEquivalence
-import Algorithm.HkntToDfa
+import Compiler.Hknt
 import Language.Automata.HkntParser.Class
 import Language.Automata.HkntParser
 

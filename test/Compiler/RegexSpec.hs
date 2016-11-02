@@ -1,9 +1,9 @@
-module Algorithm.RegexCompilerSpec (main, spec) where
+module Compiler.RegexSpec (main, spec) where
 
 import Test.Hspec
 import Test.QuickCheck
 
-import Algorithm.RegexCompiler
+import Compiler.Regex
 import Data.Nfa
 import Data.Regex
 
