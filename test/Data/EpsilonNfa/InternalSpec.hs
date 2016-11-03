@@ -6,7 +6,6 @@ import Control.Monad.Trans.RWS.Strict
 import Data.IntSet
 import qualified Data.Map as Map
 import Test.Hspec
-import Test.QuickCheck
 
 main :: IO ()
 main = hspec spec

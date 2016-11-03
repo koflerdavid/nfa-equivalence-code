@@ -1,14 +1,11 @@
 module Compiler.RegexSpec (main, spec) where
 
-import Test.Hspec
-import Test.QuickCheck
-
 import Compiler.Regex
 import Data.EpsilonNfa
 import Data.Regex
 
 import Control.Monad (forM_)
-import Data.Set (fromList)
+import Test.Hspec
 
 main :: IO ()
 main = do
@@ -16,6 +13,7 @@ main = do
   putStrLn (show regexENfa)
   hspec spec
 
+spec :: Spec
 spec = do
   describe "run a" $ do
     let enfa = compileRegex (Atom 'a')

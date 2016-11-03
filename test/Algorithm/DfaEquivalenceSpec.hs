@@ -2,7 +2,6 @@ module Algorithm.DfaEquivalenceSpec (main, spec) where
 
 import Control.Monad (forM_)
 import Test.Hspec
-import Test.QuickCheck
 
 import Algorithm.DfaEquivalence
 import Data.Dfa

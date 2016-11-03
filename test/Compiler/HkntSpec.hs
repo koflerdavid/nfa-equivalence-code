@@ -5,15 +5,12 @@ import Data.Dfa
 import Language.Automata.HkntParser
 
 import Control.Monad
-import Data.IntSet as IS
-import Data.Map as M
-import Data.Set as S
 import Test.Hspec
-import Test.QuickCheck
 
 main :: IO ()
 main = hspec spec
 
+spec :: Spec
 spec = do
   describe "the DFA compiler" $ do
     forM_ cases $ \ (input, expected) -> do
@@ -24,7 +21,7 @@ spec = do
               Result transitions acceptingStates _ <- parseHknt input
               fmap fst $ compileHkntToDfa transitions acceptingStates
 
-
+cases :: [(String, Dfa Char)]
 cases = [
         ("accept: a b", buildDfaUnsafe [0, 1] [])
     ]

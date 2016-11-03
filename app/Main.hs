@@ -3,18 +3,16 @@
 
 module Main where
 
-
-import Data.Dfa
-import Data.Regex
-
 import Control.Monad (forM_, when)
-import qualified Data.Map as Map
+import Data.List as List
+import Data.Map as Map
 import Options.Generic
 import System.Exit
 import System.IO
 
 import Algorithm.DfaEquivalence
 import Compiler.Hknt
+import Data.Dfa
 import Language.Automata.HkntParser.Class
 import Language.Automata.HkntParser
 
@@ -24,7 +22,6 @@ data Action
   deriving (Generic,Show)
 
 instance ParseRecord Action
-
 
 main :: IO ()
 main = do
@@ -63,7 +60,7 @@ parseInput = maybe (parseInput' stdin) $ \file -> withFile file ReadMode parseIn
         return (dfa, stateMapping, checks)
 
 equivalenceChecks :: [Check String] -> [Check String]
-equivalenceChecks = filter (\(_, operation, _) -> operation == Equivalence)
+equivalenceChecks = List.filter (\(_, operation, _) -> operation == Equivalence)
 
 translateState :: (Ord s, Show s) => Map.Map s s' -> s -> IO s'
 translateState stateMapping state =
@@ -74,4 +71,5 @@ ensureSingletonStateSet stateSet =
     when (length stateSet > 1) $ do
         printErrorAndExit "Use the NFA mode if the equivalence of sets of states shall be checked."
 
+printErrorAndExit :: String -> IO a
 printErrorAndExit msg = hPutStrLn stderr msg >> exitWith (ExitFailure 2)

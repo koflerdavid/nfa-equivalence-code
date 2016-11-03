@@ -4,9 +4,7 @@ module Language.Automata.HkntParserSpec (main, spec) where
 import HkntSamples
 import Language.Automata.HkntParser
 
-import Control.Monad (forM_)
 import Test.Hspec
-import Test.QuickCheck
 
 
 main :: IO ()

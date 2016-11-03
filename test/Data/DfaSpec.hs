@@ -6,7 +6,6 @@ import Data.IntSet as IS
 import Data.Set as Set
 
 import Test.Hspec
-import Test.QuickCheck
 
 import Data.Dfa
 
@@ -27,8 +26,8 @@ spec = do
 
   describe "buildDfa" $ do
     it "dfaStates should contain the accepting state(s) of the DFA" $ do
-      let dfa = buildDfaUnsafe [1] [((0, 'a'), 1)]
-      dfaAcceptingStates dfa `shouldSatisfy` (`IS.isSubsetOf` dfaStates dfa)
+      let builtDfa = buildDfaUnsafe [1] [((0, 'a'), 1)]
+      dfaAcceptingStates builtDfa `shouldSatisfy` (`IS.isSubsetOf` dfaStates builtDfa)
 
   describe "dfaAlphabet" $ do
     it "the alphabet of the sample DFA should be {'a','b'}" $ do

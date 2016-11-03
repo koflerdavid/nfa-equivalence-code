@@ -1,6 +1,6 @@
 module HkntSamples where
 
-
+introductionInHkntFormat :: String
 introductionInHkntFormat =
     "x -a-> y\n\
     \y -a-> z\n\

@@ -14,7 +14,7 @@ type FaState = Int
 
 compileRegex :: Ord c => Regex c -> ENfa.ENfa c
 compileRegex regex =
-  let (lastFaState, transitions) = execState (compileRegex' regex 0 1) (2, S.empty)
+  let (_lastFaState, transitions) = execState (compileRegex' regex 0 1) (2, S.empty)
   in ENfa.buildEnfa [1] (toList transitions)
 
 type Transition c = ((FaState, Maybe c), [FaState])

@@ -1,5 +1,3 @@
-{-# LANGUAGE ScopedTypeVariables #-}
-
 module Data.EpsilonNfa
   (
     ENfa(..)

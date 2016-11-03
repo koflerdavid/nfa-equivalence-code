@@ -2,11 +2,8 @@ module Data.EpsilonNfaSpec (main, spec) where
 
 import Control.Monad (forM_)
 import Test.Hspec
-import Test.QuickCheck
 
 import Data.EpsilonNfa
-import Data.Regex
-import Compiler.Regex
 
 main :: IO ()
 main = hspec spec

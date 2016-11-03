@@ -7,7 +7,6 @@ import Language.Automata.HkntParser.Tokeniser
 
 import Control.Monad (forM_)
 import Test.Hspec
-import Test.QuickCheck
 import Text.Parsec
 
 main :: IO ()
