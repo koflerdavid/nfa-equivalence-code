@@ -1,6 +1,6 @@
-module Data.Nfa.InternalSpec (main, spec) where
+module Data.EpsilonNfa.InternalSpec (main, spec) where
 
-import Data.Nfa.Internal
+import Data.EpsilonNfa.Internal
 
 import Control.Monad.Trans.RWS.Strict
 import Data.IntSet
@@ -13,20 +13,20 @@ main = hspec spec
 
 spec :: Spec
 spec = do
-  describe "nfaStep'ping" $ do
+  describe "enfaStep'ping" $ do
     let (firstState, secondState, thirdState, fourthState) = (1, 2, 3, 4)
         transitions = Map.fromList [((firstState, Just 'a'), singleton secondState),
                                     ((firstState, Nothing), singleton thirdState),
                                     ((thirdState, Just 'c'), singleton fourthState)]
 
     it "should be possible to do an 'a' step" $ do
-      execRWS (nfaStep 'a') transitions (singleton firstState) `shouldBe` (singleton secondState, ())
+      execRWS (enfaStep 'a') transitions (singleton firstState) `shouldBe` (singleton secondState, ())
 
     it "should not be possible to do a 'b' step" $ do
-      execRWS (nfaStep 'b') transitions (singleton firstState) `shouldBe` (empty, ())
+      execRWS (enfaStep 'b') transitions (singleton firstState) `shouldBe` (empty, ())
 
     it "should be possible to do a 'c' step (via the third state)" $ do
-      execRWS (nfaStep 'c') transitions (singleton firstState) `shouldBe` (singleton fourthState, ())
+      execRWS (enfaStep 'c') transitions (singleton firstState) `shouldBe` (singleton fourthState, ())
 
   describe "step" $ do
     let (firstState, secondState, thirdState) = (0, 1, 2)

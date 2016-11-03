@@ -1,4 +1,4 @@
-module Data.Nfa.Internal where
+module Data.EpsilonNfa.Internal where
 
 import Control.Monad.Trans.RWS.Strict
 import qualified Data.Map as M
@@ -8,8 +8,8 @@ type Transitions c = M.Map (Int, Maybe c) IntSet
 type NfaState c a = RWS (Transitions c) () IntSet a
 
 -- This function should update the state and also consider the epsilon closure
-nfaStep :: Ord c => c -> NfaState c ()
-nfaStep c = do
+enfaStep :: Ord c => c -> NfaState c ()
+enfaStep c = do
   table <- ask
   modify (\qs -> closure table $ step table (closure table qs) (Just c))
 

@@ -21,9 +21,9 @@ library
                      , Compiler.Hknt
                      , Compiler.Regex
                      , Data.Dfa
-                     , Data.Nfa
+                     , Data.EpsilonNfa
+                     , Data.EpsilonNfa.Internal
                      , Data.Regex
-                     , Data.Nfa.Internal
                      , Language.Automata.HkntParser
                      , Language.Automata.HkntParser.Class
                      , Language.Automata.HkntParser.Internal
@@ -64,8 +64,8 @@ test-suite NfaExperiments-test
                      , Compiler.HkntSpec
                      , Compiler.RegexSpec
                      , Data.DfaSpec
-                     , Data.NfaSpec
-                     , Data.Nfa.InternalSpec
+                     , Data.EpsilonNfaSpec
+                     , Data.EpsilonNfa.InternalSpec
                      , Data.EquivalenceSpec
                      , HkntSamples
                      , Language.Automata.HkntParserSpec

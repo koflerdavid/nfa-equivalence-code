@@ -5,7 +5,6 @@ module Main where
 
 
 import Data.Dfa
-import Data.Nfa
 import Data.Regex
 
 import Control.Monad (forM_, when)

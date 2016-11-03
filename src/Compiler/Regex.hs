@@ -3,7 +3,7 @@ module Compiler.Regex
     compileRegex
   ) where
 
-import qualified Data.Nfa as Nfa
+import qualified Data.EpsilonNfa as ENfa
 import Data.Regex
 
 import Control.Monad.Trans.State.Strict
@@ -12,10 +12,10 @@ import qualified Data.Sequence as S
 
 type FaState = Int
 
-compileRegex :: Ord c => Regex c -> Nfa.Nfa c
+compileRegex :: Ord c => Regex c -> ENfa.ENfa c
 compileRegex regex =
   let (lastFaState, transitions) = execState (compileRegex' regex 0 1) (2, S.empty)
-  in Nfa.buildNfa [1] (toList transitions)
+  in ENfa.buildEnfa [1] (toList transitions)
 
 type Transition c = ((FaState, Maybe c), [FaState])
 
