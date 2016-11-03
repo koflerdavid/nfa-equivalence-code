@@ -23,6 +23,7 @@ library
                      , Data.Dfa
                      , Data.EpsilonNfa
                      , Data.EpsilonNfa.Internal
+                     , Data.Nfa
                      , Data.Regex
                      , Language.Automata.HkntParser
                      , Language.Automata.HkntParser.Class
@@ -66,6 +67,7 @@ test-suite NfaExperiments-test
                      , Data.DfaSpec
                      , Data.EpsilonNfaSpec
                      , Data.EpsilonNfa.InternalSpec
+                     , Data.NfaSpec
                      , Data.EquivalenceSpec
                      , HkntSamples
                      , Language.Automata.HkntParserSpec
