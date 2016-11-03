@@ -1,9 +1,10 @@
 module Data.Nfa.InternalSpec (main, spec) where
 
-import Control.Monad.Trans.RWS.Strict
 import Data.Nfa.Internal
-import Data.IntSet
 
+import Control.Monad.Trans.RWS.Strict
+import Data.IntSet
+import qualified Data.Map as Map
 import Test.Hspec
 import Test.QuickCheck
 
@@ -14,9 +15,9 @@ spec :: Spec
 spec = do
   describe "nfaStep'ping" $ do
     let (firstState, secondState, thirdState, fourthState) = (1, 2, 3, 4)
-        transitions = transitionTable [((firstState, Just 'a'), [secondState]),
-                                       ((firstState, Nothing), [thirdState]),
-                                       ((thirdState, Just 'c'), [fourthState])]
+        transitions = Map.fromList [((firstState, Just 'a'), singleton secondState),
+                                    ((firstState, Nothing), singleton thirdState),
+                                    ((thirdState, Just 'c'), singleton fourthState)]
 
     it "should be possible to do an 'a' step" $ do
       execRWS (nfaStep 'a') transitions (singleton firstState) `shouldBe` (singleton secondState, ())
@@ -29,16 +30,16 @@ spec = do
 
   describe "step" $ do
     let (firstState, secondState, thirdState) = (0, 1, 2)
-        transitions = transitionTable [((firstState, Just 'a'), [secondState]),
-                                       ((firstState, Nothing), [thirdState])]
+        transitions = Map.fromList [((firstState, Just 'a'), singleton secondState),
+                                    ((firstState, Nothing), singleton thirdState)]
 
     it "should go from firstState with 'a' to secondState" $ do
       step transitions (singleton firstState) (Just 'a') `shouldBe` singleton secondState
 
   describe "closure" $ do
     let (firstState, secondState, thirdState) = (1, 2, 3)
-        transitions = transitionTable [((firstState, Just 'a'), [secondState]),
-                                       ((firstState, Nothing), [thirdState])]
+        transitions = Map.fromList [((firstState, Just 'a'), singleton secondState),
+                                    ((firstState, Nothing), singleton thirdState)]
 
     it "should compute the closure of the first state correctly" $ do
       transitions `closure` singleton firstState `shouldBe` fromList [firstState, thirdState]
@@ -51,8 +52,8 @@ spec = do
 
   describe "epsilonReachable" $ do
     let (firstState, secondState, thirdState) = (1, 2, 3)
-        transitions = transitionTable [((firstState, Just 'a'), [secondState]),
-                                       ((firstState, Nothing), [thirdState])]
+        transitions = Map.fromList [((firstState, Just 'a'), singleton secondState),
+                                    ((firstState, Nothing), singleton thirdState)]
 
     it "should be the third state from the first state" $ do
       transitions `getEpsilonReachableStates` firstState `shouldBe` singleton thirdState

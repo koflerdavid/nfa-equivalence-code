@@ -1,15 +1,11 @@
 module Data.Nfa.Internal where
 
 import Control.Monad.Trans.RWS.Strict
-import qualified Data.Map.Strict as M
+import qualified Data.Map as M
 import Data.IntSet as IS
 
 type Transitions c = M.Map (Int, Maybe c) IntSet
 type NfaState c a = RWS (Transitions c) () IntSet a
-
-transitionTable :: Ord c => [((Int, Maybe c), [Int])] -> Transitions c
-transitionTable nfaTransitionFunction = IS.union `M.fromListWith` transitions
-  where transitions = Prelude.map (\ (q_and_c, states) -> (q_and_c, IS.fromList states)) nfaTransitionFunction
 
 -- This function should update the state and also consider the epsilon closure
 nfaStep :: Ord c => c -> NfaState c ()

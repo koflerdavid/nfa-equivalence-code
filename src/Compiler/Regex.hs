@@ -15,7 +15,7 @@ type FaState = Int
 compileRegex :: Ord c => Regex c -> Nfa.Nfa c
 compileRegex regex =
   let (lastFaState, transitions) = execState (compileRegex' regex 0 1) (2, S.empty)
-  in Nfa.Nfa (toList $ alphabet regex) [0 .. lastFaState-1] [0] [1] (toList transitions)
+  in Nfa.buildNfa [1] (toList transitions)
 
 type Transition c = ((FaState, Maybe c), [FaState])
 
