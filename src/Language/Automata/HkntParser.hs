@@ -1,22 +1,18 @@
 module Language.Automata.HkntParser
-  (
-    parseHknt
-  , Result(..)
-  , Operation(..)
-  ) where
+    ( parseHknt
+    , Result(..)
+    , Operation(..)
+    ) where
 
+import           Language.Automata.HkntParser.Class
+import           Language.Automata.HkntParser.Internal
+import           Language.Automata.HkntParser.Tokeniser
 
-import Language.Automata.HkntParser.Class
-import Language.Automata.HkntParser.Internal
-import Language.Automata.HkntParser.Tokeniser
-
-import Data.Either.Combinators (mapLeft)
-import Text.Parsec
-
+import           Data.Either.Combinators                ( mapLeft )
+import           Text.Parsec
 
 parseHknt :: String -> Either String Result
 parseHknt input = mapLeft show $ tokeniseAndParse hkntParser "<input>" input
-
 
 -- The format of the scanner is as described on https://perso.ens-lyon.fr/damien.pous/hknt/
 -- The only whitespace restriction enforced is that

@@ -1,8 +1,6 @@
 module Language.Automata.HkntParser.Class where
 
-
-import Data.List (intersperse)
-
+import           Data.List ( intersperse )
 
 type Transition = (String, Char, String)
 
@@ -11,11 +9,10 @@ data Operation = Inclusion | Equivalence
 
 type Check s = ([s], Operation, [s])
 
-data Result =
-    Result { resTransitions :: [Transition]
-           , resAcceptingStates :: [String]
-           , resChecks :: [Check String]
-    }
+data Result = Result { resTransitions     :: [Transition]
+                     , resAcceptingStates :: [String]
+                     , resChecks          :: [Check String]
+                     }
     deriving (Eq, Show)
 
 data Token = Identifier { tkIdentifierName :: String }
@@ -26,8 +23,7 @@ data Token = Identifier { tkIdentifierName :: String }
            | GreaterEquals
            | Arrow { tkLabels :: [Char] }
            | Newline
-           deriving (Eq)
-
+    deriving (Eq)
 
 instance (Show Token) where
     show (Identifier name) = name
@@ -36,5 +32,5 @@ instance (Show Token) where
     show Colon = ":"
     show Equals = "="
     show GreaterEquals = "=>"
-    show (Arrow labels) = concat ["-", intersperse '+' labels, "->"]
+    show (Arrow labels) = concat [ "-", intersperse '+' labels, "->" ]
     show Newline = "<newline>"
