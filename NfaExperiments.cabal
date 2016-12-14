@@ -25,6 +25,7 @@ library
                      , Data.EpsilonNfa.Internal
                      , Data.Nfa
                      , Data.Regex
+                     , Data.CongruenceClosure
                      , Language.Automata.HkntParser
                      , Language.Automata.HkntParser.Class
                      , Language.Automata.HkntParser.Internal
@@ -69,6 +70,7 @@ test-suite NfaExperiments-test
                      , Data.EpsilonNfa.InternalSpec
                      , Data.NfaSpec
                      , Data.EquivalenceSpec
+                     , Data.CongruenceClosureSpec
                      , HkntSamples
                      , Language.Automata.HkntParserSpec
                      , Language.Automata.HkntParser.InternalSpec
