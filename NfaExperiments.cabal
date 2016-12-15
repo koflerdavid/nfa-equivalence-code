@@ -50,6 +50,7 @@ executable NfaExperiments-exe
                      , optparse-generic
                      , transformers
   other-modules:       DfaChecking
+                     , NfaChecking
   default-language:    Haskell2010
 
 test-suite NfaExperiments-test

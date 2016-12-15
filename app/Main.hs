@@ -3,12 +3,13 @@
 
 module Main where
 
-import           Control.Monad.Trans.Except         (runExceptT)
+import           Control.Monad.Trans.Except ( runExceptT )
 import           Options.Generic
 import           System.Exit
 import           System.IO
 
 import           DfaChecking
+import           NfaChecking
 
 data Action = DfaEquivalence (Maybe String)
             | NfaEquivalence (Maybe String)
@@ -20,7 +21,11 @@ main :: IO ()
 main = do
     command <- getRecord "automata equivalence"
     case command of
-        NfaEquivalence _ -> printErrorAndExit "Checking NFA equivalence is not supported yet."
+        NfaEquivalence filename -> do
+            result <- runExceptT (checkNfaEquivalence filename)
+            case result of
+                Left message -> printErrorAndExit message
+                Right results -> if and results then exitSuccess else exitWith (ExitFailure 1)
         DfaEquivalence filename -> do
             result <- runExceptT (checkDfaEquivalence filename)
             case result of
