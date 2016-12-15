@@ -25,6 +25,30 @@ download all the necessary packages and build them inside the sandbox.
 
 All of this can also done by using the provided Makefile by just running `make` or `make build`.
 
+Running the tool
+----------------
+
+The tool receives its input in the format used by Bonchi and Pous at
+[the web=appendix of their paper](https://perso.ens-lyon.fr/damien.pous/hknt/).
+
+Example for checking equality of two NFAs:
+
+    $ stack exec NfaExperiments-exe nfaequivalence
+       x -a-> y
+       y -a-> z
+       z -a-> x y
+       u -a-> w v
+       v -a-> w
+       w -a-> u
+       accept: y v
+       check: x = u
+       ^D
+       Checking equivalence of ["x"] and ["u"]
+       True
+    $ echo $?
+       0
+
+
 Technical Report
 ----------------
 
