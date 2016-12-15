@@ -4,6 +4,7 @@ module Data.Nfa
     , nfaStates
     , buildNfa
     , runNfa
+    , nfaStep
     , accepts
     ) where
 
@@ -35,10 +36,11 @@ nfaAlphabet
 nfaStates :: Nfa c -> ISet.IntSet
 nfaStates nfa = nfaAcceptingStates nfa `ISet.union` transitionStates nfa
   where
-    transitionStates = ISet.unions
+    transitionStates
+        = ISet.unions
         . List.map (\((q, _), qs) -> q `ISet.insert` qs) -- Collect the states
-            . Map.toAscList
-                . nfaTransitions
+        . Map.toAscList
+        . nfaTransitions
 
 runNfa :: (Ord c, Foldable t) => Nfa c -> [Int] -> t c -> [Int]
 runNfa nfa initialStates =
