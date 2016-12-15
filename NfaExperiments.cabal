@@ -27,6 +27,7 @@ library
                      , Data.Nfa
                      , Data.Regex
                      , Data.CongruenceClosure
+                     , Data.CongruenceClosure.Internal
                      , Language.Automata.HkntParser
                      , Language.Automata.HkntParser.Class
                      , Language.Automata.HkntParser.Internal
