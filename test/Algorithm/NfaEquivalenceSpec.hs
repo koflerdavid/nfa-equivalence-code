@@ -15,7 +15,9 @@ main :: IO ()
 main = hspec spec
 
 spec :: Spec
-spec = forM_ [ ("HK naive", nfaStatesEquivalentHkNaive) ] $
+spec = forM_ [ ("HK naive", nfaStatesEquivalentHkNaive)
+             , ("HK with congruence", nfaStatesEquivalentHkC)
+             ] $
     \(name, nfaEquivalent) ->
         describe name $ do
             it "should prove the first example in the HKNT paper as equal" $ do
