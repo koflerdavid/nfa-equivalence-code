@@ -28,7 +28,7 @@ spec = do
                     (enfa `accepts` runEnfa enfa [ 0 ] input) `shouldBe` False
 
     describe "run (a|b)*" $ do
-        let enfa = compileRegex (Asterisk (Alternative [ Atom 'a', Atom 'b' ]))
+        let enfa = compileRegex (Asterisk (Alternative (Atom 'a') (Atom 'b')))
         it "accepts the empty string, \"a\", \"b\" and \"ab\"" $ do
             forM_ [ "", "a", "b", "ab" ] $
                 \input -> do

@@ -23,26 +23,24 @@ type CompilerState c a = State (FaState, Seq (Transition c)) a
 
 -- The compiler generates the automaton between the two specified FaStates.
 compileRegex' :: Regex c -> FaState -> FaState -> CompilerState c ()
-compileRegex' (Capture inner _) startFaState endFaState =
-    compileRegex' inner startFaState endFaState
 
 compileRegex' (Atom c) startFaState endFaState =
     transition startFaState c [ endFaState ]
 
 -- Just don't connect the given FaStates to each other
-compileRegex' (Alternative []) _startFaState _endFaState =
+compileRegex' Empty _startFaState _endFaState =
     return ()
 
-compileRegex' (Alternative rs) startFaState endFaState = do
-    mapM_ (\r -> compileRegex' r startFaState endFaState) rs
+compileRegex' (Alternative r s) startFaState endFaState = do
+    mapM_ (\r -> compileRegex' r startFaState endFaState) [r, s]
 
 -- generate an automaton with just one transition. Unfortunately it is quite difficult to avoid creating
 -- this intermediary FaState, but it's not too bad. Many cases can be avoided with the use of `Optional`.
-compileRegex' (Sequence []) startFaState endFaState =
+compileRegex' Epsilon startFaState endFaState =
     startFaState `epsilonTransitionsTo` [ endFaState ]
 
-compileRegex' (Sequence (r1 : rs)) startFaState finalFaState =
-    compileSequence r1 rs startFaState
+compileRegex' (Sequence first second) startFaState finalFaState =
+    compileSequence first [second] startFaState
   where
     -- if there is just one element then we have to stop because the last FaState is already given
     compileSequence r [] currentStartFaState =
@@ -56,10 +54,6 @@ compileRegex' (Asterisk inner) startFaState endFaState = do
     compileRegex' inner startFaState endFaState
     startFaState `epsilonTransitionsTo` [ endFaState ]
     endFaState `epsilonTransitionsTo` [ startFaState ]
-
-compileRegex' (Optional inner) startFaState endFaState = do
-    compileRegex' inner startFaState endFaState
-    startFaState `epsilonTransitionsTo` [ endFaState ]
 
 freshFaState :: CompilerState c FaState
 freshFaState = do
