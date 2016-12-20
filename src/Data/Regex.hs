@@ -16,7 +16,7 @@ data Regex c = Atom c
              | Alternative (Regex c) (Regex c)
              | Sequence (Regex c) (Regex c)
              | Asterisk (Regex c)
-    deriving (Eq, Ord, Show)
+    deriving (Eq, Ord)
 
 alphabet :: Ord c => Regex c -> Set.Set c
 alphabet regex = execWriter (computeAlphabet regex)
@@ -103,3 +103,15 @@ normalised' r =
         Alternative Epsilon (Sequence a inner@(Asterisk a')) | a == a' -> inner -- 1 + a a* = a*
         Alternative Epsilon inner@(Asterisk _) -> inner
         _ -> r
+
+instance (Show c) => Show (Regex c) where
+    showsPrec _ Empty = ('∅':)
+    showsPrec _ Epsilon = ('ε':)
+    showsPrec _ (Atom c) = (show c ++)
+    showsPrec prec (Alternative r s) =
+        let inner = (showsPrec 6 r) . (" + " ++) . showsPrec 6 s in
+        if prec > 6 then ('(':) . inner . (')':) . inner else inner
+    showsPrec prec (Sequence r s) =
+        let inner = showsPrec 7 r . (' ':) . showsPrec 7 s in
+        if prec > 7 then ('(':) . inner . ('(':) else inner
+    showsPrec _ (Asterisk r) = showsPrec 8 r . ('*':)

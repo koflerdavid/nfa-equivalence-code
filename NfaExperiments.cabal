@@ -19,6 +19,7 @@ library
   exposed-modules:     Algorithm.AutomataMerge
                      , Algorithm.DfaEquivalence
                      , Algorithm.NfaEquivalence
+                     , Algorithm.Regex.Derivation
                      , Compiler.Hknt
                      , Compiler.Regex
                      , Data.Dfa
@@ -69,6 +70,7 @@ test-suite NfaExperiments-test
   other-modules:       Algorithm.AutomataMergeSpec
                      , Algorithm.DfaEquivalenceSpec
                      , Algorithm.NfaEquivalenceSpec
+                     , Algorithm.Regex.DerivationSpec
                      , Compiler.HkntSpec
                      , Compiler.RegexSpec
                      , Data.DfaSpec
