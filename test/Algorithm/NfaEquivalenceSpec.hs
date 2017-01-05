@@ -22,8 +22,8 @@ spec = forM_ [ ("HK naive", nfaStatesEquivalentHkNaive)
         describe name $ do
             it "should prove the first example in the HKNT paper as equal" $ do
                 let result = nfaEquivalent introductionNfaMerged (IS.singleton 3) (IS.singleton 0)
-                result `shouldBe` Right True
+                result `shouldBe` True
 
             it "should prove figure 3 in the HKNT paper as equal" $ do
                 let result = nfaEquivalent figure3NfaMerged (IS.singleton 0) (IS.singleton 1)
-                result `shouldBe` Right True
+                result `shouldBe` True

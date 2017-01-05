@@ -13,9 +13,9 @@ type NfaStates = IS.IntSet
 
 type Error = String
 
-nfaStatesEquivalentHkNaive :: (Ord c) => Nfa c -> NfaStates -> NfaStates -> Either Error Bool
+nfaStatesEquivalentHkNaive :: (Ord c) => Nfa c -> NfaStates -> NfaStates -> Bool
 nfaStatesEquivalentHkNaive nfa set1 set2 =
-    return (runEquivM' $ check (viewl $ singleton (set1, set2)))
+    runEquivM' $ check (viewl $ singleton (set1, set2))
   where
     check :: ViewL (NfaStates, NfaStates) -> EquivM' s NfaStates Bool
     check EmptyL = return True
@@ -34,11 +34,11 @@ nfaStatesEquivalentHkNaive nfa set1 set2 =
     alphabet = S.toList (nfaAlphabet nfa)
     nfaStep' = nfaStep nfa
 
-type HkcEquivM a = StateT CC.CongruenceClosure (Either Error) a
+type HkcEquivM = State CC.CongruenceClosure
 
-nfaStatesEquivalentHkC :: (Ord c) => Nfa c -> NfaStates -> NfaStates -> Either Error Bool
+nfaStatesEquivalentHkC :: (Ord c) => Nfa c -> NfaStates -> NfaStates -> Bool
 nfaStatesEquivalentHkC nfa set1 set2 =
-    evalStateT (check (viewl $ singleton (set1, set2))) CC.empty
+    evalState (check (viewl $ singleton (set1, set2))) CC.empty
   where
     check :: ViewL (NfaStates, NfaStates) -> HkcEquivM Bool
     check EmptyL = return True
@@ -59,7 +59,7 @@ nfaStatesEquivalentHkC nfa set1 set2 =
     nfaStep' = nfaStep nfa
 
     equivalentM :: NfaStates -> NfaStates -> HkcEquivM Bool
-    equivalentM set1 set2 = gets $ \relation -> CC.equivalent set1 set2 relation
+    equivalentM s1 s2 = gets $ \relation -> CC.equivalent s1 s2 relation
 
     equateM :: NfaStates -> NfaStates -> HkcEquivM ()
-    equateM set1 set2 = modify $ \relation -> CC.equate relation set1 set2
+    equateM s1 s2 = modify $ \relation -> CC.equate relation s1 s2

@@ -31,11 +31,8 @@ checkNfaEquivalence filename = do
             let result = nfaStatesEquivalentHkC nfa
                                                 (IS.fromList stateSet1')
                                                 (IS.fromList stateSet2')
-            case result of
-                Left message -> throwE message
-                Right equivalent -> do
-                    lift $ putStrLn (show equivalent)
-                    return equivalent
+            lift $ putStrLn (show result)
+            return result
 
 parseInput :: Maybe String -> IOWithError (Nfa Char, Map.Map String Int, [Check String])
 parseInput = maybe (relift $ parseInput' stdin) $
