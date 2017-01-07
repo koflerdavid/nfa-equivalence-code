@@ -26,6 +26,7 @@ library
                      , Data.EpsilonNfa
                      , Data.EpsilonNfa.Internal
                      , Data.Nfa
+                     , Data.Queue
                      , Data.Regex
                      , Data.CongruenceClosure
                      , Data.CongruenceClosure.Internal
