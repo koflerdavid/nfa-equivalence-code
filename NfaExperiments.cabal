@@ -50,9 +50,11 @@ executable NfaExperiments-exe
                      , containers
                      , NfaExperiments
                      , optparse-generic
-                     , transformers
+                     -- For the Control.Monad.Trans.Except module
+                     , transformers >= 0.4
   other-modules:       DfaChecking
                      , NfaChecking
+                     , RegexFullDerivation
   default-language:    Haskell2010
 
 test-suite NfaExperiments-test
