@@ -3,7 +3,7 @@ module RegexFullDerivation where
 import           Algorithm.Regex.Derivation
 import           Data.Queue                 as Queue
 import           Data.Regex
---import           Language.RegexParser
+import           Language.RegexParser
 
 import           Control.Monad
 import           Control.Monad.Trans.Class  ( lift )
@@ -17,17 +17,17 @@ import           System.IO
 parseAndDeriveRegexToDfa :: ExceptT String IO ()
 parseAndDeriveRegexToDfa = do
     input <- lift $ getContents
---    let result = parseRegex input
-    let result = Right $ Sequence (Atom 'c') (Atom 'd')
-    case result of
+    case parseRegex "<stdin>" input of
         Left parseError -> throwE parseError
         Right regex -> do
             let transitions = deriveRegexToDfa regex
-            forM_ (Map.toList transitions) $ \(r, ts) -> do
-                lift $ putStr (show r)
-                forM_ (Map.toAscList ts) $ \(c, r') -> do
-                    lift $ putStr $ ['\t', c] ++ " -> " ++ show r'
-                lift $ putStr "\n"
+            forM_ (Map.toList transitions) $
+                \(r, ts) -> do
+                    lift $ putStr (show r)
+                    forM_ (Map.toAscList ts) $
+                        \(c, r') -> do
+                            lift $ putStr $ [ '\t', c ] ++ " -> " ++ show r'
+                    lift $ putStr "\n"
 
 type RegexDfaTransitions = Map.Map (Regex Char) (Map.Map Char (Regex Char))
 
