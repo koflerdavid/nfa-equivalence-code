@@ -12,12 +12,12 @@ derive :: (Ord c) => c -> Regex c -> Regex c
 derive _ Epsilon =
     Empty
 
-derive _ r | matchesOnlyEmptyString r = Empty
+derive _ r | matchesOnlyEmptyWord r = Empty
 
 derive _ Empty =
     Empty
 
-derive _ r | matchesOnlyEmptyString r = Empty
+derive _ r | matchesOnlyEmptyWord r = Empty
 
 derive c (Atom c')
     | c == c' = Epsilon
@@ -30,18 +30,9 @@ derive c r@(Asterisk inner) =
     normalised $ Sequence (derive c inner) r
 
 derive c (Sequence r s) =
-    if (not . containsEmptyWord) r
+    if (not . matchesEmptyWord) r
     then normalised $ Sequence (derive c r) s
     else normalised $ Alternative (Sequence (derive c r) s) (derive c s)
-
-containsEmptyWord :: Regex c -> Bool
-containsEmptyWord regex = case regex of
-    Atom _ -> False
-    Epsilon -> True
-    Empty -> False
-    Asterisk _ -> True
-    Alternative r s -> containsEmptyWord r || containsEmptyWord s
-    Sequence r s -> containsEmptyWord r && containsEmptyWord s
 
 wordDerive :: (Ord c) => [c] -> Regex c -> Regex c
 wordDerive cs r = foldr derive r (reverse cs) -- Use foldr instead of foldl

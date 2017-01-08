@@ -2,7 +2,8 @@ module Data.Regex
     ( Regex(..)
     , alphabet
     , empty
-    , matchesOnlyEmptyString
+    , matchesEmptyWord
+    , matchesOnlyEmptyWord
     , normalised
     ) where
 
@@ -41,20 +42,29 @@ empty (Alternative r s) =
     empty r && empty s
 empty (Sequence r s) = empty r || empty s
 
-matchesOnlyEmptyString :: Regex c -> Bool
-matchesOnlyEmptyString Epsilon =
+matchesEmptyWord :: Regex c -> Bool
+matchesEmptyWord regex = case regex of
+    Atom _ -> False
+    Epsilon -> True
+    Empty -> False
+    Asterisk _ -> True
+    Alternative r s -> matchesEmptyWord r || matchesEmptyWord s
+    Sequence r s -> matchesEmptyWord r && matchesEmptyWord s
+
+matchesOnlyEmptyWord :: Regex c -> Bool
+matchesOnlyEmptyWord Epsilon =
     True
-matchesOnlyEmptyString Empty =
+matchesOnlyEmptyWord Empty =
     False
-matchesOnlyEmptyString (Atom _) =
+matchesOnlyEmptyWord (Atom _) =
     False
 
-matchesOnlyEmptyString (Asterisk r) =
+matchesOnlyEmptyWord (Asterisk r) =
     empty r
-matchesOnlyEmptyString (Sequence r s) =
-    matchesOnlyEmptyString r && matchesOnlyEmptyString s
-matchesOnlyEmptyString (Alternative r s) =
-    matchesOnlyEmptyString r && matchesOnlyEmptyString s
+matchesOnlyEmptyWord (Sequence r s) =
+    matchesOnlyEmptyWord r && matchesOnlyEmptyWord s
+matchesOnlyEmptyWord (Alternative r s) =
+    matchesOnlyEmptyWord r && matchesOnlyEmptyWord s
 
 -- | Taken from "Proof pearl: Regular Expression Equivalence and Relational Algebra"
 -- with small modifications from my side
@@ -63,7 +73,7 @@ normalised Empty = Empty
 normalised regex | empty regex = Empty -- Captures Empty -!> Empty, among others
 
 normalised Epsilon = Epsilon
-normalised regex | matchesOnlyEmptyString regex =
+normalised regex | matchesOnlyEmptyWord regex =
                    Epsilon -- Captures Epsilon -!> Epsilon, among others
 normalised regex@(Atom _) = regex
 
