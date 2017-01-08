@@ -51,8 +51,10 @@ executable NfaExperiments-exe
   ghc-options:         -threaded -rtsopts -with-rtsopts=-N
   build-depends:       base
                      , containers
+                     , HaTeX
                      , NfaExperiments
                      , optparse-generic
+                     , text
                      -- For the Control.Monad.Trans.Except module
                      , transformers >= 0.4
   other-modules:       DfaChecking

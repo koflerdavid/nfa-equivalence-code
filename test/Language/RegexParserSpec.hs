@@ -35,7 +35,7 @@ spec = do
                     tokeniseAndParse primitiveRegex "testcase" input `shouldBe` Right expected
   where
     regexCases = [ ("a", a)
-                 , ("a b", ab)
+                 , ("a b ", ab)
                  , ("'a' b", ab)
                  , ("a", a)
                  , ("a | b", Alternative a b)
