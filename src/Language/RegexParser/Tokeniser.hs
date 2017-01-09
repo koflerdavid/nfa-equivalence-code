@@ -9,7 +9,7 @@ tokenise :: String -> SourceName -> Either ParseError [(SourcePos, Token)]
 tokenise source input = parse regexTokeniser source input
 
 regexTokeniser :: Parsec String () [(SourcePos, Token)]
-regexTokeniser = between spaces spaces $ ((,) <$> getPosition <*> regexToken) `sepBy` spaces
+regexTokeniser = between spaces spaces $ ((,) <$> getPosition <*> regexToken) `sepEndBy` spaces
 
 regexToken :: Parsec String () Token
 regexToken = do
