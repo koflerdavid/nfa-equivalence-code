@@ -46,5 +46,6 @@ spec = do
                  , ("ab*", Sequence a (Asterisk b))
                  , ("(a | b)?", Alternative (Alternative a b) Epsilon)
                  , ("ab* | c", Alternative (Sequence a (Asterisk b)) c)
+                 , ("1ε0∅", foldr1 Sequence [Epsilon, Epsilon, Empty, Empty])
                  ]
     primitiveRegexCases = [ ("a", a), ("'b'", b), ("(a | b)", Alternative a b) ]

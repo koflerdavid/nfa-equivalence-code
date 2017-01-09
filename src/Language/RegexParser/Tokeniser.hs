@@ -13,8 +13,8 @@ regexTokeniser = between spaces spaces $ ((,) <$> getPosition <*> regexToken) `s
 
 regexToken :: Parsec String () Token
 regexToken = do
-    char '0' *> pure EmptyToken
-        <|> char '1' *> pure EpsilonToken
+    oneOf "0∅" *> pure EmptyToken
+        <|> oneOf "1ε" *> pure EpsilonToken
         <|> char '*' *> pure ZeroOrMoreTimesToken
         <|> char '+' *> pure OneOrMoreTimesToken
         <|> char '?' *> pure ZeroOrOneTimesToken
