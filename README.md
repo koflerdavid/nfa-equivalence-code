@@ -49,9 +49,13 @@ Example for checking equality of two NFAs:
        0
 
 Example for turning a regular expression into a DFA by using derivatives:
-    $ stack exec regex-derivation
+
+    $ stack exec regex-derivation -- --without-skeleton
       a* (b | c)
       <LaTeX snippet for DFA table>
+
+To quickly view the result, the option `--without-skeleton` can be
+removed to produce a regular LaTeX document.
 
 Technical Report
 ----------------

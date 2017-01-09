@@ -17,36 +17,47 @@ import           Text.LaTeX.Base.Texy
 import           Text.LaTeX.Base.Class
 import           Text.LaTeX.Packages.AMSMath
 import           Text.LaTeX.Packages.AMSSymb
+import           Text.LaTeX.Packages.Inputenc
 
-printTransitionTable :: Regex Char -> RegexDfaTransitions -> IO ()
-printTransitionTable regex transitions = do
+printTransitionTable :: Bool -> Regex Char -> RegexDfaTransitions -> IO ()
+printTransitionTable withoutSkeleton regex transitions = do
     let regexAlphabet = alphabet regex
         firstColumn = [ LeftColumn, DVerticalLine ]
         stateColumns = take (2 * Set.size regexAlphabet) $ cycle [ LeftColumn, VerticalLine ]
         table = tabular (Just Center)
                         (firstColumn ++ stateColumns)
                         (tableHeader regexAlphabet <> lnbk <> hline <> tableBody transitions)
-    TIO.putStrLn . render $ table
+        theDocument = if withoutSkeleton
+                            then table
+                            else thePreamble <> document table
+    TIO.putStrLn . render $ theDocument
+
+thePreamble :: LaTeX
+thePreamble = mconcat [ documentclass [] article
+                       , usepackage [utf8] inputenc
+                       , usepackage [] amsmath
+                       , usepackage [] amssymb
+                       ]
+
+tableHeader :: Set Char -> LaTeX
+tableHeader inputs = do
+    List.foldl1 (&) $ "state" : (List.map stateName . Set.toAscList $ inputs)
+
+stateName :: Char -> LaTeX
+stateName s = fromString (show s)
+
+regexRepr :: Regex Char -> LaTeX
+regexRepr = texy
+
+tableBody :: RegexDfaTransitions -> LaTeX
+tableBody transitions = mconcat $ List.map (uncurry stateTransitions) (Map.toList transitions)
+
+stateTransitions :: Regex Char -> Map Char (Regex Char) -> LaTeX
+stateTransitions r ts = columns
   where
-    tableHeader :: Set Char -> LaTeX
-    tableHeader inputs = do
-        List.foldl1 (&) $ "state" : (List.map stateName . Set.toAscList $ inputs)
-
-    stateName :: Char -> LaTeX
-    stateName s = fromString (show s)
-
-    regexRepr :: Regex Char -> LaTeX
-    regexRepr = texy
-
-    tableBody :: RegexDfaTransitions -> LaTeX
-    tableBody transitions = mconcat $ List.map (uncurry stateTransitions) (Map.toList transitions)
-
-    stateTransitions :: Regex Char -> Map Char (Regex Char) -> LaTeX
-    stateTransitions r ts = columns
-      where
-        maybeStar = if matchesEmptyWord r then math (raw "\\star") else mempty
-        title = maybeStar <> regexRepr r
-        columns = List.foldl1 (&) (title : (List.map regexRepr . Map.elems $ ts)) <> lnbk
+    maybeStar = if matchesEmptyWord r then math (raw "\\star") else mempty
+    title = maybeStar <> regexRepr r
+    columns = List.foldl1 (&) (title : (List.map regexRepr . Map.elems $ ts)) <> lnbk
 
 instance Texy (Regex Char) where
     texy r = math $ texyPrec 0 r

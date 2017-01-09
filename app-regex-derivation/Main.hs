@@ -10,7 +10,7 @@ import           System.IO
 
 import           RegexFullDerivation
 
-data Action = RegexFullDerivation
+data Action = RegexFullDerivation { withoutSkeleton :: Bool }
     deriving (Generic, Show)
 
 instance ParseRecord Action
@@ -19,8 +19,8 @@ main :: IO ()
 main = do
     command <- getRecord "regex derivation"
     case command of
-        RegexFullDerivation -> do
-            result <- runExceptT parseAndDeriveRegexToDfa
+        RegexFullDerivation noSkeleton -> do
+            result <- runExceptT (parseAndDeriveRegexToDfa noSkeleton)
             case result of
                 Left message -> printErrorAndExit message
                 Right results -> exitSuccess

@@ -18,13 +18,13 @@ import qualified Data.Text                  as T
 import qualified Data.Text.IO               as TIO
 import           System.IO
 
-parseAndDeriveRegexToDfa :: ExceptT String IO ()
-parseAndDeriveRegexToDfa = do
+parseAndDeriveRegexToDfa :: Bool -> ExceptT String IO ()
+parseAndDeriveRegexToDfa withoutSkeleton = do
     input <- lift $ getContents
     case parseRegex "<stdin>" input of
         Left parseError -> throwE parseError
         Right regex -> do
-            lift $ LaTeXOutput.printTransitionTable regex (deriveRegexToDfa regex)
+            lift $ LaTeXOutput.printTransitionTable withoutSkeleton regex (deriveRegexToDfa regex)
 
 deriveRegexToDfa :: Regex Char -> RegexDfaTransitions
 deriveRegexToDfa regex =
