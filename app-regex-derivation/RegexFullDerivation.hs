@@ -1,11 +1,13 @@
 module RegexFullDerivation where
 
+import qualified RegexDfaOutput.LaTeX       as LaTeXOutput
+import qualified RegexDfaOutput.Tsv         as TsvOutput
+import           Types
+
 import           Algorithm.Regex.Derivation
 import           Data.Queue                 as Queue
 import           Data.Regex
 import           Language.RegexParser
-import qualified RegexDfaOutput.LaTeX       as LaTeXOutput
-import           Types
 
 import           Control.Monad
 import           Control.Monad.Trans.Class  ( lift )
@@ -18,13 +20,16 @@ import qualified Data.Text                  as T
 import qualified Data.Text.IO               as TIO
 import           System.IO
 
-parseAndDeriveRegexToDfa :: Bool -> ExceptT String IO ()
-parseAndDeriveRegexToDfa withoutSkeleton = do
+parseAndDeriveRegexToDfa :: OutputFormat -> Bool -> ExceptT String IO ()
+parseAndDeriveRegexToDfa outputFormat withoutSkeleton = do
     input <- lift $ getContents
     case parseRegex "<stdin>" input of
         Left parseError -> throwE parseError
         Right regex -> do
-            lift $ LaTeXOutput.printTransitionTable withoutSkeleton regex (deriveRegexToDfa regex)
+            let printer = case outputFormat of
+                    Latex -> LaTeXOutput.printTransitionTable
+                    Tsv -> TsvOutput.printTransitionTable
+            lift $ printer withoutSkeleton regex (deriveRegexToDfa regex)
 
 deriveRegexToDfa :: Regex Char -> RegexDfaTransitions
 deriveRegexToDfa regex =

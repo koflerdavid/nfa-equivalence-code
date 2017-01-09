@@ -7,11 +7,11 @@ import           Types
 
 import           Data.Regex
 
-import           Data.List                   as List
-import           Data.Map                    as Map
-import           Data.Set                    as Set
-import qualified Data.Text                   as T
-import qualified Data.Text.IO                as TIO
+import           Data.List                    as List
+import           Data.Map                     as Map
+import           Data.Set                     as Set
+import qualified Data.Text                    as T
+import qualified Data.Text.IO                 as TIO
 import           Text.LaTeX
 import           Text.LaTeX.Base.Texy
 import           Text.LaTeX.Base.Class
@@ -27,17 +27,15 @@ printTransitionTable withoutSkeleton regex transitions = do
         table = tabular (Just Center)
                         (firstColumn ++ stateColumns)
                         (tableHeader regexAlphabet <> lnbk <> hline <> tableBody transitions)
-        theDocument = if withoutSkeleton
-                            then table
-                            else thePreamble <> document table
+        theDocument = if withoutSkeleton then table else thePreamble <> document table
     TIO.putStrLn . render $ theDocument
 
 thePreamble :: LaTeX
 thePreamble = mconcat [ documentclass [] article
-                       , usepackage [utf8] inputenc
-                       , usepackage [] amsmath
-                       , usepackage [] amssymb
-                       ]
+                      , usepackage [ utf8 ] inputenc
+                      , usepackage [] amsmath
+                      , usepackage [] amssymb
+                      ]
 
 tableHeader :: Set Char -> LaTeX
 tableHeader inputs = do
