@@ -72,6 +72,8 @@ executable regex-derivation
                      -- For the Control.Monad.Trans.Except module
                      , transformers >= 0.4
   other-modules:       RegexFullDerivation
+                     , RegexDfaOutput.LaTeX
+                     , Types
   default-language:    Haskell2010
 
 test-suite NfaExperiments-test
