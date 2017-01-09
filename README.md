@@ -33,7 +33,7 @@ The tool receives its input in the format used by Bonchi and Pous at
 
 Example for checking equality of two NFAs:
 
-    $ stack exec NfaExperiments-exe nfaequivalence
+    $ stack exec automata-equivalence nfaequivalence
        x -a-> y
        y -a-> z
        z -a-> x y
@@ -48,6 +48,10 @@ Example for checking equality of two NFAs:
     $ echo $?
        0
 
+Example for turning a regular expression into a DFA by using derivatives:
+    $ stack exec regex-derivation
+      a* (b | c)
+      <LaTeX snippet for DFA table>
 
 Technical Report
 ----------------
