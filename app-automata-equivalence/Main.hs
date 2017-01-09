@@ -10,11 +10,9 @@ import           System.IO
 
 import           DfaChecking
 import           NfaChecking
-import           RegexFullDerivation
 
 data Action = DfaEquivalence (Maybe String)
             | NfaEquivalence (Maybe String)
-            | RegexDerivation
     deriving (Generic, Show)
 
 instance ParseRecord Action
@@ -33,11 +31,6 @@ main = do
             case result of
                 Left message -> printErrorAndExit message
                 Right results -> if and results then exitSuccess else exitWith (ExitFailure 1)
-        RegexDerivation -> do
-            result <- runExceptT parseAndDeriveRegexToDfa
-            case result of
-                Left message -> printErrorAndExit message
-                Right results -> exitSuccess
 
 printErrorAndExit :: String -> IO a
 printErrorAndExit msg = hPutStrLn stderr msg >> exitWith (ExitFailure 2)
