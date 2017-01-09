@@ -119,7 +119,7 @@ instance (Show c) => Show (Regex c) where
     showsPrec _ Epsilon = ('ε':)
     showsPrec _ (Atom c) = (show c ++)
     showsPrec prec (Alternative r s) =
-        let inner = (showsPrec 6 r) . (" + " ++) . showsPrec 6 s in
+        let inner = (showsPrec 6 r) . (" | " ++) . showsPrec 6 s in
         if prec > 6 then ('(':) . inner . (')':) else inner
     showsPrec prec (Sequence r s) =
         let inner = showsPrec 7 r . (' ':) . showsPrec 7 s in
