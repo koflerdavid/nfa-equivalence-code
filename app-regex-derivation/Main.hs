@@ -3,17 +3,19 @@
 
 module Main where
 
+import           RegexDerivation
+import           RegexFullDerivation
+import           Types
+
 import           Control.Monad.Trans.Except ( runExceptT )
 import           Options.Generic
 import           System.Exit
 import           System.IO
 
-import           RegexFullDerivation
-import           Types
-
 data Action = RegexFullDerivation { outputFormat    :: OutputFormat
                                   , withoutSkeleton :: Bool
                                   }
+            | RegexDerivation String
     deriving (Generic, Show)
 
 instance ParseRecord Action
@@ -26,7 +28,13 @@ main = do
             result <- runExceptT (parseAndDeriveRegexToDfa format noSkeleton)
             case result of
                 Left message -> printErrorAndExit message
-                Right results -> exitSuccess
+                Right _ -> exitSuccess
+
+        RegexDerivation word -> do
+            result <- runExceptT (parseAndDeriveRegexByWord word)
+            case result of
+                Left message -> printErrorAndExit message
+                Right _ -> exitSuccess
 
 printErrorAndExit :: String -> IO a
 printErrorAndExit msg = hPutStrLn stderr msg >> exitWith (ExitFailure 2)

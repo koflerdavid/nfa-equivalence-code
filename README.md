@@ -48,14 +48,40 @@ Example for checking equality of two NFAs:
     $ echo $?
        0
 
+Regular expressions use the following BNF grammar:
+
+    regex            <- regex '|' regex
+                      | regex regex
+                      | regex postfix-operator
+                      | primitiveRegex
+                      | '(' regex ')'
+    primitiveRegex   <- 'a' | 'b' | ...
+                      | "\'a\'" |"\'b\'" | ...
+                      | 0 | 1
+    postfix-operator <- '*' | '?' | '+'
+
+Single characters can be typed without clothes.
+Special characters (like braces, operators, 0, 1) have to be surrounded by single quotes.
+The precedence rules are as usual:
+
+    alternative < sequence < zeroOrMore = zeroOrOne = oneOrMore
+
 Example for turning a regular expression into a DFA by using derivatives:
 
     $ stack exec regex-derivation -- --without-skeleton
       a* (b | c)
+      ^D
       <LaTeX snippet for DFA table>
 
 To quickly view the result, the option `--without-skeleton` can be
 removed to produce a regular LaTeX document.
+
+Example for deriving a regular expression by a word:
+
+    $ stack exec regex-derivation -- regexderivation abc
+      a (b | c) (c | de)* f
+      ^D
+      ('c' | 'd' 'e')* 'f'
 
 Technical Report
 ----------------
