@@ -21,6 +21,7 @@ library
                      , Algorithm.DfaEquivalence
                      , Algorithm.NfaEquivalence
                      , Algorithm.Regex.Derivation
+                     , Algorithm.Regex.Equivalence
                      , Compiler.Hknt
                      , Compiler.Regex
                      , Data.Dfa
@@ -79,6 +80,7 @@ executable regex-derivation
                      , transformers >= 0.4
 
   other-modules:       RegexDerivation
+                     , RegexEquivalence
                      , RegexFullDerivation
                      , RegexDfaOutput.LaTeX
                      , RegexDfaOutput.Tsv

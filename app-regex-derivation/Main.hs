@@ -4,6 +4,7 @@
 module Main where
 
 import           RegexDerivation
+import           RegexEquivalence
 import           RegexFullDerivation
 import           Types
 
@@ -16,6 +17,7 @@ data Action = RegexFullDerivation { outputFormat    :: OutputFormat
                                   , withoutSkeleton :: Bool
                                   }
             | RegexDerivation String
+            | RegexEquivalence
     deriving (Generic, Show)
 
 instance ParseRecord Action
@@ -35,6 +37,13 @@ main = do
             case result of
                 Left message -> printErrorAndExit message
                 Right _ -> exitSuccess
+
+        RegexEquivalence -> do
+            result <- runExceptT checkRegexEquivalence
+            case result of
+                Left message -> printErrorAndExit message
+                Right True -> exitSuccess
+                Right False -> exitWith (ExitFailure 1)
 
 printErrorAndExit :: String -> IO a
 printErrorAndExit msg = hPutStrLn stderr msg >> exitWith (ExitFailure 2)

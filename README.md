@@ -83,6 +83,23 @@ Example for deriving a regular expression by a word:
       ^D
       ('c' | 'd' 'e')* 'f'
 
+Example for checking two regular expression (on consecutive lines) for
+equivalence:
+
+    $ stack exec regex-derivation regexequivalence
+      a b c*
+      a c* b
+      "acb"	∅	ε
+      "abc"	'c'*	∅
+
+The first two input lines contain the regular expressions to compare.
+The program computes the equivalence and, in the case of nonequivalence,
+prints out witnesses for that.
+Each of those strings is accepted by only one of the regular expression,
+but not by the other.
+The second and third column contain the derivation of each input regular
+expression by that word.
+
 Technical Report
 ----------------
 
