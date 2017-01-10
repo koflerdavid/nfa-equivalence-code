@@ -1,13 +1,11 @@
 module RegexEquivalence where
 
 import           Algorithm.Regex.Equivalence
-import           Data.Regex
 import           Language.RegexParser
 
 import           Control.Monad               ( forM_ )
 import           Control.Monad.Trans.Class   ( lift )
-import           Control.Monad.Trans.Except
-import           System.IO
+import           Control.Monad.Trans.Except  ( ExceptT, throwE )
 
 checkRegexEquivalence :: ExceptT String IO Bool
 checkRegexEquivalence = do

@@ -47,7 +47,7 @@ enfaStates enfa = enfaAcceptingStates enfa `ISet.union` transitionStates enfa
         . Map.toAscList
         . enfaTransitions
 
-runEnfa :: (Ord c, Show c) => ENfa c -> [Int] -> [c] -> [Int]
+runEnfa :: (Ord c) => ENfa c -> [Int] -> [c] -> [Int]
 runEnfa enfa initialStates input =
     ISet.toList finalStates
   where

@@ -1,7 +1,7 @@
 module Data.Queue where
 
 import qualified Data.List     as List
-import Data.Monoid
+import           Data.Monoid
 import qualified Data.Sequence as Seq
 
 class Queue q where

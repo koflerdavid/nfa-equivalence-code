@@ -10,10 +10,8 @@ import           Data.Regex
 import           Data.List                    as List
 import           Data.Map                     as Map
 import           Data.Set                     as Set
-import qualified Data.Text                    as T
 import qualified Data.Text.IO                 as TIO
 import           Text.LaTeX
-import           Text.LaTeX.Base.Texy
 import           Text.LaTeX.Base.Class
 import           Text.LaTeX.Packages.AMSMath
 import           Text.LaTeX.Packages.AMSSymb
@@ -54,12 +52,13 @@ stateTransitions :: Regex Char -> Map Char (Regex Char) -> LaTeX
 stateTransitions r ts = columns
   where
     maybeStar = if matchesEmptyWord r then math (raw "\\star") else mempty
-    title = maybeStar <> regexRepr r
-    columns = List.foldl1 (&) (title : (List.map regexRepr . Map.elems $ ts)) <> lnbk
+    theTitle = maybeStar <> regexRepr r
+    columns = List.foldl1 (&) (theTitle : (List.map regexRepr . Map.elems $ ts)) <> lnbk
 
 instance Texy (Regex Char) where
     texy r = math $ texyPrec 0 r
 
+texyPrec :: (LaTeXC l, Show c) => Int -> Regex c -> l
 texyPrec _ Empty = raw "\\varnothing"
 texyPrec _ Epsilon = epsilon
 texyPrec _ (Atom c) = fromString (show c)

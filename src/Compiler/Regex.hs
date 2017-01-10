@@ -32,7 +32,7 @@ compileRegex' Empty _startFaState _endFaState =
     return ()
 
 compileRegex' (Alternative r s) startFaState endFaState = do
-    mapM_ (\r -> compileRegex' r startFaState endFaState) [r, s]
+    mapM_ (\t -> compileRegex' t startFaState endFaState) [r, s]
 
 -- generate an automaton with just one transition. Unfortunately it is quite difficult to avoid creating
 -- this intermediary FaState, but it's not too bad. Many cases can be avoided with the use of `Optional`.

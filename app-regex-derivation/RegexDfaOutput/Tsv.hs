@@ -17,7 +17,5 @@ printTransitionTable _ regex transitions = do
             putStr $ if regex == r then "-> " else "   "
             putStr $ if matchesEmptyWord r then " * " else " "
             putStr (show r)
-            forM_ (Map.toAscList ts) $
-                \(c, r') -> do
-                    putStr ('\t' : show r')
+            forM_ (Map.elems ts) $ \r' -> putStr ('\t' : show r')
             putStr "\n"

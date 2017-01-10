@@ -46,7 +46,7 @@ dfaAcceptingStates (Dfa acceptingStates _) =
 dfaErrorState :: Maybe Int
 dfaErrorState = Nothing
 
-dfaTransitions :: (Ord c) => Dfa c -> Map.Map (Int, c) Int
+dfaTransitions :: Dfa c -> Map.Map (Int, c) Int
 dfaTransitions (Dfa _ transitions) =
     transitions
 

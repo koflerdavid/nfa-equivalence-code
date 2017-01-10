@@ -8,7 +8,6 @@ import           Data.IntSet              as IS
 import           Test.Hspec
 
 import           Algorithm.NfaEquivalence
-import           Data.Nfa
 import           HkntSamples
 
 main :: IO ()

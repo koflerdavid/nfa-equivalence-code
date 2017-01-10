@@ -1,6 +1,6 @@
 module NfaChecking ( checkNfaEquivalence ) where
 
-import           Control.Monad                      ( forM, when )
+import           Control.Monad                      ( forM )
 import           Control.Monad.Trans.Class          ( lift )
 import           Control.Monad.Trans.Except         ( ExceptT, runExceptT, throwE )
 import           Data.IntSet                        as IS

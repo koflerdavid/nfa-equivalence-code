@@ -6,7 +6,7 @@ module Language.RegexParserSpec
 import           Data.Regex
 import           Language.RegexParser
 
-import           Control.Monad        ( forM_ )
+import           Control.Monad                 ( forM_ )
 import           Test.Hspec
 
 main :: IO ()
@@ -27,12 +27,6 @@ spec = do
             \(input, expected) -> do
                 it ("should parse " ++ show input ++ " to " ++ show expected) $ do
                     parseRegex "testcase" input `shouldBe` Right expected
-
-    describe "primitiveRegexParser" $ do
-        forM_ primitiveRegexCases $
-            \(input, expected) -> do
-                it ("should parse " ++ show input ++ " to " ++ show expected) $ do
-                    tokeniseAndParse primitiveRegex "testcase" input `shouldBe` Right expected
   where
     regexCases = [ ("a", a)
                  , ("a b ", ab)
@@ -46,6 +40,5 @@ spec = do
                  , ("ab*", Sequence a (Asterisk b))
                  , ("(a | b)?", Alternative (Alternative a b) Epsilon)
                  , ("ab* | c", Alternative (Sequence a (Asterisk b)) c)
-                 , ("1ε0∅", foldr1 Sequence [Epsilon, Epsilon, Empty, Empty])
+                 , ("1ε0∅", foldr1 Sequence [ Epsilon, Epsilon, Empty, Empty ])
                  ]
-    primitiveRegexCases = [ ("a", a), ("'b'", b), ("(a | b)", Alternative a b) ]

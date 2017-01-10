@@ -9,16 +9,12 @@ import           Data.Queue                 as Queue
 import           Data.Regex
 import           Language.RegexParser
 
-import           Control.Monad
 import           Control.Monad.Trans.Class  ( lift )
-import           Control.Monad.Trans.Except ( ExceptT, runExceptT, throwE )
-import           Control.Monad.Trans.State
+import           Control.Monad.Trans.Except ( ExceptT, throwE )
+import           Control.Monad.Trans.State  ( State, evalState, gets, modify )
 import           Data.List                  as List
 import           Data.Map                   as Map
 import           Data.Set                   as Set
-import qualified Data.Text                  as T
-import qualified Data.Text.IO               as TIO
-import           System.IO
 
 parseAndDeriveRegexToDfa :: OutputFormat -> Bool -> ExceptT String IO ()
 parseAndDeriveRegexToDfa outputFormat withoutSkeleton = do
@@ -54,10 +50,10 @@ deriveRegexForAlphabet :: Queue q
                        => [Char]
                        -> Regex Char
                        -> State (RegexDfaTransitions, q (Regex Char)) ()
-deriveRegexForAlphabet alphabet regex =
+deriveRegexForAlphabet regexAlphabet regex =
     modify $
         \(transitions, queue) ->
-            let derivations = List.map (\c -> (c, derive c regex)) alphabet
+            let derivations = List.map (\c -> (c, derive c regex)) regexAlphabet
                 regexesToQueue = List.filter (`Map.notMember` transitions) $ snd (unzip derivations)
                 transitions' = Map.insert regex (Map.fromAscList derivations) transitions
             in
