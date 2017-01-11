@@ -1,12 +1,14 @@
+{-# LANGUAGE LambdaCase #-}
+
 module Algorithm.DfaEquivalence where
 
 import           Algorithm.AutomataMerge
 import           Data.Dfa
 import           Data.Equivalence.Monad
+import           Data.Queue              as Q
 
 import           Control.Monad           ( when )
 import qualified Data.IntSet             as IS
-import           Data.Sequence
 import qualified Data.Set                as S
 
 data Error = NotDfaState Int
@@ -16,17 +18,20 @@ dfaStatesEquivalentHkNaive :: Ord c => Dfa c -> DfaState -> DfaState -> Either E
 dfaStatesEquivalentHkNaive dfa s1 s2 = do
     s1 `assertIsStateOf` dfa
     s2 `assertIsStateOf` dfa
-    return $ check S.empty (viewl $ singleton (s1, s2))
+    return $ check S.empty (Q.singleton (s1, s2))
   where
-    check :: S.Set (DfaState, DfaState) -> ViewL (DfaState, DfaState) -> Bool
-    check _ EmptyL = True
-    check bisim (pair@(x, y) :< ps)
-        | pair `S.member` bisim = check bisim (viewl ps)
-        | (dfa `dfaAccepts` x) /= (dfa `dfaAccepts` y) = False
-        | otherwise = check ((x, y) `S.insert` bisim) (viewl $ fromList todo >< ps)
+    check :: S.Set (DfaState, DfaState) -> FifoQueue (DfaState, DfaState) -> Bool
+    check bisim queue = (flip . maybe) True (Q.pop queue) $
+        \case
+            (pair@(x, y), queue')
+                | pair `S.member` bisim ->
+                      check bisim queue'
+                | (dfa `dfaAccepts` x) /= (dfa `dfaAccepts` y) ->
+                      False
+                | otherwise -> check ((x, y) `S.insert` bisim) (queue' `Q.pushAll` todo x y)
       where
-        todo = [ (x `dfaStep'` c, y `dfaStep'` c)
-               | c <- alphabet ]
+        todo x y = [ (x `dfaStep'` c, y `dfaStep'` c)
+                   | c <- alphabet ]
 
     alphabet = S.toList (dfaAlphabet dfa)
     --            dfaStep' :: (Ord c) => Dfa c -> (DfaState, c) -> DfaState
@@ -36,21 +41,21 @@ dfaStatesEquivalentHk :: Ord c => Dfa c -> DfaState -> DfaState -> Either Error 
 dfaStatesEquivalentHk dfa s1 s2 = do
     s1 `assertIsStateOf` dfa
     s2 `assertIsStateOf` dfa
-    return (runEquivM' $ check (viewl $ singleton (s1, s2)))
+    return (runEquivM' $ check (Q.singleton (s1, s2)))
   where
-    check :: ViewL (DfaState, DfaState) -> EquivM' s DfaState Bool
-    check EmptyL = return True
-    check ((x, y) :< ps) = do
-        alreadyEqual <- equivalent x y
-        if alreadyEqual
-            then check (viewl ps)
-            else if (dfa `dfaAccepts` x) /= (dfa `dfaAccepts` y)
-                 then return False
-                 else equate x y >> check (viewl $ fromList todo >< ps)
+    check :: FifoQueue (DfaState, DfaState) -> EquivM' s DfaState Bool
+    check queue = (flip . maybe) (return True) (Q.pop queue) $
+        \case
+            ((x, y), queue') -> do
+                alreadyEqual <- equivalent x y
+                if alreadyEqual
+                    then check queue'
+                    else if (dfa `dfaAccepts` x) /= (dfa `dfaAccepts` y)
+                         then return False
+                         else equate x y >> check (queue' `Q.pushAll` todo x y)
       where
-        todo :: [(DfaState, DfaState)]
-        todo = [ (x `dfaStep'` c, y `dfaStep'` c)
-               | c <- alphabet ]
+        todo x y = [ (x `dfaStep'` c, y `dfaStep'` c)
+                   | c <- alphabet ]
 
     alphabet = S.toList (dfaAlphabet dfa)
     dfaStep' = dfaStep dfa
