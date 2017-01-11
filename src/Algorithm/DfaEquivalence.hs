@@ -1,4 +1,5 @@
-{-# LANGUAGE LambdaCase #-}
+{-# LANGUAGE LambdaCase          #-}
+{-# LANGUAGE ScopedTypeVariables #-}
 
 module Algorithm.DfaEquivalence where
 
@@ -14,48 +15,55 @@ import qualified Data.Set                as S
 data Error = NotDfaState Int
     deriving (Eq, Show)
 
-dfaStatesEquivalentHkNaive :: Ord c => Dfa c -> DfaState -> DfaState -> Either Error Bool
+type Constraint c = ([c], DfaState, DfaState)
+
+dfaStatesEquivalentHkNaive :: forall c.
+                           (Ord c)
+                           => Dfa c
+                           -> DfaState
+                           -> DfaState
+                           -> Either Error Bool
 dfaStatesEquivalentHkNaive dfa s1 s2 = do
     s1 `assertIsStateOf` dfa
     s2 `assertIsStateOf` dfa
-    return $ check S.empty (Q.singleton (s1, s2))
+    return $ check S.empty (Q.singleton ([], s1, s2))
   where
-    check :: S.Set (DfaState, DfaState) -> FifoQueue (DfaState, DfaState) -> Bool
+    check :: S.Set (DfaState, DfaState) -> FifoQueue (Constraint c) -> Bool
     check bisim queue = (flip . maybe) True (Q.pop queue) $
         \case
-            (pair@(x, y), queue')
-                | pair `S.member` bisim ->
+            (constraint@(w, x, y), queue')
+                | (x, y) `S.member` bisim ->
                       check bisim queue'
                 | (dfa `dfaAccepts` x) /= (dfa `dfaAccepts` y) ->
                       False
-                | otherwise -> check ((x, y) `S.insert` bisim) (queue' `Q.pushAll` todo x y)
+                | otherwise -> check ((x, y) `S.insert` bisim) (queue' `Q.pushAll` todo constraint)
       where
-        todo x y = [ (x `dfaStep'` c, y `dfaStep'` c)
-                   | c <- alphabet ]
+        todo (w, x, y) = [ (c : w, x `dfaStep'` c, y `dfaStep'` c)
+                         | c <- alphabet ]
 
     alphabet = S.toList (dfaAlphabet dfa)
     --            dfaStep' :: (Ord c) => Dfa c -> (DfaState, c) -> DfaState
     dfaStep' = dfaStep dfa
 
-dfaStatesEquivalentHk :: Ord c => Dfa c -> DfaState -> DfaState -> Either Error Bool
+dfaStatesEquivalentHk :: forall c. (Ord c) => Dfa c -> DfaState -> DfaState -> Either Error Bool
 dfaStatesEquivalentHk dfa s1 s2 = do
     s1 `assertIsStateOf` dfa
     s2 `assertIsStateOf` dfa
-    return (runEquivM' $ check (Q.singleton (s1, s2)))
+    return (runEquivM' $ check (Q.singleton ([], s1, s2)))
   where
-    check :: FifoQueue (DfaState, DfaState) -> EquivM' s DfaState Bool
+    check :: FifoQueue (Constraint c) -> EquivM' s DfaState Bool
     check queue = (flip . maybe) (return True) (Q.pop queue) $
         \case
-            ((x, y), queue') -> do
+            (constraint@(w, x, y), queue') -> do
                 alreadyEqual <- equivalent x y
                 if alreadyEqual
                     then check queue'
                     else if (dfa `dfaAccepts` x) /= (dfa `dfaAccepts` y)
                          then return False
-                         else equate x y >> check (queue' `Q.pushAll` todo x y)
+                         else equate x y >> check (queue' `Q.pushAll` todo constraint)
       where
-        todo x y = [ (x `dfaStep'` c, y `dfaStep'` c)
-                   | c <- alphabet ]
+        todo (w, x, y) = [ (c : w, x `dfaStep'` c, y `dfaStep'` c)
+                         | c <- alphabet ]
 
     alphabet = S.toList (dfaAlphabet dfa)
     dfaStep' = dfaStep dfa

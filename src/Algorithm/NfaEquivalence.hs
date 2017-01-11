@@ -1,3 +1,5 @@
+{-# LANGUAGE ScopedTypeVariables #-}
+
 module Algorithm.NfaEquivalence where
 
 import qualified Data.CongruenceClosure         as CC
@@ -13,45 +15,47 @@ type NfaStates = IS.IntSet
 
 type Error = String
 
-nfaStatesEquivalentHkNaive :: (Ord c) => Nfa c -> NfaStates -> NfaStates -> Bool
+type Constraint c = ([c], NfaStates, NfaStates)
+
+nfaStatesEquivalentHkNaive :: forall c. (Ord c) => Nfa c -> NfaStates -> NfaStates -> Bool
 nfaStatesEquivalentHkNaive nfa set1 set2 =
-    runEquivM' $ check (Q.singleton (set1, set2))
+    runEquivM' $ check (Q.singleton ([], set1, set2))
   where
-    check :: FifoQueue (NfaStates, NfaStates) -> EquivM' s NfaStates Bool
+    check :: FifoQueue (Constraint c) -> EquivM' s NfaStates Bool
     check queue = (flip . maybe) (return True) (Q.pop queue) $
-        \((xs, ys), queue') -> do
+        \(constraint@(w, xs, ys), queue') -> do
             alreadyEqual <- xs `equivalent` ys
             if alreadyEqual
                 then check queue'
                 else if (nfa `accepts` IS.toList xs) /= (nfa `accepts` IS.toList ys)
                      then return False
-                     else equate xs ys >> check (queue' `Q.pushAll` todo xs ys)
+                     else equate xs ys >> check (queue' `Q.pushAll` todo constraint)
       where
-        todo xs ys = [ (xs `nfaStep'` c, ys `nfaStep'` c)
-                     | c <- alphabet ]
+        todo (w, xs, ys) = [ (c : w, xs `nfaStep'` c, ys `nfaStep'` c)
+                           | c <- alphabet ]
 
     alphabet = S.toList (nfaAlphabet nfa)
     nfaStep' = nfaStep nfa
 
 type HkcEquivM = State CC.CongruenceClosure
 
-nfaStatesEquivalentHkC :: (Ord c) => Nfa c -> NfaStates -> NfaStates -> Bool
+nfaStatesEquivalentHkC :: forall c. (Ord c) => Nfa c -> NfaStates -> NfaStates -> Bool
 nfaStatesEquivalentHkC nfa set1 set2 =
-    evalState (check (Q.singleton (set1, set2))) CC.empty
+    evalState (check (Q.singleton ([], set1, set2))) CC.empty
   where
-    check :: FifoQueue (NfaStates, NfaStates) -> HkcEquivM Bool
+    check :: FifoQueue (Constraint c) -> HkcEquivM Bool
     check queue = (flip . maybe) (return True) (Q.pop queue) $
-        \((xs, ys), queue') -> do
+        \(constraint@(w, xs, ys), queue') -> do
             -- TODO: do not only consider the relation, but also the pairs in `ps`. See 3.3
             alreadyEqual <- xs `equivalentM` ys
             if alreadyEqual
                 then check queue'
                 else if (nfa `accepts` IS.toList xs) /= (nfa `accepts` IS.toList ys)
                      then return False
-                     else equateM xs ys >> check (queue' `Q.pushAll` todo xs ys)
+                     else equateM xs ys >> check (queue' `Q.pushAll` todo constraint)
       where
-        todo xs ys = [ (xs `nfaStep'` c, ys `nfaStep'` c)
-                     | c <- alphabet ]
+        todo (w, xs, ys) = [ (c : w, xs `nfaStep'` c, ys `nfaStep'` c)
+                           | c <- alphabet ]
 
     alphabet = S.toList (nfaAlphabet nfa)
     nfaStep' = nfaStep nfa
