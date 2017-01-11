@@ -16,6 +16,8 @@ class Queue q where
     pushAll :: q a -> [a] -> q a
     pushAll q es = foldr (flip push) q es
 
+    singleton :: a -> q a
+
 newtype FifoQueue a = FifoQueue [a]
 
 instance Queue FifoQueue where
@@ -23,12 +25,16 @@ instance Queue FifoQueue where
     null (FifoQueue es) = List.null es
     push (FifoQueue es) e = FifoQueue (e : es)
     pop (FifoQueue []) = Nothing
-    pop (FifoQueue (e : es)) = Just (e, FifoQueue es)
-    pushAll (FifoQueue es) fs = FifoQueue (reverse fs ++ es)
+    pop (FifoQueue (e : es)) =
+        Just (e, FifoQueue es)
+    pushAll (FifoQueue es) fs =
+        FifoQueue (reverse fs ++ es)
+    singleton = FifoQueue . (: [])
 
 instance Monoid (FifoQueue a) where
     mempty = empty
-    mappend (FifoQueue es) (FifoQueue fs) = FifoQueue (fs ++ es)
+    mappend (FifoQueue es) (FifoQueue fs) =
+        FifoQueue (fs ++ es)
 
 newtype LifoQueue a = LifoQueue (Seq.Seq a)
 
@@ -39,8 +45,11 @@ instance Queue LifoQueue where
     pop (LifoQueue es) = case Seq.viewl es of
         Seq.EmptyL -> Nothing
         (Seq.:<) e es' -> Just (e, LifoQueue es')
-    pushAll (LifoQueue es) fs = LifoQueue (es <> Seq.fromList fs)
+    pushAll (LifoQueue es) fs =
+        LifoQueue (es <> Seq.fromList fs)
+    singleton = LifoQueue . Seq.singleton
 
 instance Monoid (LifoQueue a) where
     mempty = empty
-    mappend (LifoQueue es) (LifoQueue fs) = LifoQueue (es <> fs)
+    mappend (LifoQueue es) (LifoQueue fs) =
+        LifoQueue (es <> fs)

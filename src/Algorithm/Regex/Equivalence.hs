@@ -26,7 +26,7 @@ type Witness c = ([c], Regex c, Regex c)
 -- the other doesn't. These are not all strings for which they behave differently, but the shortest.
 getDifferences :: (Ord c) => Regex c -> Regex c -> [Witness c]
 getDifferences regex1 regex2 =
-    let initialConstraint = Q.empty `Q.push` ([], regex1, regex2)
+    let initialConstraint = Q.singleton ([], regex1, regex2)
         -- First, check the constraints
         -- Then, extract the differences which were found
         witnesses = execWriter $ runEquivT' (check combinedAlphabet initialConstraint)
