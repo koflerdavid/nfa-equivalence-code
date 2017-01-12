@@ -14,7 +14,7 @@ main :: IO ()
 main = hspec spec
 
 spec :: Spec
-spec = forM_ [ ("HK naive", nfaStatesEquivalentHkNaive)
+spec = forM_ [ ("HK naive", nfaStatesEquivalentHk)
              , ("HK with congruence", nfaStatesEquivalentHkC)
              ] $
     \(name, nfaEquivalent) ->

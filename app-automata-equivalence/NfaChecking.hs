@@ -1,6 +1,8 @@
 module NfaChecking ( checkNfaEquivalence ) where
 
-import           Control.Monad                      ( forM )
+import           Util
+
+import           Control.Monad                      ( forM, forM_, mapM, when )
 import           Control.Monad.Trans.Class          ( lift )
 import           Control.Monad.Trans.Except         ( ExceptT, runExceptT, throwE )
 import           Data.IntSet                        as IS
@@ -28,11 +30,34 @@ checkNfaEquivalence filename = do
                     "Checking equivalence of " ++ strStateSet1 ++ " and " ++ strStateSet2
             stateSet1' <- mapM (translateState stateMapping) stateSet1
             stateSet2' <- mapM (translateState stateMapping) stateSet2
-            let result = nfaStatesEquivalentHkC nfa
-                                                (IS.fromList stateSet1')
-                                                (IS.fromList stateSet2')
-            lift $ putStrLn (show result)
-            return result
+            let (maybeWitness, trace) = nfaStatesDifferencesHkC nfa
+                                                                (IS.fromList stateSet1')
+                                                                (IS.fromList stateSet2')
+
+            let invStateMapping = invertMap stateMapping
+            forM_ trace (printConstraint invStateMapping)
+
+            case maybeWitness of
+                Nothing -> return True
+                Just witness -> do
+                    lift $ putStrLn "\nFailed on:"
+                    printConstraint invStateMapping (False, witness)
+                    return False
+
+printConstraint :: Map Int String -> (Bool, Constraint Char) -> IOWithError ()
+printConstraint stateMapping (skipped, (w, xs, ys)) = do
+    xs' <- mapM (translateState stateMapping) (IS.toList xs)
+    ys' <- mapM (translateState stateMapping) (IS.toList ys)
+    lift $ do
+        when skipped $ putStr "skipped"
+        putChar '\t'
+        putStr (show w)
+        putChar '\t'
+        putStr "{ "
+        putStr (List.intercalate ", " xs')
+        putStr " }\t{ "
+        putStr (List.intercalate ", " ys')
+        putStr " }\n"
 
 parseInput :: Maybe String -> IOWithError (Nfa Char, Map.Map String Int, [Check String])
 parseInput = maybe (relift $ parseInput' stdin) $

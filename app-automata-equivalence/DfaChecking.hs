@@ -1,6 +1,8 @@
 module DfaChecking ( checkDfaEquivalence ) where
 
-import           Control.Monad                      ( forM, when )
+import           Util
+
+import           Control.Monad                      ( forM, forM_, when )
 import           Control.Monad.Trans.Class          ( lift )
 import           Control.Monad.Trans.Except         ( ExceptT, runExceptT, throwE )
 import           Data.List                          as List
@@ -26,12 +28,33 @@ checkDfaEquivalence filename = do
             lift $ hPutStrLn stderr $ "Checking equivalence of " ++ state1 ++ " and " ++ state2
             state1' <- translateState stateMapping state1
             state2' <- translateState stateMapping state2
-            let result = dfaStatesEquivalentHk dfa (Just state1') (Just state2')
+            let result = dfaStatesDifferencesHk dfa (Just state1') (Just state2')
             case result of
                 Left (NotDfaState s) -> throwE $ "The following is not a DFA state: " ++ show s
-                Right equivalent -> do
-                    lift $ putStrLn (show equivalent)
-                    return equivalent
+                Right (maybeWitness, trace) -> do
+                    let invStateMapping = invertMap stateMapping
+                    forM_ trace (printConstraint invStateMapping)
+
+                    case maybeWitness of
+                        Nothing -> return True
+                        Just witness -> do
+                            lift $ putStrLn "\nFailed on:"
+                            printConstraint invStateMapping (False, witness)
+                            return False
+
+printConstraint :: Map Int String -> (Bool, Constraint Char) -> IOWithError ()
+printConstraint invStateMapping (skipped, (w, x, y)) = do
+    x' <- maybe (return "_|_") (translateState invStateMapping) x
+    y' <- maybe (return "_|_") (translateState invStateMapping) y
+    lift $ do
+        when skipped $ putStr "skipped"
+        putChar '\t'
+        putStr (show w)
+        putChar '\t'
+        putStr x'
+        putChar '\t'
+        putStr y'
+        putChar '\n'
 
 parseInput :: Maybe String -> IOWithError (Dfa Char, Map.Map String Int, [Check String])
 parseInput = maybe (relift $ parseInput' stdin) $

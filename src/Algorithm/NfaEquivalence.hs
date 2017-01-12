@@ -1,15 +1,21 @@
 {-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE TupleSections #-}
 
 module Algorithm.NfaEquivalence where
 
-import qualified Data.CongruenceClosure         as CC
+import qualified Data.CongruenceClosure          as CC
 import           Data.Nfa
-import           Data.Queue                     as Q
+import           Data.Queue                      as Q
 
-import           Control.Monad.Trans.State.Lazy
+import           Control.Monad.Trans.Class       ( lift )
+import           Control.Monad.Trans.RWS.Lazy    as RWS
+import           Control.Monad.Trans.Writer.Lazy as Writer
 import           Data.Equivalence.Monad
-import qualified Data.IntSet                    as IS
-import qualified Data.Set                       as S
+import           Data.Foldable                   ( toList )
+import qualified Data.IntSet                     as IS
+import           Data.Maybe                      ( isNothing )
+import           Data.Sequence                   as Seq
+import qualified Data.Set                        as S
 
 type NfaStates = IS.IntSet
 
@@ -17,51 +23,104 @@ type Error = String
 
 type Constraint c = ([c], NfaStates, NfaStates)
 
-nfaStatesEquivalentHkNaive :: forall c. (Ord c) => Nfa c -> NfaStates -> NfaStates -> Bool
-nfaStatesEquivalentHkNaive nfa set1 set2 =
-    runEquivM' $ check (Q.singleton ([], set1, set2))
+nfaStatesEquivalentHk :: (Ord c) => Nfa c -> NfaStates -> NfaStates -> Bool
+nfaStatesEquivalentHk nfa set1 set2 =
+    let (maybeWitness, _) = nfaStatesDifferencesHk nfa set1 set2
+    in
+        isNothing maybeWitness
+
+type HkEquivM s c = EquivT' s NfaStates (Writer (Seq (Bool, Constraint c)))
+
+-- | Find an input word which disproves the equality of the given sets of NFA states,
+-- Also the set of possible states the automata are in (after reading the input word) is returned.
+-- For each constraint to check a trace is produced.
+-- The flag in the traces indicates whether that check was redundant, and thus was skipped.
+-- This implementation uses a Union-Find data structure.
+nfaStatesDifferencesHk :: forall c.
+                            (Ord c)
+                            => Nfa c
+                            -> NfaStates
+                            -> NfaStates
+                            -> (Maybe (Constraint c), [(Bool, Constraint c)])
+nfaStatesDifferencesHk nfa set1 set2 =
+    let (witness, traces) = runWriter $ runEquivT' $ check (Q.singleton ([], set1, set2))
+    in
+        (witness, toList traces)
   where
-    check :: FifoQueue (Constraint c) -> EquivM' s NfaStates Bool
-    check queue = (flip . maybe) (return True) (Q.pop queue) $
-        \(constraint@(w, xs, ys), queue') -> do
+    check :: FifoQueue (Constraint c) -> HkEquivM s c (Maybe (Constraint c))
+    check queue = (flip . maybe) (return Nothing) (Q.pop queue) $
+        \(constraint@(_w, xs, ys), queue') -> do
             alreadyEqual <- xs `equivalent` ys
             if alreadyEqual
-                then check queue'
+                then skip constraint >> check queue'
                 else if (nfa `accepts` IS.toList xs) /= (nfa `accepts` IS.toList ys)
-                     then return False
-                     else equate xs ys >> check (queue' `Q.pushAll` todo constraint)
+                     then return (Just constraint)
+                     else do
+                         equate xs ys
+                         trace constraint
+                         check (queue' `Q.pushAll` todo constraint)
       where
-        todo (w, xs, ys) = [ (c : w, xs `nfaStep'` c, ys `nfaStep'` c)
+        todo (w, xs, ys) = [ (w ++ [ c ], xs `nfaStep'` c, ys `nfaStep'` c)
                            | c <- alphabet ]
 
     alphabet = S.toList (nfaAlphabet nfa)
     nfaStep' = nfaStep nfa
 
-type HkcEquivM = State CC.CongruenceClosure
+    trace :: Constraint c -> HkEquivM s c () -- Necessary to help the type checker
+    trace = lift . Writer.tell . Seq.singleton . (False,)
 
-nfaStatesEquivalentHkC :: forall c. (Ord c) => Nfa c -> NfaStates -> NfaStates -> Bool
+    skip :: Constraint c -> HkEquivM s c () -- Necessary to help the type checker
+    skip = lift . Writer.tell . Seq.singleton . (True,)
+
+
+type HkcM c = RWS () (Seq (Bool, Constraint c)) CC.CongruenceClosure
+
+nfaStatesEquivalentHkC :: (Ord c) => Nfa c -> NfaStates -> NfaStates -> Bool
 nfaStatesEquivalentHkC nfa set1 set2 =
-    evalState (check (Q.singleton ([], set1, set2))) CC.empty
+    let (maybeWitness, _) = nfaStatesDifferencesHkC nfa set1 set2
+    in
+        isNothing maybeWitness
+
+-- | Find an input word which disproves the equality of the given sets of NFA states,
+-- Also the set of possible states the automata are in (after reading the input word) is returned.
+-- For each constraint to check a trace is produced.
+-- The flag in the traces indicates whether that check was redundant, and thus was skipped.
+-- This implementation uses a set rewriting datastructure to implement the congruence closure.
+nfaStatesDifferencesHkC :: forall c.
+                        (Ord c)
+                        => Nfa c
+                        -> NfaStates
+                        -> NfaStates
+                        -> (Maybe (Constraint c), [(Bool, Constraint c)])
+nfaStatesDifferencesHkC nfa set1 set2 =
+    let (witness, traces) = evalRWS (check (Q.singleton ([], set1, set2))) () CC.empty
+    in
+        (witness, toList traces)
   where
-    check :: FifoQueue (Constraint c) -> HkcEquivM Bool
-    check queue = (flip . maybe) (return True) (Q.pop queue) $
-        \(constraint@(w, xs, ys), queue') -> do
+    check :: FifoQueue (Constraint c) -> HkcM c (Maybe (Constraint c))
+    check queue = (flip . maybe) (return Nothing) (Q.pop queue) $
+        \(constraint@(_w, xs, ys), queue') -> do
             -- TODO: do not only consider the relation, but also the pairs in `ps`. See 3.3
             alreadyEqual <- xs `equivalentM` ys
             if alreadyEqual
-                then check queue'
+                then skip constraint >> check queue'
                 else if (nfa `accepts` IS.toList xs) /= (nfa `accepts` IS.toList ys)
-                     then return False
-                     else equateM xs ys >> check (queue' `Q.pushAll` todo constraint)
+                     then return (Just constraint)
+                     else do
+                         equateM xs ys
+                         trace constraint
+                         check (queue' `Q.pushAll` todo constraint)
       where
-        todo (w, xs, ys) = [ (c : w, xs `nfaStep'` c, ys `nfaStep'` c)
+        todo (w, xs, ys) = [ (w ++ [ c ], xs `nfaStep'` c, ys `nfaStep'` c)
                            | c <- alphabet ]
 
     alphabet = S.toList (nfaAlphabet nfa)
     nfaStep' = nfaStep nfa
 
-    equivalentM :: NfaStates -> NfaStates -> HkcEquivM Bool
+    equivalentM :: NfaStates -> NfaStates -> HkcM c Bool
     equivalentM s1 s2 = gets $ \relation -> CC.equivalent s1 s2 relation
 
-    equateM :: NfaStates -> NfaStates -> HkcEquivM ()
+    equateM :: NfaStates -> NfaStates -> HkcM c ()
     equateM s1 s2 = modify $ \relation -> CC.equate relation s1 s2
+    trace = RWS.tell . Seq.singleton . (False,)
+    skip = RWS.tell . Seq.singleton . (True,)
