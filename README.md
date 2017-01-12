@@ -68,7 +68,7 @@ The precedence rules are as usual:
 
 Example for turning a regular expression into a DFA by using derivatives:
 
-    $ stack exec regex-derivation -- --without-skeleton
+    $ stack exec regex-derivation -- --withoutSkeleton
       a* (b | c)
       ^D
       <LaTeX snippet for DFA table>
