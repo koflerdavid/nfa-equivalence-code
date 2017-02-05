@@ -13,6 +13,7 @@ import           Data.Set                     as Set
 import qualified Data.Text.IO                 as TIO
 import           Text.LaTeX
 import           Text.LaTeX.Base.Class
+import           Text.LaTeX.Base.Pretty
 import           Text.LaTeX.Packages.AMSMath
 import           Text.LaTeX.Packages.AMSSymb
 import           Text.LaTeX.Packages.Inputenc
@@ -26,7 +27,7 @@ printTransitionTable withoutSkeleton regex transitions = do
                         (firstColumn ++ stateColumns)
                         (tableHeader regexAlphabet <> lnbk <> hline <> tableBody transitions)
         theDocument = if withoutSkeleton then table else thePreamble <> document table
-    TIO.putStrLn . render $ theDocument
+    putStrLn . prettyLaTeX $ theDocument
 
 thePreamble :: LaTeX
 thePreamble = mconcat [ documentclass [] article
