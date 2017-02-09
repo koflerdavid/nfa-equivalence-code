@@ -58,6 +58,17 @@ spec = do
         it "should not consider {2, 3, 4} and {3, 5} as equal" $ do
             equal [ 2, 3, 4 ] [ 3, 5 ] relation' `shouldNotBe` True
 
+    describe "deleteting a rule from a congruence closure" $ do
+        let relation' = equate relation [ 3, 4 ] [ 3, 5 ]
+
+        it "should consider {3, 4} and {3, 5} as equal" $ do
+            equal [ 3, 4 ] [ 3, 5 ] relation' `shouldBe` True
+
+        let relation'' = CC.unequate relation' (IS.fromList [3, 4]) (IS.fromList [3, 5])
+
+        it "should not, after unequating, consider {3, 4} and {4, 5} as equal anymore" $ do
+            equal [ 3, 4 ] [ 3, 5 ] relation'' `shouldBe` False
+
 equal :: [Int] -> [Int] -> CC.CongruenceClosure -> Bool
 equal is1 is2 rel = CC.equivalent (IS.fromList is1) (IS.fromList is2) rel
 
