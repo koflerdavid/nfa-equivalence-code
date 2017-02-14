@@ -96,6 +96,8 @@ executable benchmark
   ghc-options:         -threaded -rtsopts -with-rtsopts=-N -O2 -Wall
   build-depends:       base
                      , containers
+                     , criterion
+                     , deepseq
                      , graphviz
                      , NfaExperiments
                      , optparse-generic
