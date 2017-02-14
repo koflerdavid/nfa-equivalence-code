@@ -96,14 +96,18 @@ executable benchmark
   ghc-options:         -threaded -rtsopts -with-rtsopts=-N -O2 -Wall
   build-depends:       base
                      , containers
+                     , graphviz
                      , NfaExperiments
                      , optparse-generic
                      , MonadRandom
                      , random
+                     , text
                      , time
                      -- For the Control.Monad.Trans.Except module
                      , transformers >= 0.4
-  other-modules:       RandomNfa
+  other-modules:       AutomataOutput
+                     , Interpolator
+                     , RandomNfa
   default-language:    Haskell2010
 
 test-suite NfaExperiments-test
