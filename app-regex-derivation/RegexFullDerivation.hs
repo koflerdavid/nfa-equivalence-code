@@ -1,5 +1,6 @@
 module RegexFullDerivation where
 
+import qualified RegexDfaOutput.Html        as HtmlOutput
 import qualified RegexDfaOutput.LaTeX       as LaTeXOutput
 import qualified RegexDfaOutput.Tsv         as TsvOutput
 import           Types
@@ -23,6 +24,7 @@ parseAndDeriveRegexToDfa outputFormat withoutSkeleton = do
         Left parseError -> throwE parseError
         Right regex -> do
             let printer = case outputFormat of
+                    Html -> HtmlOutput.printTransitionTable
                     Latex -> LaTeXOutput.printTransitionTable
                     Tsv -> TsvOutput.printTransitionTable
             lift $ printer withoutSkeleton regex (deriveRegexToDfa regex)

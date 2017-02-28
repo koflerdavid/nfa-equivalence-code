@@ -10,7 +10,7 @@ import           Options.Generic
 
 type RegexDfaTransitions = Map (Regex Char) (Map Char (Regex Char))
 
-data OutputFormat = Latex | Tsv
+data OutputFormat = Latex | Tsv | Html
     deriving (Eq, Generic, ParseField, ParseFields, Read, Show)
 
 instance ParseRecord OutputFormat
