@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<h1>Algorithms</h1>
+
+<h2>Derivatives of Regular Expressions</h2>
+
+<form id="frmWordDerivation" method="POST" action="/regex/derivation">
+    <label>
+        Word:
+        <input name="word" type="text" id="txtWord">
+    </label>
+
+    <label>
+        Regular expression:
+        <textarea name="regex" cols="60" rows="5" id="txtRegex"></textarea>
+    </label>
+
+    <button type="submit">Derive!</button>
+    <output id="wordDerivationOutput"></output>
+</form>
+
+<script type="application/javascript">
+    function createPostRequest(url) {
+        const request = new XMLHttpRequest();
+        request.open('POST', url, true);
+        request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+        return request;
+    }
+
+    document.getElementById("frmWordDerivation").onsubmit = function (e) {
+        const request = createPostRequest('/regex/derivation');
+        request.onload = function () {
+            if (request.status === 200) {
+                document.getElementById('wordDerivationOutput').innerText = request.responseText;
+            } else {
+                console.error("Error", request);
+            }
+        };
+
+        const word = document.getElementById('txtWord').value || '';
+        const regex = document.getElementById('txtRegex').value || 'ε';
+        request.send(encodeURI('word=' + word) + '&' + encodeURI('regex=' + regex));
+        e.preventDefault();
+    };
+</script>
+</body>
+</html>
