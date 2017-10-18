@@ -1,0 +1,33 @@
+form input, form textarea, form output, form button {
+    display: block;
+    margin-bottom: 1em;
+}
+
+#divOutput {
+    visibility: hidden;
+}
+
+@media (min-width: 500px) {
+    body {
+        padding-left: 20%;
+        padding-right: 20%;
+    }
+
+    form {
+        display: table;
+    }
+
+    form label {
+        display: table-cell;
+        vertical-align: top;
+        padding-right: 1em;
+    }
+
+    form input, form textarea, form output {
+        display: table-cell;
+    }
+
+    form .form-row {
+        display: table-row;
+    }
+}

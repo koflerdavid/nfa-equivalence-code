@@ -2,26 +2,50 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Algorithms on Regular Expression and Finite Automata</title>
+    <link rel="stylesheet" type="text/css" href="static/styles.css">
 </head>
 <body>
-<h1>Algorithms</h1>
+<h1>Algorithms on Regular Expression and Finite Automata</h1>
+
+<p>
+    This website was created to let students use the algorithms developed as part of my
+    Master thesis to check their homework and to aid in preparing for their exams.
+    Please be aware that for now all queries are executed on the server.
+    Therefore, there are strict rate and runtime limits in place to
+    protect my webspace and to ensure the user experience of other students.
+</p>
+
+<p>
+    The code is licenced under a BSD3-license and available on
+    <a target="_blank" href="https://github.com/koflerdavid/nfa-equivalence-code">its GitHub
+        page</a>.
+    Issue reports and pull requests are always welcome :)
+</p>
 
 <h2>Derivatives of Regular Expressions</h2>
 
 <form id="frmWordDerivation" method="POST" action="/regex/derivation">
-    <label>
-        Word:
-        <input name="word" type="text" id="txtWord">
-    </label>
+    <div class="form-row">
+        <label for="txtWord">
+            Word:
+        </label>
+        <input name="word" type="text" id="txtWord" class="clearfix">
+    </div>
 
-    <label>
-        Regular expression:
-        <textarea name="regex" cols="60" rows="5" id="txtRegex"></textarea>
-    </label>
+    <div class="form-row">
+        <label for="txtRegex">
+            Regular expression:
+        </label>
+        <textarea name="regex" rows="5" id="txtRegex" class="clearfix"></textarea>
+    </div>
 
     <button type="submit">Derive!</button>
-    <output id="wordDerivationOutput"></output>
+
+    <div class="form-row" id="divOutput">
+        <label for="wordDerivationOutput">Result:</label>
+        <output id="wordDerivationOutput"></output>
+    </div>
 </form>
 
 <script type="application/javascript">
@@ -33,18 +57,24 @@
     }
 
     document.getElementById("frmWordDerivation").onsubmit = function (e) {
-        const request = createPostRequest('/regex/derivation');
-        request.onload = function () {
+        const request = createPostRequest('regex/derivation');
+        request.addEventListener('load', function () {
             if (request.status === 200) {
                 document.getElementById('wordDerivationOutput').innerText = request.responseText;
+                document.getElementById('divOutput').style = "visibility: visible;";
             } else {
                 console.error("Error", request);
             }
-        };
+        });
+
+        request.addEventListener('error', function (e) {
+            console.error("Error", request, e);
+        });
 
         const word = document.getElementById('txtWord').value || '';
         const regex = document.getElementById('txtRegex').value || 'ε';
         request.send(encodeURI('word=' + word) + '&' + encodeURI('regex=' + regex));
+
         e.preventDefault();
     };
 </script>
