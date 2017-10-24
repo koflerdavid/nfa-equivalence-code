@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Algorithms on Regular Expression and Finite Automata</title>
-    <link rel="stylesheet" type="text/css" href="static/styles.css">
+    <link rel="stylesheet" type="text/css" href="./static/styles.css">
 </head>
 <body>
 <h1>Algorithms on Regular Expression and Finite Automata</h1>
@@ -30,14 +30,14 @@
         <label for="txtWord">
             Word:
         </label>
-        <input name="word" type="text" id="txtWord" class="clearfix">
+        <input name="word" type="text" id="txtWord">
     </div>
 
     <div class="form-row">
         <label for="txtRegex">
             Regular expression:
         </label>
-        <textarea name="regex" rows="5" id="txtRegex" class="clearfix"></textarea>
+        <textarea name="regex" rows="5" id="txtRegex"></textarea>
     </div>
 
     <button type="submit">Derive!</button>
@@ -45,6 +45,15 @@
     <div class="form-row" id="divOutput">
         <label for="wordDerivationOutput">Result:</label>
         <output id="wordDerivationOutput"></output>
+    </div>
+</form>
+
+<h2>Converting Regular Expressions to DFAs</h2>
+
+<form id="frmRegexToDfa" method="post" action="regex/dfa_conversion">
+    <div class="form-row">
+        <label for="txtInputRegex">Regex:</label>
+        <textarea name="regex" rows="5" id="txtInputRegex"></textarea>
     </div>
 </form>
 
