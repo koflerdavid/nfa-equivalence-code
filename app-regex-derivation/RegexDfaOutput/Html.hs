@@ -2,7 +2,7 @@
 
 module RegexDfaOutput.Html ( printTransitionTable ) where
 
-import           Types
+import           Algorithm.Regex.DfaConversion ( RegexDfaTransitions )
 
 import           Control.Monad     ( forM_ )
 import           Data.Map          as Map

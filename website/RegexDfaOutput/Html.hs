@@ -5,15 +5,15 @@ module RegexDfaOutput.Html
   , formatTransitionTable
   ) where
 
-import Control.Monad (forM_)
-import Data.Map as Map
-import Data.Regex
-import Data.Set as Set
-import Data.Text.Lazy
-import qualified Data.Text.Lazy.IO as TIO
-import Lucid
+import           Algorithm.Regex.DfaConversion ( RegexDfaTransitions )
 
-type RegexDfaTransitions = Map (Regex Char) (Map Char (Regex Char))
+import           Control.Monad     (forM_)
+import           Data.Map          as Map
+import           Data.Regex
+import           Data.Set          as Set
+import           Data.Text.Lazy
+import qualified Data.Text.Lazy.IO as TIO
+import           Lucid
 
 printTransitionTable :: Bool -> Regex Char -> RegexDfaTransitions -> IO ()
 printTransitionTable withoutSkeleton regex transitions = do

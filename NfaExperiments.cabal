@@ -30,6 +30,7 @@ library
                      , Data.Nfa
                      , Data.Queue
                      , Data.Regex
+                     , Algorithm.Regex.DfaConversion
                      , Data.CongruenceClosure
                      , Data.CongruenceClosure.Internal
                      , Language.Automata.HkntParser

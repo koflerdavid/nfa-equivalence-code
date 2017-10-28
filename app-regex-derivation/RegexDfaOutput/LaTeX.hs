@@ -3,19 +3,18 @@
 
 module RegexDfaOutput.LaTeX ( printTransitionTable ) where
 
-import           Types
+import Algorithm.Regex.DfaConversion ( RegexDfaTransitions )
+import Data.Regex
 
-import           Data.Regex
-
-import           Data.List                    as List
-import           Data.Map                     as Map
-import           Data.Set                     as Set
-import           Text.LaTeX
-import           Text.LaTeX.Base.Class
-import           Text.LaTeX.Base.Pretty
-import           Text.LaTeX.Packages.AMSMath
-import           Text.LaTeX.Packages.AMSSymb
-import           Text.LaTeX.Packages.Inputenc
+import Data.List                    as List
+import Data.Map                     as Map
+import Data.Set                     as Set
+import Text.LaTeX
+import Text.LaTeX.Base.Class
+import Text.LaTeX.Base.Pretty
+import Text.LaTeX.Packages.AMSMath
+import Text.LaTeX.Packages.AMSSymb
+import Text.LaTeX.Packages.Inputenc
 
 printTransitionTable :: Bool -> Regex Char -> RegexDfaTransitions -> IO ()
 printTransitionTable withoutSkeleton regex transitions = do
