@@ -10,7 +10,6 @@ import           Data.Regex
 import           Data.List                    as List
 import           Data.Map                     as Map
 import           Data.Set                     as Set
-import qualified Data.Text.IO                 as TIO
 import           Text.LaTeX
 import           Text.LaTeX.Base.Class
 import           Text.LaTeX.Base.Pretty
@@ -44,7 +43,7 @@ stateName :: Char -> LaTeX
 stateName s = fromString (show s)
 
 regexRepr :: Regex Char -> LaTeX
-regexRepr = texy
+regexRepr = texy . TexyRegex
 
 tableBody :: RegexDfaTransitions -> LaTeX
 tableBody transitions = mconcat $ List.map (uncurry stateTransitions) (Map.toList transitions)
@@ -56,8 +55,10 @@ stateTransitions r ts = columns
     theTitle = maybeStar <> regexRepr r
     columns = List.foldl1 (&) (theTitle : (List.map regexRepr . Map.elems $ ts)) <> lnbk
 
-instance Texy (Regex Char) where
-    texy r = math $ texyPrec 0 r
+newtype TexyRegex c = TexyRegex { innerRegex :: Regex c }
+
+instance Texy (TexyRegex Char) where
+    texy r = math $ texyPrec 0 $ innerRegex r
 
 texyPrec :: (LaTeXC l, Show c) => Int -> Regex c -> l
 texyPrec _ Empty = raw "\\varnothing"

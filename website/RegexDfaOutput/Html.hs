@@ -8,7 +8,6 @@ module RegexDfaOutput.Html
 import Control.Monad (forM_)
 import Data.Map as Map
 import Data.Regex
-import           Data.Map
 import Data.Set as Set
 import Data.Text.Lazy
 import qualified Data.Text.Lazy.IO as TIO
