@@ -16,7 +16,7 @@ import qualified Data.Text.Lazy.IO as TIO
 import           Lucid
 
 printTransitionTable :: Bool -> Regex Char -> RegexDfaTransitions -> IO ()
-printTransitionTable withoutSkeleton regex transitions = do
+printTransitionTable withoutSkeleton regex transitions =
   TIO.putStrLn (formatTransitionTable withoutSkeleton regex transitions)
 
 formatTransitionTable :: Bool -> Regex Char -> RegexDfaTransitions -> Text
@@ -27,7 +27,7 @@ formatTransitionTable withoutSkeleton regex transitions = renderText $
            head_ $ do
              meta_ [charset_ "UTF-8"]
              title_ "Regex to Dfa"
-             style_ $ "td { border: 1px solid black; }"
+             style_ "td { border: 1px solid black; }"
            body_ $ do
              p_ $ do
                "The following is the state transition table for an "
@@ -46,10 +46,10 @@ formatTransitionTable withoutSkeleton regex transitions = renderText $
             th_ "state"
             th_ "initial state?"
             th_ "final state?"
-            forM_ (Set.toAscList $ alphabet regex) $ \c -> do
+            forM_ (Set.toAscList $ alphabet regex) $ \c ->
               th_ (toHtml . show $ c)
         tbody_ $
-          forM_ (Map.toList transitions) $ \(r, ts) -> do
+          forM_ (Map.toList transitions) $ \(r, ts) ->
             tr_ $ do
               td_ $ toHtml . show $ r
               td_ $
