@@ -3,7 +3,7 @@ form input, form textarea, form output, form button {
     margin-bottom: 1em;
 }
 
-#divOutput {
+.output-container {
     visibility: hidden;
 }
 

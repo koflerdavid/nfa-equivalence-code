@@ -42,7 +42,7 @@
 
     <button type="submit">Derive!</button>
 
-    <div class="form-row" id="divOutput">
+    <div class="form-row output-container" id="divDerivationOutput">
         <label for="wordDerivationOutput">Result:</label>
         <output id="wordDerivationOutput"></output>
     </div>
@@ -55,6 +55,11 @@
         <label for="txtInputRegex">Regex:</label>
         <textarea name="regex" rows="5" id="txtInputRegex"></textarea>
     </div>
+    <button type="submit">Convert!</button>
+    <div class="form-row output-container" id="divDfaOutput">
+        <label for="dfaRepresentation">DFA:</label>
+        <div id="dfaRepresentation"></div>
+    </div>
 </form>
 
 <script type="application/javascript">
@@ -65,14 +70,14 @@
         return request;
     }
 
-    document.getElementById("frmWordDerivation").onsubmit = function (e) {
+    document.getElementById('frmWordDerivation').onsubmit = function (e) {
         const request = createPostRequest('regex/derivation');
         request.addEventListener('load', function () {
             if (request.status === 200) {
                 document.getElementById('wordDerivationOutput').innerText = request.responseText;
-                document.getElementById('divOutput').style = "visibility: visible;";
+                document.getElementById('divDerivationOutput').style = "visibility: visible;";
             } else {
-                console.error("Error", request);
+                console.error("Regex derivation request error", request);
             }
         });
 
@@ -83,6 +88,27 @@
         const word = document.getElementById('txtWord').value || '';
         const regex = document.getElementById('txtRegex').value || 'ε';
         request.send(encodeURI('word=' + word) + '&' + encodeURI('regex=' + regex));
+
+        e.preventDefault();
+    };
+
+    document.getElementById('frmRegexToDfa').onsubmit = function (e) {
+        const request = createPostRequest('regex/dfa_conversion');
+        request.addEventListener('load', function () {
+            if (request.status === 200) {
+                document.getElementById('dfaRepresentation').innerHTML = request.responseText;
+                document.getElementById('divDfaOutput').style = "visibility: visible;";
+            } else {
+                console.error("Regex conversion request error", request);
+            }
+        });
+
+        request.addEventListener('error', function (e) {
+            console.error("Error", request, e);
+        });
+
+        const regex = document.getElementById('txtInputRegex').value || '';
+        request.send(encodeURI('regex=' + regex));
 
         e.preventDefault();
     };

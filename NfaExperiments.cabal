@@ -97,13 +97,18 @@ executable website
   default-language:    Haskell2010
   main-is:             Main.hs
   other-modules:       RegexHandlers
+                     , RegexDfaOutput.Html
   build-depends:
                        base                      >= 4     && < 5
                      , bytestring                >= 0.9.1 && < 0.11
+                     , containers
+                     , lucid
                      , monad-control             >= 1.0   && < 1.1
                      , mtl                       >= 2     && < 3
                      , snap-core                 >= 1.0   && < 1.1
                      , snap-server               >= 1.0   && < 1.1
+                     , text
+                     , transformers
                      , NfaExperiments
 
   if impl(ghc >= 6.12.0)
