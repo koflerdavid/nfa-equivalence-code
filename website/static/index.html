@@ -63,55 +63,66 @@
 </form>
 
 <script type="application/javascript">
-    function createPostRequest(url) {
+    function createRequest(url, method) {
         const request = new XMLHttpRequest();
-        request.open('POST', url, true);
+        request.open(method || 'POST', url, true);
         request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
         return request;
     }
 
-    document.getElementById('frmWordDerivation').onsubmit = function (e) {
-        const request = createPostRequest('regex/derivation');
-        request.addEventListener('load', function () {
-            if (request.status === 200) {
-                document.getElementById('wordDerivationOutput').innerText = request.responseText;
-                document.getElementById('divDerivationOutput').style = "visibility: visible;";
-            } else {
-                console.error("Regex derivation request error", request);
-            }
-        });
+    function samePageForm(id, formParser, onSuccess, onError, requestConfigurator) {
+        const form = document.getElementById(id)
+            , action = form.getAttribute('action')
+            , method = form.getAttribute('method');
 
-        request.addEventListener('error', function (e) {
-            console.error("Error", request, e);
-        });
+        form.onsubmit = function (e) {
+            const request = createRequest(action, method);
+            request.addEventListener('load', function () {
+                onSuccess(request);
+            });
 
+            request.addEventListener('error', function (e) {
+                onError(e, request);
+            });
+
+            const encodedFormData = formParser(form);
+            request.send(encodedFormData);
+
+            e.preventDefault();
+        };
+    }
+
+    samePageForm('frmWordDerivation', function () {
         const word = document.getElementById('txtWord').value || '';
         const regex = document.getElementById('txtRegex').value || 'ε';
-        request.send(encodeURI('word=' + word) + '&' + encodeURI('regex=' + regex));
+        return encodeURI('word=' + word) + '&' + encodeURI('regex=' + regex);
+    }, function (request) {
+        if (request.status === 200) {
+            document.getElementById('wordDerivationOutput').innerText = request.responseText;
+            document.getElementById('divDerivationOutput').style = "visibility: visible;";
+        } else {
+            console.error("Regex derivation request error", request);
+        }
+    }, function (e, request) {
+        console.error("Regex derivation request error", request, e);
+    });
 
-        e.preventDefault();
-    };
-
-    document.getElementById('frmRegexToDfa').onsubmit = function (e) {
-        const request = createPostRequest('regex/dfa_conversion');
-        request.addEventListener('load', function () {
-            if (request.status === 200) {
-                document.getElementById('dfaRepresentation').innerHTML = request.responseText;
-                document.getElementById('divDfaOutput').style = "visibility: visible;";
-            } else {
-                console.error("Regex conversion request error", request);
-            }
-        });
-
-        request.addEventListener('error', function (e) {
-            console.error("Error", request, e);
-        });
-
+    samePageForm('frmRegexToDfa', function (form) {
         const regex = document.getElementById('txtInputRegex').value || '';
-        request.send(encodeURI('regex=' + regex));
-
-        e.preventDefault();
-    };
+        return encodeURI('regex=' + regex);
+    }, function (request) {
+        if (request.status === 200) {
+            document.getElementById('dfaRepresentation').innerHTML = request.responseText;
+            document.getElementById('divDfaOutput').style = "visibility: visible;";
+        } else {
+            console.error("Regex conversion request error", request);
+        }
+    }, function () {
+        console.error("Regex conversion request error", request, e);
+    }, function (request) {
+        // Request a HTML fragment from the server
+        request.setRequestHeader('X-Embeddable', 'true');
+    });
 </script>
 </body>
 </html>
