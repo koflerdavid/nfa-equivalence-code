@@ -3,7 +3,6 @@
 
 module Types where
 
-import Data.Map
 import Options.Generic
 
 data OutputFormat = Latex | Tsv | Html

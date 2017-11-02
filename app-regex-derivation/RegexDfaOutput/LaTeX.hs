@@ -3,7 +3,7 @@
 
 module RegexDfaOutput.LaTeX ( printTransitionTable ) where
 
-import Algorithm.Regex.DfaConversion ( RegexDfaTransitions )
+import Data.Dfa.Regex               ( RegexDfaTransitions )
 import Data.Regex
 
 import Data.List                    as List

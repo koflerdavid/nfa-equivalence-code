@@ -25,6 +25,8 @@ library
                      , Compiler.Hknt
                      , Compiler.Regex
                      , Data.Dfa
+                     , Data.Dfa.Format.Html
+                     , Data.Dfa.Regex
                      , Data.EpsilonNfa
                      , Data.EpsilonNfa.Internal
                      , Data.Nfa
@@ -46,7 +48,9 @@ library
                      , containers
                      , either
                      , equivalence
+                     , lucid
                      , parsec >= 3 && < 4
+                     , text
                      , transformers
 
   default-language:    Haskell2010
@@ -98,7 +102,6 @@ executable website
   default-language:    Haskell2010
   main-is:             Main.hs
   other-modules:       RegexHandlers
-                     , RegexDfaOutput.Html
   build-depends:
                        base                      >= 4     && < 5
                      , bytestring                >= 0.9.1 && < 0.11

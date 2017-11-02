@@ -1,11 +1,11 @@
 module RegexDfaOutput.Tsv ( printTransitionTable ) where
 
-import Algorithm.Regex.DfaConversion ( RegexDfaTransitions )
-import Data.Regex                    ( Regex, alphabet, matchesEmptyWord )
+import Data.Dfa.Regex ( RegexDfaTransitions )
+import Data.Regex     ( Regex, alphabet, matchesEmptyWord )
 
-import Control.Monad                 ( forM_ )
-import Data.Map                      as Map
-import Data.Set                      as Set
+import Control.Monad  ( forM_ )
+import Data.Map       as Map
+import Data.Set       as Set
 
 printTransitionTable :: Bool -> Regex Char -> RegexDfaTransitions -> IO ()
 printTransitionTable _ regex transitions = do

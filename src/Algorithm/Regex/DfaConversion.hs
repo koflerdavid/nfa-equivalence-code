@@ -1,6 +1,7 @@
 module Algorithm.Regex.DfaConversion where
 
 import Algorithm.Regex.Derivation ( derive )
+import Data.Dfa.Regex             ( RegexDfaTransitions )
 import Data.Queue                 as Queue
 import Data.Regex                 ( Regex, alphabet )
 
@@ -8,8 +9,6 @@ import Control.Monad.Trans.State  ( State, evalState, gets, modify )
 import Data.List                  as List
 import Data.Map                   as Map
 import Data.Set                   as Set
-
-type RegexDfaTransitions = Map (Regex Char) (Map Char (Regex Char))
 
 deriveRegexToDfa :: Regex Char -> RegexDfaTransitions
 deriveRegexToDfa regex =
@@ -42,5 +41,3 @@ deriveRegexForAlphabet regexAlphabet regex =
                 transitions' = Map.insert regex (Map.fromAscList derivations) transitions
             in
                 (transitions', Queue.pushAll queue regexesToQueue)
-
-

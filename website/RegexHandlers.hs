@@ -4,9 +4,9 @@ module RegexHandlers where
 
 import Algorithm.Regex.Derivation
 import Algorithm.Regex.DfaConversion   ( deriveRegexToDfa )
+import Data.Dfa.Format.Html            ( asHtml )
 import Data.Regex
 import Language.RegexParser
-import RegexDfaOutput.Html
 
 import Data.ByteString.Char8           ( unpack )
 import Data.Map
@@ -47,4 +47,4 @@ regexToDfaConversionHandler =
           Right regex -> do
             let transitions = deriveRegexToDfa regex
             withHeader <- fmap (isNothing . getHeader "X-Embeddable") getRequest
-            writeLazyText (formatTransitionTable withHeader regex transitions)
+            writeLazyText (asHtml withHeader regex transitions)
