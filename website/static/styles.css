@@ -1,4 +1,4 @@
-form input, form textarea, form output, form button {
+.form-rows input, form textarea, form output, form button {
     display: block;
     margin-bottom: 1em;
 }
@@ -7,27 +7,37 @@ form input, form textarea, form output, form button {
     visibility: hidden;
 }
 
+.error-message {
+    display: none;
+}
+
+.error-message.visible {
+    color: red;
+    font-weight: bold;
+    display: block;
+}
+
 @media (min-width: 500px) {
     body {
         padding-left: 20%;
         padding-right: 20%;
     }
 
-    form {
+    .form-rows {
         display: table;
     }
 
-    form label {
+    .form-rows label {
         display: table-cell;
         vertical-align: top;
         padding-right: 1em;
     }
 
-    form input, form textarea, form output {
+    .form-rows input, .form-rows textarea, .form-rows output {
         display: table-cell;
     }
 
-    form .form-row {
+    .form-rows .form-row {
         display: table-row;
     }
 }

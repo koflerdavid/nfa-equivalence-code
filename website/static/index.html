@@ -18,71 +18,132 @@
 
 <p>
     The code is licenced under a BSD3-license and available on
-    <a target="_blank" href="https://github.com/koflerdavid/nfa-equivalence-code">its GitHub
-        page</a>.
+    <a target="_blank"
+       href="https://github.com/koflerdavid/nfa-equivalence-code">its GitHub page</a>.
     Issue reports and pull requests are always welcome :)
 </p>
 
 <h2>Derivatives of Regular Expressions</h2>
 
 <form id="frmWordDerivation" method="POST" action="/regex/derivation">
-    <div class="form-row">
-        <label for="txtWord">
-            Word:
-        </label>
-        <input name="word" type="text" id="txtWord">
-    </div>
+    <p class="error-message">
+        An error occurred when performing the request. Please try again.
+        If the problem persists, contact the site administrator.
+    </p>
 
-    <div class="form-row">
-        <label for="txtRegex">
-            Regular expression:
-        </label>
-        <textarea name="regex" rows="5" id="txtRegex"></textarea>
-    </div>
+    <div class="form-rows">
+        <div class="form-row">
+            <label for="txtWord">
+                Word:
+            </label>
+            <input name="word" type="text" id="txtWord">
+        </div>
 
-    <button type="submit">Derive!</button>
+        <div class="form-row">
+            <label for="txtRegex">
+                Regular expression:
+            </label>
+            <textarea name="regex" rows="5" id="txtRegex"></textarea>
+        </div>
 
-    <div class="form-row output-container" id="divDerivationOutput">
-        <label for="wordDerivationOutput">Result:</label>
-        <output id="wordDerivationOutput"></output>
+        <button type="submit">Derive!</button>
+
+        <div class="form-row output-container" id="divDerivationOutput">
+            <label for="wordDerivationOutput">Result:</label>
+            <output id="wordDerivationOutput"></output>
+        </div>
     </div>
 </form>
 
 <h2>Converting Regular Expressions to DFAs</h2>
 
 <form id="frmRegexToDfa" method="post" action="regex/dfa_conversion">
-    <div class="form-row">
-        <label for="txtInputRegex">Regex:</label>
-        <textarea name="regex" rows="5" id="txtInputRegex"></textarea>
-    </div>
-    <button type="submit">Convert!</button>
-    <div class="form-row output-container" id="divDfaOutput">
-        <label for="dfaRepresentation">DFA:</label>
-        <div id="dfaRepresentation"></div>
+    <p class="error-message">
+        An error occurred when performing the request. Please try again.
+        If the problem persists, contact the site administrator.
+    </p>
+
+    <div class="form-rows">
+        <div class="form-row">
+            <label for="txtInputRegex">Regex:</label>
+            <textarea name="regex" rows="5" id="txtInputRegex"></textarea>
+        </div>
+        <button type="submit">Convert!</button>
+        <div class="form-row output-container" id="divDfaOutput">
+            <label for="dfaRepresentation">DFA:</label>
+            <div id="dfaRepresentation"></div>
+        </div>
     </div>
 </form>
 
 <script type="application/javascript">
-    function createRequest(url, method) {
-        const request = new XMLHttpRequest();
-        request.open(method || 'POST', url, true);
-        request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-        return request;
+    ajaxifyForm('frmWordDerivation', function () {
+        const word = byId('txtWord').value || '';
+        const regex = byId('txtRegex').value || 'ε';
+        return encodeURI('word=' + word) + '&' + encodeURI('regex=' + regex);
+    }, function (request, form) {
+        if (request.status === 200) {
+            hideErrorMessages(form);
+            byId('wordDerivationOutput').innerText = request.responseText;
+            byId('divDerivationOutput').style = "visibility: visible;";
+        } else {
+            showErrorMessage(form);
+            console.error("Regex derivation request error", request);
+        }
+    }, function (e, request, form) {
+        showErrorMessage(form);
+        console.error("Regex derivation request error", request, e);
+    });
+
+    ajaxifyForm('frmRegexToDfa', function (form) {
+        const regex = byId('txtInputRegex').value || '';
+        return encodeURI('regex=' + regex);
+    }, function (request, form) {
+        if (request.status === 200) {
+            hideErrorMessages(form);
+            byId('dfaRepresentation').innerHTML = request.responseText;
+            byId('divDfaOutput').style = "visibility: visible;";
+        } else {
+            showErrorMessage(form);
+            console.error("Regex conversion request error", request);
+        }
+    }, function (e, request, form) {
+        showErrorMessage(form);
+        console.error("Regex conversion request error", request, e);
+    }, function (request) {
+        // Request a HTML fragment from the server instead of full HTML
+        request.setRequestHeader('X-Embeddable', 'true');
+    });
+
+    function showErrorMessage(form) {
+        byClassName(form, 'error-message')
+            .forEach(function (element) {
+                element.classList.add('visible');
+            });
     }
 
-    function samePageForm(id, formParser, onSuccess, onError, requestConfigurator) {
-        const form = document.getElementById(id)
+    function hideErrorMessages(form) {
+        byClassName(form, 'error-message')
+            .forEach(function (element) {
+                element.classList.remove('visible');
+            });
+    }
+
+    function ajaxifyForm(id, formParser, onSuccess, onError, requestConfigurator) {
+        const form = byId(id)
             , action = form.getAttribute('action')
             , method = form.getAttribute('method');
 
         form.onsubmit = function (e) {
             const request = createRequest(action, method);
             request.addEventListener('load', function () {
-                onSuccess(request);
+                onSuccess(request, form);
             });
 
+            requestConfigurator(request);
+
             request.addEventListener('error', function (e) {
-                onError(e, request);
+                onError(e, request, form);
             });
 
             const encodedFormData = formParser(form);
@@ -92,37 +153,25 @@
         };
     }
 
-    samePageForm('frmWordDerivation', function () {
-        const word = document.getElementById('txtWord').value || '';
-        const regex = document.getElementById('txtRegex').value || 'ε';
-        return encodeURI('word=' + word) + '&' + encodeURI('regex=' + regex);
-    }, function (request) {
-        if (request.status === 200) {
-            document.getElementById('wordDerivationOutput').innerText = request.responseText;
-            document.getElementById('divDerivationOutput').style = "visibility: visible;";
-        } else {
-            console.error("Regex derivation request error", request);
+    function byId(id) {
+        const element = document.getElementById(id);
+        if (element == null) {
+            throw new DOMError('Element with id ' + id + ' not found');
         }
-    }, function (e, request) {
-        console.error("Regex derivation request error", request, e);
-    });
 
-    samePageForm('frmRegexToDfa', function (form) {
-        const regex = document.getElementById('txtInputRegex').value || '';
-        return encodeURI('regex=' + regex);
-    }, function (request) {
-        if (request.status === 200) {
-            document.getElementById('dfaRepresentation').innerHTML = request.responseText;
-            document.getElementById('divDfaOutput').style = "visibility: visible;";
-        } else {
-            console.error("Regex conversion request error", request);
-        }
-    }, function () {
-        console.error("Regex conversion request error", request, e);
-    }, function (request) {
-        // Request a HTML fragment from the server
-        request.setRequestHeader('X-Embeddable', 'true');
-    });
+        return element;
+    }
+
+    function byClassName(element, className) {
+        return Array.from(element.getElementsByClassName(className));
+    }
+
+    function createRequest(url, method) {
+        const request = new XMLHttpRequest();
+        request.open(method || 'POST', url, true);
+        request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+        return request;
+    }
 </script>
 </body>
 </html>
