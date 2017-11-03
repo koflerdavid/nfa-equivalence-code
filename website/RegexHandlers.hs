@@ -3,18 +3,14 @@
 module RegexHandlers where
 
 import Algorithm.Regex.Derivation
-import Algorithm.Regex.DfaConversion   ( deriveRegexToDfa )
-import Data.Dfa.Format.Html            ( asHtml )
-import Data.Regex
+import Algorithm.Regex.DfaConversion ( deriveRegexToDfa )
+import Data.Dfa.Format.Html          ( asHtml )
 import Language.RegexParser
 
-import Data.ByteString.Char8           ( unpack )
-import Data.Map
-import Data.Maybe                      ( isNothing )
-import Data.String                     ( fromString )
+import Data.ByteString.Char8         ( unpack )
+import Data.Maybe                    ( isJust )
+import Data.String                   ( fromString )
 import Snap.Core
-
-type RegexDfaTransitions = Map (Regex Char) (Map Char (Regex Char))
 
 derivationHandler :: Snap ()
 derivationHandler =
@@ -46,5 +42,5 @@ regexToDfaConversionHandler =
           Left _parseError -> writeBS "Regex parse error"
           Right regex -> do
             let transitions = deriveRegexToDfa regex
-            withHeader <- fmap (isNothing . getHeader "X-Embeddable") getRequest
-            writeLazyText (asHtml withHeader regex transitions)
+            withoutSkeleton <- fmap (isJust . getHeader "X-Embeddable") getRequest
+            writeLazyText (asHtml withoutSkeleton regex transitions)
