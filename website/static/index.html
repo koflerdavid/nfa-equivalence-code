@@ -23,6 +23,78 @@
     Issue reports and pull requests are always welcome :)
 </p>
 
+<h2>Regular Expression Language</h2>
+
+<p>
+    Regular expressions are composed of the tokens in the following list.
+    Tokens can, but are not required to, be separated by any amount of whitespaces.
+</p>
+
+<ul>
+    <li>
+        <code>0</code>, <code>&emptyset;</code>, or <code>&apos;&apos;</code>
+        represent the empty language.
+    </li>
+    <li>
+        <code>1</code> or <code>&epsilon;</code>
+        represent the language with only the empty word.
+    </li>
+    <li>
+        The characters <code>&lpar;&rpar;&ast;&plus;&vert;&quest;</code>
+        are operators.
+    </li>
+    <li>
+        Any character, enclosed in single quotes (<code>&apos;</code>),
+        represents the language with that character as the only word.
+        This is useful to represent characters that have a special meaning
+        according to the other rules.
+    </li>
+    <li>
+        Any character that is not one of the special characters from the above rules
+        (<code>&quot;&apos;&lpar;&rpar;&ast;&plus;&vert;&quest;01&emptyset;&epsilon;</code>)
+        can be represented by itself,
+        without enclosure in pairs of <code>&apos;;</code>.
+    </li>
+</ul>
+
+<p>
+    The tokens defined in the previous list are used to compose larger regular expressions
+    out of smaller ones.
+    To avoid having to write lots of parentheses, operator precedence rules are assumed:
+    postfix operators have the highest precedence, then language concatenation,
+    and lastly language union (<code>&</code>).
+    Parentheses can be used to enclose expressions and to circumvent operator predecence rules.
+</p>
+
+<ul>
+    <li>
+        The postfix operator <code>&ast;</code> represents the Kleene star operation.
+    </li>
+    <li>
+        The postfix operator <code>&plus;</code> represents the "Kleene plus", e.g.,
+        <code>a&plus;</code> can be replaced with <code>aa&ast;</code>.
+    </li>
+    <li>
+        The postfix operator <code>&quest;</code> says that
+        the regular expression before it is optional, e.g.,
+        <code>a&quest;</code> can be replaced with <code>(a &plus; &epsilon;)</code>.
+    </li>
+    <li>
+        The vertical bar <code>&vert;</code> represents the union of languages.
+        (This operator has been chosen instead of <code>&plus;</code>
+        to avoid having to deal with an ambigous grammar.)
+    </li>
+    <li>
+        Juxtaposition of regular expressions, i.e., writing them next to each other,
+        represents language concatenation.
+    </li>
+</ul>
+
+<p>
+    Examples for valid regular expressions are: <code>a(a|b)&ast;b</code>,
+    <code>b&plus;&quest;</code>, <code>'(' (')' | '(' ')' ) ')'</code>.
+</p>
+
 <h2>Derivatives of Regular Expressions</h2>
 
 <form id="frmWordDerivation" method="POST" action="/regex/derivation">
