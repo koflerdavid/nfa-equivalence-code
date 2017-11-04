@@ -211,7 +211,9 @@
                 onSuccess(request, form);
             });
 
-            requestConfigurator(request);
+            if (requestConfigurator != null) {
+                requestConfigurator(request);
+            }
 
             request.addEventListener('error', function (e) {
                 onError(e, request, form);
