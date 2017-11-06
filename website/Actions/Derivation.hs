@@ -36,8 +36,9 @@ action =
           Utf8DecodingError parameter -> do
             writeBS $ UTF8.fromString . show $ parameter
             writeBS " was not specified as a valid UTF-8 string"
-          RegularExpressionParseError ->
-            writeBS "Parse error in regular expression"
+          RegularExpressionParseError parseError -> do
+            writeBS "Parse error in regular expression:\n"
+            writeBS (UTF8.fromString . show $ parseError)
 
 derive :: Maybe ByteString -> Maybe ByteString -> Either DerivationError (Regex Char)
 derive Nothing _ = Left (ParameterNotFound Regex)
@@ -50,5 +51,5 @@ derive (Just utf8InputRegexString) (Just utf8Word) = do
   when (UTF8.replacement_char `elem` word) $
     Left (Utf8DecodingError Word)
   case parseRegex "<param>" inputRegexString of
-    Left _parseError -> Left RegularExpressionParseError
+    Left parseError -> Left RegularExpressionParseError parseError
     Right regex -> return $ wordDerive word regex
