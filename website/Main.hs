@@ -2,9 +2,10 @@
 
 module Main where
 
-import RegexHandlers
+import Actions.Derivation           as Derivation
+import Actions.RegexToDfaConversion as RegexToDfaConversion
 
-import Control.Applicative
+import Control.Applicative          ( (<|>) )
 import Snap.Core
 import Snap.Http.Server
 import Snap.Util.FileServe
@@ -16,7 +17,7 @@ site :: Snap ()
 site =
   ifTop (sendFile "website/static/index.html") <|>
   route
-    [ ("regex/derivation", derivationHandler)
-    , ("regex/dfa_conversion", regexToDfaConversionHandler)
+    [ ("regex/derivation", Derivation.action)
+    , ("regex/dfa_conversion", RegexToDfaConversion.action)
     ] <|>
   dir "static" (serveDirectory "website/static")
