@@ -97,10 +97,11 @@
 <h2>Derivatives of Regular Expressions</h2>
 
 <form id="frmWordDerivation" method="POST" action="/regex/derivation">
-    <p class="error-message">
+    <p class="error-message generic-error-message">
         An error occurred when performing the request. Please try again.
         If the problem persists, contact the site administrator.
     </p>
+    <p class="error-message custom-error-message"></p>
 
     <div class="form-rows">
         <div class="form-row">
@@ -129,10 +130,11 @@
 <h2>Converting Regular Expressions to DFAs</h2>
 
 <form id="frmRegexToDfa" method="post" action="regex/dfa_conversion">
-    <p class="error-message">
+    <p class="error-message generic-error-message">
         An error occurred when performing the request. Please try again.
         If the problem persists, contact the site administrator.
     </p>
+    <p class="error-message custom-error-message"></p>
 
     <div class="form-rows">
         <div class="form-row">
@@ -140,57 +142,77 @@
             <textarea name="regex" rows="5" id="txtInputRegex"></textarea>
         </div>
         <button type="submit">Convert!</button>
+
         <div class="form-row output-container" id="divDfaOutput">
-            <label for="dfaRepresentation">DFA:</label>
+            <label>DFA:</label>
             <div id="dfaRepresentation"></div>
         </div>
     </div>
 </form>
 
 <script type="application/javascript">
-    ajaxifyForm('frmWordDerivation', function () {
-        const word = byId('txtWord').value || '';
-        const regex = byId('txtRegex').value || 'ε';
-        return encodeURI('word=' + word) + '&' + encodeURI('regex=' + regex);
-    }, function (request, form) {
-        if (request.status === 200) {
+    ajaxifyForm('frmWordDerivation',
+        function () {
+            const word = byId('txtWord').value || '';
+            const regex = byId('txtRegex').value || 'ε';
+            return encodeURI('word=' + word) + '&' + encodeURI('regex=' + regex);
+        },
+        function (request, form) {
             hideErrorMessages(form);
-            byId('wordDerivationOutput').innerText = request.responseText;
-            byId('divDerivationOutput').style = "visibility: visible;";
-        } else {
-            showErrorMessage(form);
-            console.error("Regex derivation request error", request);
-        }
-    }, function (e, request, form) {
-        showErrorMessage(form);
-        console.error("Regex derivation request error", request, e);
-    });
 
-    ajaxifyForm('frmRegexToDfa', function (form) {
-        const regex = byId('txtInputRegex').value || '';
-        return encodeURI('regex=' + regex);
-    }, function (request, form) {
-        if (request.status === 200) {
+            if (request.status === 200) {
+                byId('wordDerivationOutput').innerText = request.responseText;
+                byId('divDerivationOutput').style = "visibility: visible;";
+            } else if (request.status === 400) {
+                showErrorMessage(form, request.responseText);
+            } else {
+                showErrorMessage(form, "Regex derivation error");
+                console.error("Regex derivation request error", request);
+            }
+        },
+        function (e, request, form) {
+            showErrorMessage(form, "Regex derivation request error");
+            console.error("Regex derivation request error", request, e);
+        });
+
+    ajaxifyForm('frmRegexToDfa',
+        function () {
+            const regex = byId('txtInputRegex').value || '';
+            return encodeURI('regex=' + regex);
+        },
+        function (request, form) {
             hideErrorMessages(form);
-            byId('dfaRepresentation').innerHTML = request.responseText;
-            byId('divDfaOutput').style = "visibility: visible;";
-        } else {
-            showErrorMessage(form);
-            console.error("Regex conversion request error", request);
-        }
-    }, function (e, request, form) {
-        showErrorMessage(form);
-        console.error("Regex conversion request error", request, e);
-    }, function (request) {
-        // Request a HTML fragment from the server instead of full HTML
-        request.setRequestHeader('X-Embeddable', 'true');
-    });
 
-    function showErrorMessage(form) {
-        byClassName(form, 'error-message')
-            .forEach(function (element) {
-                element.classList.add('visible');
-            });
+            if (request.status === 200) {
+                byId('dfaRepresentation').innerHTML = request.responseText;
+                byId('divDfaOutput').style = "visibility: visible;";
+            } else {
+                showErrorMessage(form, "Regex conversion error");
+                console.error("Regex conversion error", request);
+            }
+        },
+        function (e, request, form) {
+            showErrorMessage(form);
+            console.error("Regex conversion request error", request, e);
+        },
+        function (request) {
+            // Request a HTML fragment from the server instead of full HTML
+            request.setRequestHeader('X-Embeddable', 'true');
+        });
+
+    function showErrorMessage(form, message) {
+        if (message == null) {
+            byClassName(form, 'generic-error-message')
+                .forEach(function (element) {
+                    element.classList.add('visible');
+                });
+        } else {
+            byClassName(form, 'custom-error-message')
+                .forEach(function (element) {
+                    element.classList.add('visible');
+                    element.innerText = message;
+                });
+        }
     }
 
     function hideErrorMessages(form) {
@@ -205,7 +227,7 @@
             , action = form.getAttribute('action')
             , method = form.getAttribute('method');
 
-        form.onsubmit = function (e) {
+        form.addEventListener('submit',function (e) {
             const request = createRequest(action, method);
             request.addEventListener('load', function () {
                 onSuccess(request, form);
@@ -223,7 +245,7 @@
             request.send(encodedFormData);
 
             e.preventDefault();
-        };
+        });
     }
 
     function byId(id) {

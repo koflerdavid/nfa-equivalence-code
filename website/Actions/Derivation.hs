@@ -16,17 +16,17 @@ data DerivationParameter = Regex | Word
 data DerivationError
   = ParameterNotFound DerivationParameter
   | Utf8DecodingError DerivationParameter
-  | RegularExpressionParseError
+  | RegularExpressionParseError String
 
 action :: Snap ()
 action =
   method POST $ do
     setTimeout 10
     result <- derive <$> getParam "regex" <*> getParam "word"
+    modifyResponse $ setContentType "text/plain; charset=utf-8"
     case result of
-      Right regex' -> do
-        modifyResponse $ setContentType "text/plain; charset=utf-8"
-        writeBS $ UTF8.fromString (show regex')
+      Right derivedRegex ->
+        writeBS $ UTF8.fromString (show derivedRegex)
       Left e -> do
         modifyResponse $ setResponseCode 400
         case e of
@@ -38,7 +38,7 @@ action =
             writeBS " was not specified as a valid UTF-8 string"
           RegularExpressionParseError parseError -> do
             writeBS "Parse error in regular expression:\n"
-            writeBS (UTF8.fromString . show $ parseError)
+            writeBS (UTF8.fromString parseError)
 
 derive :: Maybe ByteString -> Maybe ByteString -> Either DerivationError (Regex Char)
 derive Nothing _ = Left (ParameterNotFound Regex)
@@ -50,6 +50,6 @@ derive (Just utf8InputRegexString) (Just utf8Word) = do
     Left (Utf8DecodingError Regex)
   when (UTF8.replacement_char `elem` word) $
     Left (Utf8DecodingError Word)
-  case parseRegex "<param>" inputRegexString of
-    Left parseError -> Left RegularExpressionParseError parseError
+  case parseRegex "<regex>" inputRegexString of
+    Left parseError -> Left (RegularExpressionParseError parseError)
     Right regex -> return $ wordDerive word regex
