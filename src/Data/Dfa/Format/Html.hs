@@ -43,11 +43,15 @@ asHtml withoutSkeleton regex =
                 forM_ (Set.toAscList . faInputs $ regexDfa) $ -- Ascending order
                     \c ->
                         th_ (toHtml . show $ c)
-        tbody_ $
-            forM_ (Map.toList . transitions $ regexDfa) $
-                \(r, ts) ->
-                    tr_ $ do
-                        td_ $ toHtml . show $ r
-                        td_ $ if regex == r then "->" else " "
-                        td_ $ if matchesEmptyWord r then "*" else " "
-                        forM_ (Map.elems ts) $ td_ . toHtml . show -- Map.elems yields ascending order
+        tbody_ $ do
+            transitionTableRow (regex, transitions regexDfa ! regex)
+            -- Leave out the initial regex, as it has been printed before
+            forM_ (Map.toList . Map.delete regex . transitions $ regexDfa) transitionTableRow
+
+    transitionTableRow :: (Regex Char, Map Char (Regex Char)) -> Html ()
+    transitionTableRow (r, ts) =
+        tr_ $ do
+            td_ $ toHtml . show $ r
+            td_ $ if regex == r then "->" else " "
+            td_ $ if matchesEmptyWord r then "*" else " "
+            forM_ (Map.elems ts) $ td_ . toHtml . show -- Map.elems yields ascending order
