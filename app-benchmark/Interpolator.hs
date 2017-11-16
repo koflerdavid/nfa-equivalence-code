@@ -26,7 +26,7 @@ unsafeInterpolate :: Show a => Template a -> [[a]] -> [a]
 unsafeInterpolate (Template n parts) args =
     if n /= length args + 1
     then error $ "Not enough arguments to insert"
-    else 
+    else
     -- The idea is to put an argument in front of every part.
     -- Since there is no argument in front of the first part, an empty string is inserted.
     concat $

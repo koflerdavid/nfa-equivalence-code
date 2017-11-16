@@ -1,14 +1,14 @@
 module Language.Automata.HkntParser.Tokeniser where
 
-import           Language.Automata.HkntParser.Class
+import Language.Automata.HkntParser.Class
 
-import           Control.Monad                      ( forM )
-import           Data.Char
-import           Text.Parsec                        hiding ( token )
+import Control.Monad                      ( forM )
+import Data.Char
+import Text.Parsec                        hiding ( token )
 
 tokenise :: String -> Either ParseError [(SourcePos, Token)]
 tokenise input = do
-    let 
+    let
         -- It is necessary to conserve the line numbers because empty lines will be ignored
         inputLines = zip [1 ..] (lines input)
         withoutEmptyLines = removeEmptyLines inputLines

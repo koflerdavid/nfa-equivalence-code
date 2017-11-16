@@ -3,11 +3,11 @@ module Algorithm.Regex.DerivationSpec
     , spec
     ) where
 
-import           Control.Monad (forM_)
-import           Test.Hspec
+import Control.Monad              ( forM_ )
+import Test.Hspec
 
-import           Algorithm.Regex.Derivation
-import           Data.Regex
+import Algorithm.Regex.Derivation
+import Data.Regex
 
 main :: IO ()
 main = hspec spec

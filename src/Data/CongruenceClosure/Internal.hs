@@ -1,6 +1,6 @@
 module Data.CongruenceClosure.Internal where
 
-import           Data.IntSet
+import Data.IntSet
 
 normalForm :: [(IntSet, IntSet)] -> IntSet -> IntSet
 normalForm rules integerSet =

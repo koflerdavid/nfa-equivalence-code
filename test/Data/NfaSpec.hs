@@ -3,10 +3,10 @@ module Data.NfaSpec
     , spec
     ) where
 
-import           Control.Monad ( forM_ )
-import           Test.Hspec
+import Control.Monad ( forM_ )
+import Test.Hspec
 
-import           Data.Nfa
+import Data.Nfa
 
 main :: IO ()
 main = hspec spec

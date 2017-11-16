@@ -4,17 +4,17 @@ module Algorithm.Regex.Equivalence
     , Witness
     ) where
 
-import           Algorithm.Regex.Derivation
-import           Data.Regex
-import           Data.Queue                      as Q
+import Algorithm.Regex.Derivation
+import Data.Queue                      as Q
+import Data.Regex
 
-import           Control.Monad.Trans.Class       ( lift )
-import           Control.Monad.Trans.Writer.Lazy
-import           Data.Equivalence.Monad          as Equiv
-import           Data.Foldable
-import           Data.List                       as List
-import           Data.Sequence                   as Seq
-import           Data.Set                        as Set
+import Control.Monad.Trans.Class       ( lift )
+import Control.Monad.Trans.Writer.Lazy
+import Data.Equivalence.Monad          as Equiv
+import Data.Foldable
+import Data.List                       as List
+import Data.Sequence                   as Seq
+import Data.Set                        as Set
 
 equivalent :: (Ord c) => Regex c -> Regex c -> Bool
 equivalent regex1 regex2 =

@@ -1,9 +1,9 @@
 module Language.RegexParser.Tokeniser where
 
-import           Language.RegexParser.Class
+import Language.RegexParser.Class
 
-import           Data.Char                  ( isSpace )
-import           Text.Parsec                hiding ( spaces )
+import Data.Char                  ( isSpace )
+import Text.Parsec                hiding ( spaces )
 
 tokenise :: String -> SourceName -> Either ParseError [(SourcePos, Token)]
 tokenise source input = parse regexTokeniser source input

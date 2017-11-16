@@ -3,7 +3,7 @@ module Language.RegexParser.Class
     , RegexTokenParser
     ) where
 
-import           Text.Parsec
+import Text.Parsec
 
 data Token = CharToken Char
            | EpsilonToken
@@ -17,14 +17,14 @@ data Token = CharToken Char
     deriving (Eq)
 
 instance Show Token where
-    show (CharToken c) = show c
-    show EpsilonToken = "ε"
-    show EmptyToken = "∅"
+    show (CharToken c)        = show c
+    show EpsilonToken         = "ε"
+    show EmptyToken           = "∅"
     show ZeroOrMoreTimesToken = "*"
-    show OneOrMoreTimesToken = "+"
-    show ZeroOrOneTimesToken = "?"
-    show AlternativeToken = "|"
-    show LeftParentheseToken = "("
+    show OneOrMoreTimesToken  = "+"
+    show ZeroOrOneTimesToken  = "?"
+    show AlternativeToken     = "|"
+    show LeftParentheseToken  = "("
     show RightParentheseToken = ")"
 
 type RegexTokenParser u a = Parsec [(SourcePos, Token)] u a

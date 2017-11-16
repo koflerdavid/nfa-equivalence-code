@@ -1,4 +1,4 @@
-{-# LANGUAGE FlexibleInstances     #-}
+{-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 
 module Data.Nfa
@@ -11,14 +11,14 @@ module Data.Nfa
     , accepts
     ) where
 
-import           Data.FiniteAutomaton
+import Data.FiniteAutomaton
 
-import           Control.Arrow        (second)
-import           Data.Foldable        as Foldable
-import           Data.IntSet          as ISet
-import           Data.List            as List
-import           Data.Map             as Map
-import           Data.Set             as Set
+import Control.Arrow        ( second )
+import Data.Foldable        as Foldable
+import Data.IntSet          as ISet
+import Data.List            as List
+import Data.Map             as Map
+import Data.Set             as Set
 
 data Nfa c = Nfa { nfaAcceptingStates :: ISet.IntSet
                  , nfaTransitions     :: Map.Map (Int, c) ISet.IntSet

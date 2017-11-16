@@ -1,7 +1,7 @@
-{-# LANGUAGE DeriveGeneric      #-}
-{-# LANGUAGE OverloadedStrings  #-}
+{-# LANGUAGE DeriveAnyClass #-}
+{-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE StandaloneDeriving #-}
-{-# LANGUAGE DeriveAnyClass     #-}
 
 module Main where
 
@@ -12,8 +12,8 @@ import           AutomataOutput
 import qualified Interpolator             as I
 import           RandomNfa
 
-import           Control.Monad            ( forM, forM_ )
 import           Control.DeepSeq          ( NFData, force )
+import           Control.Monad            ( forM, forM_ )
 import           Control.Monad.Random     ( evalRandT )
 import           Criterion.Main
 import qualified Data.IntSet              as IntSet

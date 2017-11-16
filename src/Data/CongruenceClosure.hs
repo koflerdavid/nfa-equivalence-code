@@ -8,8 +8,8 @@ module Data.CongruenceClosure
 
 import           Data.CongruenceClosure.Internal
 
-import           Data.List                       as List
 import qualified Data.IntSet                     as IS
+import           Data.List                       as List
 
 type Rule = (IS.IntSet, IS.IntSet)
 

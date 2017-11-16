@@ -1,4 +1,4 @@
-{-# LANGUAGE FlexibleInstances     #-}
+{-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 
 module Data.EpsilonNfa
@@ -10,13 +10,13 @@ module Data.EpsilonNfa
     , accepts
     ) where
 
-import           Control.Arrow                  (second)
-import           Control.Monad                  (forM_)
-import           Control.Monad.Trans.RWS.Strict (execRWS)
+import           Control.Arrow                  ( second )
+import           Control.Monad                  ( forM_ )
+import           Control.Monad.Trans.RWS.Strict ( execRWS )
 import           Data.IntSet                    as ISet
 import           Data.List                      as List
 import           Data.Map                       as Map
-import           Data.Maybe                     (fromJust, isJust)
+import           Data.Maybe                     ( fromJust, isJust )
 import qualified Data.Set                       as Set
 
 import           Data.EpsilonNfa.Internal

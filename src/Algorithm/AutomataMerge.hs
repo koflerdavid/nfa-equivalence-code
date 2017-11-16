@@ -1,9 +1,9 @@
 module Algorithm.AutomataMerge ( mergeDfa ) where
 
-import           Data.Dfa
+import Data.Dfa
 
-import           Data.IntSet as ISet
-import           Data.Map    as Map
+import Data.IntSet as ISet
+import Data.Map    as Map
 
 -- | Merges two DFAs. The states of the first automata won't get renamed.
 -- A mapping from the old states of the second automata to the new states is returned as well.

@@ -1,15 +1,15 @@
 module RegexFullDerivation where
 
-import qualified RegexDfaOutput.Html             as HtmlOutput
-import qualified RegexDfaOutput.LaTeX            as LaTeXOutput
-import qualified RegexDfaOutput.Tsv              as TsvOutput
+import qualified RegexDfaOutput.Html           as HtmlOutput
+import qualified RegexDfaOutput.LaTeX          as LaTeXOutput
+import qualified RegexDfaOutput.Tsv            as TsvOutput
 import           Types
 
-import           Algorithm.Regex.DfaConversion   ( deriveRegexToDfa )
+import           Algorithm.Regex.DfaConversion ( deriveRegexToDfa )
 import           Language.RegexParser
 
-import           Control.Monad.Trans.Class       ( lift )
-import           Control.Monad.Trans.Except      ( ExceptT, throwE )
+import           Control.Monad.Trans.Class     ( lift )
+import           Control.Monad.Trans.Except    ( ExceptT, throwE )
 
 parseAndDeriveRegexToDfa :: OutputFormat -> Bool -> ExceptT String IO ()
 parseAndDeriveRegexToDfa outputFormat withoutSkeleton = do
@@ -18,7 +18,7 @@ parseAndDeriveRegexToDfa outputFormat withoutSkeleton = do
         Left parseError -> throwE parseError
         Right regex -> do
             let printer = case outputFormat of
-                    Html -> HtmlOutput.printTransitionTable
+                    Html  -> HtmlOutput.printTransitionTable
                     Latex -> LaTeXOutput.printTransitionTable
-                    Tsv -> TsvOutput.printTransitionTable
+                    Tsv   -> TsvOutput.printTransitionTable
             lift $ printer withoutSkeleton regex (deriveRegexToDfa regex)

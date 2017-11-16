@@ -3,12 +3,12 @@ module Language.RegexParser.TokeniserSpec
     , spec
     ) where
 
-import           Language.RegexParser.Class
-import           Language.RegexParser.Tokeniser
+import Language.RegexParser.Class
+import Language.RegexParser.Tokeniser
 
-import           Control.Monad                  ( forM_ )
-import           Test.Hspec
-import           Text.Parsec
+import Control.Monad                  ( forM_ )
+import Test.Hspec
+import Text.Parsec
 
 main :: IO ()
 main = hspec spec

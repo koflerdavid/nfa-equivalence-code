@@ -3,11 +3,11 @@ module Language.RegexParser.InternalSpec
     , spec
     ) where
 
-import           Data.Regex
-import           Language.RegexParser.Internal
+import Data.Regex
+import Language.RegexParser.Internal
 
-import           Control.Monad                  ( forM_ )
-import           Test.Hspec
+import Control.Monad                 ( forM_ )
+import Test.Hspec
 
 main :: IO ()
 main = hspec spec

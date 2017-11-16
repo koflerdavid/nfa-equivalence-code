@@ -2,12 +2,12 @@
 
 module Actions.RegexToDfaConversion  ( action ) where
 
-import           Data.Dfa.Format.Html (asHtml)
-import           Language.RegexParser (parseRegex)
+import Data.Dfa.Format.Html ( asHtml )
+import Language.RegexParser ( parseRegex )
 
-import           Data.ByteString.UTF8 as UTF8
-import           Data.Maybe           (isJust)
-import           Snap.Core
+import Data.ByteString.UTF8 as UTF8
+import Data.Maybe           ( isJust )
+import Snap.Core
 
 action :: Snap ()
 action =

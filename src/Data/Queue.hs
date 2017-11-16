@@ -43,7 +43,7 @@ instance Queue LifoQueue where
     null (LifoQueue es) = Seq.null es
     push (LifoQueue es) e = LifoQueue $ es Seq.|> e
     pop (LifoQueue es) = case Seq.viewl es of
-        Seq.EmptyL -> Nothing
+        Seq.EmptyL     -> Nothing
         (Seq.:<) e es' -> Just (e, LifoQueue es')
     pushAll (LifoQueue es) fs =
         LifoQueue (es <> Seq.fromList fs)

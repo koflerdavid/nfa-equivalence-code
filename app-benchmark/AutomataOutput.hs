@@ -1,12 +1,12 @@
 module AutomataOutput where
 
-import           Data.Nfa
+import Data.Nfa
 
-import           Data.GraphViz
-import           Data.GraphViz.Printing ( renderDot, toDot )
-import           Data.Map               as Map
-import           Data.IntSet            as IntSet
-import           Data.Text.Lazy
+import Data.GraphViz
+import Data.GraphViz.Printing ( renderDot, toDot )
+import Data.IntSet            as IntSet
+import Data.Map               as Map
+import Data.Text.Lazy
 
 renderAutomata :: Nfa Char -> Text
 renderAutomata nfa = renderDot

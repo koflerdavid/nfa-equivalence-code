@@ -1,11 +1,11 @@
 module RegexEquivalence where
 
-import           Algorithm.Regex.Equivalence
-import           Language.RegexParser
+import Algorithm.Regex.Equivalence
+import Language.RegexParser
 
-import           Control.Monad               ( forM_ )
-import           Control.Monad.Trans.Class   ( lift )
-import           Control.Monad.Trans.Except  ( ExceptT, throwE )
+import Control.Monad               ( forM_ )
+import Control.Monad.Trans.Class   ( lift )
+import Control.Monad.Trans.Except  ( ExceptT, throwE )
 
 checkRegexEquivalence :: ExceptT String IO Bool
 checkRegexEquivalence = do
@@ -24,5 +24,5 @@ checkRegexEquivalence = do
     return (null witnesses)
 
 exceptM :: Monad m => Either e a -> ExceptT e m a
-exceptM (Left e) = throwE e
+exceptM (Left e)  = throwE e
 exceptM (Right a) = return a

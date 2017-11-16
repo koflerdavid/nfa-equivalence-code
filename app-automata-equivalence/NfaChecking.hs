@@ -1,20 +1,20 @@
 module NfaChecking ( checkNfaEquivalence ) where
 
-import           Util
+import Util
 
-import           Control.Monad                      ( forM, forM_, mapM, when )
-import           Control.Monad.Trans.Class          ( lift )
-import           Control.Monad.Trans.Except         ( ExceptT, runExceptT, throwE )
-import           Data.IntSet                        as IS
-import           Data.List                          as List
-import           Data.Map                           as Map
-import           System.IO
+import Control.Monad                      ( forM, forM_, mapM, when )
+import Control.Monad.Trans.Class          ( lift )
+import Control.Monad.Trans.Except         ( ExceptT, runExceptT, throwE )
+import Data.IntSet                        as IS
+import Data.List                          as List
+import Data.Map                           as Map
+import System.IO
 
-import           Algorithm.NfaEquivalence
-import           Compiler.Hknt
-import           Data.Nfa
-import           Language.Automata.HkntParser.Class
-import           Language.Automata.HkntParser
+import Algorithm.NfaEquivalence
+import Compiler.Hknt
+import Data.Nfa
+import Language.Automata.HkntParser
+import Language.Automata.HkntParser.Class
 
 type IOWithError a = ExceptT String IO a
 

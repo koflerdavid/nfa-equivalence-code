@@ -1,5 +1,5 @@
 {-# LANGUAGE FunctionalDependencies #-}
-{-# LANGUAGE MultiParamTypeClasses  #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
 
 module Data.FiniteAutomaton (
     FiniteAutomaton(..)
@@ -7,8 +7,8 @@ module Data.FiniteAutomaton (
   , Data.Map.Map
 ) where
 
-import           Data.Map
-import           Data.Set
+import Data.Map
+import Data.Set
 
 -- | This is a coinductive representation of a finite automaton.
 -- A finite automaton has a finite amount of states and inputs.

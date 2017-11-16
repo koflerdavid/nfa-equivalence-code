@@ -3,12 +3,12 @@ module Algorithm.NfaEquivalenceSpec
     , spec
     ) where
 
-import           Control.Monad            ( forM_ )
-import           Data.IntSet              as IS
-import           Test.Hspec
+import Control.Monad            ( forM_ )
+import Data.IntSet              as IS
+import Test.Hspec
 
-import           Algorithm.NfaEquivalence
-import           HkntSamples
+import Algorithm.NfaEquivalence
+import HkntSamples
 
 main :: IO ()
 main = hspec spec

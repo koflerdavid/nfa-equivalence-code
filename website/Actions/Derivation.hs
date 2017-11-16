@@ -52,4 +52,4 @@ derive (Just utf8InputRegexString) (Just utf8Word) = do
     Left (Utf8DecodingError Word)
   case parseRegex "<regex>" inputRegexString of
     Left parseError -> Left (RegularExpressionParseError parseError)
-    Right regex -> return $ wordDerive word regex
+    Right regex     -> return $ wordDerive word regex

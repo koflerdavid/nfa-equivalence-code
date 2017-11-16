@@ -3,12 +3,12 @@ module Data.EpsilonNfa.InternalSpec
     , spec
     ) where
 
-import           Data.EpsilonNfa.Internal
+import Data.EpsilonNfa.Internal
 
-import           Control.Monad.Trans.RWS.Strict
-import           Data.IntSet                    as ISet
-import           Data.Map                       as Map
-import           Test.Hspec
+import Control.Monad.Trans.RWS.Strict
+import Data.IntSet                    as ISet
+import Data.Map                       as Map
+import Test.Hspec
 
 main :: IO ()
 main = hspec spec

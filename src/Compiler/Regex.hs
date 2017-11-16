@@ -1,11 +1,11 @@
 module Compiler.Regex ( compileRegex ) where
 
-import           Data.EpsilonNfa                  as ENfa
-import           Data.Regex
+import Data.EpsilonNfa                  as ENfa
+import Data.Regex
 
-import           Control.Monad.Trans.State.Strict
-import           Data.Foldable                    ( toList )
-import           Data.Sequence                    as Seq
+import Control.Monad.Trans.State.Strict
+import Data.Foldable                    ( toList )
+import Data.Sequence                    as Seq
 
 type FaState = Int
 

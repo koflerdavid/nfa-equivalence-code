@@ -2,14 +2,14 @@
 
 module Algorithm.Regex.DfaConversion (deriveRegexToDfa) where
 
-import           Algorithm.Regex.Derivation (derive)
-import           Data.Queue                 as Queue
-import           Data.Regex                 (Regex, alphabet)
+import Algorithm.Regex.Derivation ( derive )
+import Data.Queue                 as Queue
+import Data.Regex                 ( Regex, alphabet )
 
-import           Control.Monad.Trans.State  (State, evalState, gets, modify)
-import           Data.List                  as List
-import           Data.Map                   as Map
-import           Data.Set                   as Set
+import Control.Monad.Trans.State  ( State, evalState, gets, modify )
+import Data.List                  as List
+import Data.Map                   as Map
+import Data.Set                   as Set
 
 type RegexDfaTransitions c = Map (Regex c) (Map c (Regex c))
 

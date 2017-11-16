@@ -4,12 +4,12 @@ module Language.Automata.HkntParser
     , Operation(..)
     ) where
 
-import           Language.Automata.HkntParser.Class
-import           Language.Automata.HkntParser.Internal
-import           Language.Automata.HkntParser.Tokeniser
+import Language.Automata.HkntParser.Class
+import Language.Automata.HkntParser.Internal
+import Language.Automata.HkntParser.Tokeniser
 
-import           Data.Either.Combinators                ( mapLeft )
-import           Text.Parsec
+import Data.Either.Combinators                ( mapLeft )
+import Text.Parsec
 
 parseHknt :: String -> Either String Result
 parseHknt input = mapLeft show $ tokeniseAndParse hkntParser "<input>" input

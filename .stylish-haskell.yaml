@@ -1,0 +1,8 @@
+steps:
+  - simple_align:
+      top_level_patterns: true
+  - imports:
+      align: file
+      space_surround: true
+  - language_pragmas:
+      align: false

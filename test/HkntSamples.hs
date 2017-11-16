@@ -1,6 +1,6 @@
 module HkntSamples where
 
-import           Data.Nfa
+import Data.Nfa
 
 introductionInHkntFormat :: String
 introductionInHkntFormat =

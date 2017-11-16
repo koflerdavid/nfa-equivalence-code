@@ -3,7 +3,7 @@ module Algorithm.Regex.Derivation
     , wordDerive
     ) where
 
-import           Data.Regex
+import Data.Regex
 
 -- This algorithm works as specified in
 -- "Partial derivatives of regular expressions and automata constructions",

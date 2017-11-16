@@ -3,12 +3,12 @@ module Compiler.RegexSpec
     , spec
     ) where
 
-import           Compiler.Regex
-import           Data.EpsilonNfa
-import           Data.Regex
+import Compiler.Regex
+import Data.EpsilonNfa
+import Data.Regex
 
-import           Control.Monad   ( forM_ )
-import           Test.Hspec
+import Control.Monad   ( forM_ )
+import Test.Hspec
 
 main :: IO ()
 main = do

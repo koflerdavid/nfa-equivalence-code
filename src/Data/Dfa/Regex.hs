@@ -1,17 +1,16 @@
-{-# LANGUAGE FlexibleInstances     #-}
+{-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 
 module Data.Dfa.Regex ( RegexDfa, fromRegex, transitions ) where
 
-import           Algorithm.Regex.Derivation    (derive)
-import           Algorithm.Regex.DfaConversion (deriveRegexToDfa)
-import           Data.FiniteAutomaton
-import           Data.Regex                    (Regex, alphabet,
-                                                matchesEmptyWord)
+import Algorithm.Regex.Derivation    ( derive )
+import Algorithm.Regex.DfaConversion ( deriveRegexToDfa )
+import Data.FiniteAutomaton
+import Data.Regex                    ( Regex, alphabet, matchesEmptyWord )
 
-import           Data.List                     as List
-import           Data.Map                      as Map
-import           Data.Set                      as Set
+import Data.List                     as List
+import Data.Map                      as Map
+import Data.Set                      as Set
 
 data RegexDfa c = RegexDfa {
       _transitions  :: Map (Regex c) (Map c (Regex c))

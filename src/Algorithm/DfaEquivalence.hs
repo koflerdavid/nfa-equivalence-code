@@ -1,4 +1,4 @@
-{-# LANGUAGE LambdaCase          #-}
+{-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE TupleSections #-}
 

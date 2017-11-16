@@ -23,13 +23,13 @@ alphabet :: Ord c => Regex c -> Set.Set c
 alphabet regex = execWriter (computeAlphabet regex)
   where
     computeAlphabet r = case r of
-        Epsilon -> return ()
-        Empty -> return ()
-        Atom c -> tell (Set.singleton c)
+        Epsilon         -> return ()
+        Empty           -> return ()
+        Atom c          -> tell (Set.singleton c)
 
-        Asterisk inner -> computeAlphabet inner
+        Asterisk inner  -> computeAlphabet inner
         Alternative s t -> computeAlphabet s >> computeAlphabet t
-        Sequence s t -> computeAlphabet s >> computeAlphabet t
+        Sequence s t    -> computeAlphabet s >> computeAlphabet t
 
 -- | Determines if the regular expression matches any string.
 empty :: Regex c -> Bool
@@ -45,12 +45,12 @@ empty (Sequence r s) = empty r || empty s
 matchesEmptyWord :: Regex c -> Bool
 matchesEmptyWord regex =
     case regex of
-        Atom _ -> False
-        Epsilon -> True
-        Empty -> False
-        Asterisk _ -> True
+        Atom _          -> False
+        Epsilon         -> True
+        Empty           -> False
+        Asterisk _      -> True
         Alternative r s -> matchesEmptyWord r || matchesEmptyWord s
-        Sequence r s -> matchesEmptyWord r && matchesEmptyWord s
+        Sequence r s    -> matchesEmptyWord r && matchesEmptyWord s
 
 matchesOnlyEmptyWord :: Regex c -> Bool
 matchesOnlyEmptyWord Epsilon =
@@ -111,8 +111,8 @@ normalised (Asterisk inner) = Asterisk (normalised inner)
 normalised' :: (Eq c) => Regex c -> Regex c
 normalised' r = case r of
     Alternative Epsilon (Sequence a inner@(Asterisk a')) | a == a' -> inner -- 1 + a a* = a*
-    Alternative Epsilon inner@(Asterisk _) -> inner
-    _ -> r
+    Alternative Epsilon inner@(Asterisk _)               -> inner
+    _                                                    -> r
 
 instance (Show c) =>
          Show (Regex c) where

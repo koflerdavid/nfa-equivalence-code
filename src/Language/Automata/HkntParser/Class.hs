@@ -1,6 +1,6 @@
 module Language.Automata.HkntParser.Class where
 
-import           Data.List ( intersperse )
+import Data.List ( intersperse )
 
 type Transition = (String, Char, String)
 
@@ -27,10 +27,10 @@ data Token = Identifier { tkIdentifierName :: String }
 
 instance (Show Token) where
     show (Identifier name) = name
-    show Accept = "accept"
-    show Check = "check"
-    show Colon = ":"
-    show Equals = "="
-    show GreaterEquals = "=>"
-    show (Arrow labels) = concat [ "-", intersperse '+' labels, "->" ]
-    show Newline = "<newline>"
+    show Accept            = "accept"
+    show Check             = "check"
+    show Colon             = ":"
+    show Equals            = "="
+    show GreaterEquals     = "=>"
+    show (Arrow labels)    = concat [ "-", intersperse '+' labels, "->" ]
+    show Newline           = "<newline>"

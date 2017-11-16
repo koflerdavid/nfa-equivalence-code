@@ -1,15 +1,15 @@
-{-# LANGUAGE DeriveGeneric     #-}
+{-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE OverloadedStrings #-}
 
 module Main where
 
-import           Control.Monad.Trans.Except ( runExceptT )
-import           Options.Generic
-import           System.Exit
-import           System.IO
+import Control.Monad.Trans.Except ( runExceptT )
+import Options.Generic
+import System.Exit
+import System.IO
 
-import           DfaChecking
-import           NfaChecking
+import DfaChecking
+import NfaChecking
 
 data Action = DfaEquivalence (Maybe String)
             | NfaEquivalence (Maybe String)

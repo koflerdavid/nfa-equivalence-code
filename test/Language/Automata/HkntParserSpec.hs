@@ -3,10 +3,10 @@ module Language.Automata.HkntParserSpec
     , spec
     ) where
 
-import           HkntSamples
-import           Language.Automata.HkntParser
+import HkntSamples
+import Language.Automata.HkntParser
 
-import           Test.Hspec
+import Test.Hspec
 
 main :: IO ()
 main = hspec spec

@@ -1,19 +1,19 @@
 module DfaChecking ( checkDfaEquivalence ) where
 
-import           Util
+import Util
 
-import           Control.Monad                      ( forM, forM_, when )
-import           Control.Monad.Trans.Class          ( lift )
-import           Control.Monad.Trans.Except         ( ExceptT, runExceptT, throwE )
-import           Data.List                          as List
-import           Data.Map                           as Map
-import           System.IO
+import Control.Monad                      ( forM, forM_, when )
+import Control.Monad.Trans.Class          ( lift )
+import Control.Monad.Trans.Except         ( ExceptT, runExceptT, throwE )
+import Data.List                          as List
+import Data.Map                           as Map
+import System.IO
 
-import           Algorithm.DfaEquivalence
-import           Compiler.Hknt
-import           Data.Dfa
-import           Language.Automata.HkntParser.Class
-import           Language.Automata.HkntParser
+import Algorithm.DfaEquivalence
+import Compiler.Hknt
+import Data.Dfa
+import Language.Automata.HkntParser
+import Language.Automata.HkntParser.Class
 
 type IOWithError a = ExceptT String IO a
 

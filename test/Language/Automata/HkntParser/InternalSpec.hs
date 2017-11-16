@@ -3,13 +3,13 @@ module Language.Automata.HkntParser.InternalSpec
     , spec
     ) where
 
-import           Language.Automata.HkntParser.Class
-import           Language.Automata.HkntParser.Internal
-import           Language.Automata.HkntParser.Tokeniser
+import Language.Automata.HkntParser.Class
+import Language.Automata.HkntParser.Internal
+import Language.Automata.HkntParser.Tokeniser
 
-import           Control.Monad                          ( forM_ )
-import           Test.Hspec
-import           Text.Parsec
+import Control.Monad                          ( forM_ )
+import Test.Hspec
+import Text.Parsec
 
 main :: IO ()
 main = hspec spec

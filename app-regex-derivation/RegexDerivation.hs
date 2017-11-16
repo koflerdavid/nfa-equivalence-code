@@ -1,10 +1,10 @@
 module RegexDerivation where
 
-import           Algorithm.Regex.Derivation
-import           Language.RegexParser
+import Algorithm.Regex.Derivation
+import Language.RegexParser
 
-import           Control.Monad.Trans.Class  ( lift )
-import           Control.Monad.Trans.Except ( ExceptT, throwE )
+import Control.Monad.Trans.Class  ( lift )
+import Control.Monad.Trans.Except ( ExceptT, throwE )
 
 parseAndDeriveRegexByWord :: String -> ExceptT String IO ()
 parseAndDeriveRegexByWord word = do

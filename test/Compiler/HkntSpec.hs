@@ -3,12 +3,12 @@ module Compiler.HkntSpec
     , spec
     ) where
 
-import           Compiler.Hknt
-import           Data.Dfa
-import           Language.Automata.HkntParser
+import Compiler.Hknt
+import Data.Dfa
+import Language.Automata.HkntParser
 
-import           Control.Monad
-import           Test.Hspec
+import Control.Monad
+import Test.Hspec
 
 main :: IO ()
 main = hspec spec

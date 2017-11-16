@@ -1,8 +1,8 @@
 module Data.EquivalenceSpec where
 
-import           Control.Monad.Trans.Class
-import           Test.Hspec
-import           Data.Equivalence.Monad
+import Control.Monad.Trans.Class
+import Data.Equivalence.Monad
+import Test.Hspec
 
 main :: IO ()
 main = hspec spec

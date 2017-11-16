@@ -1,8 +1,8 @@
 module Data.EpsilonNfa.Internal where
 
 import           Control.Monad.Trans.RWS.Strict
-import qualified Data.Map                       as M
 import           Data.IntSet                    as IS
+import qualified Data.Map                       as M
 
 type Transitions c = M.Map (Int, Maybe c) IntSet
 

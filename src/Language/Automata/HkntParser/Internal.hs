@@ -2,9 +2,9 @@
 
 module Language.Automata.HkntParser.Internal where
 
-import           Language.Automata.HkntParser.Class
+import Language.Automata.HkntParser.Class
 
-import           Text.Parsec                        hiding ( label, labels )
+import Text.Parsec                        hiding ( label, labels )
 
 transitions :: Parsec [(SourcePos, Token)] () [Transition]
 transitions = concat <$> transition `sepEndBy` newlineToken
@@ -15,8 +15,8 @@ transition = do
     labels <- transitionArrow
     destinations <- many1 identifier
     return [ (origin, label, destination)
-           | origin <- origins 
-           , label <- labels 
+           | origin <- origins
+           , label <- labels
            , destination <- destinations ]
 
 acceptingStates :: Parsec [(SourcePos, Token)] () [String]

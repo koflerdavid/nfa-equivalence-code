@@ -1,10 +1,10 @@
 module Compiler.Hknt where
 
-import           Data.List as List
-import           Data.Map  as Map
+import Data.List as List
+import Data.Map  as Map
 
-import           Data.Dfa
-import           Data.Nfa
+import Data.Dfa
+import Data.Nfa
 
 type Transition s c = (s, c, s)
 

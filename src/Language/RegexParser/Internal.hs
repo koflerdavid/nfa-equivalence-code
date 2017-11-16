@@ -2,14 +2,14 @@
 
 module Language.RegexParser.Internal where
 
-import           Data.Regex
-import           Language.RegexParser.Class
-import           Language.RegexParser.Tokeniser
+import Data.Regex
+import Language.RegexParser.Class
+import Language.RegexParser.Tokeniser
 
-import           Data.Either.Combinators        ( mapLeft )
-import           Data.Functor.Identity
-import           Text.Parsec                    hiding ( Empty )
-import           Text.Parsec.Expr
+import Data.Either.Combinators        ( mapLeft )
+import Data.Functor.Identity
+import Text.Parsec                    hiding ( Empty )
+import Text.Parsec.Expr
 
 tokeniseAndParse :: RegexTokenParser () a -> SourceName -> String -> Either String a
 tokeniseAndParse parser name input =

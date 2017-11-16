@@ -3,10 +3,10 @@
 module Data.Dfa.Format.Html ( asHtml ) where
 
 import           Data.Dfa.Regex
-import           Data.FiniteAutomaton (faInputs)
+import           Data.FiniteAutomaton ( faInputs )
 import           Data.Regex
 
-import           Control.Monad        (forM_)
+import           Control.Monad        ( forM_ )
 import           Data.Map             as Map
 import           Data.Set             as Set
 import qualified Data.Text.Lazy       as T

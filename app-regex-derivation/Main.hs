@@ -1,17 +1,17 @@
-{-# LANGUAGE DeriveGeneric     #-}
+{-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE OverloadedStrings #-}
 
 module Main where
 
-import           RegexDerivation
-import           RegexEquivalence
-import           RegexFullDerivation
-import           Types
+import RegexDerivation
+import RegexEquivalence
+import RegexFullDerivation
+import Types
 
-import           Control.Monad.Trans.Except ( runExceptT )
-import           Options.Generic
-import           System.Exit
-import           System.IO
+import Control.Monad.Trans.Except ( runExceptT )
+import Options.Generic
+import System.Exit
+import System.IO
 
 data Action = RegexFullDerivation { outputFormat    :: OutputFormat
                                   , withoutSkeleton :: Bool
@@ -30,20 +30,20 @@ main = do
             result <- runExceptT (parseAndDeriveRegexToDfa format noSkeleton)
             case result of
                 Left message -> printErrorAndExit message
-                Right _ -> exitSuccess
+                Right _      -> exitSuccess
 
         RegexDerivation word -> do
             result <- runExceptT (parseAndDeriveRegexByWord word)
             case result of
                 Left message -> printErrorAndExit message
-                Right _ -> exitSuccess
+                Right _      -> exitSuccess
 
         RegexEquivalence -> do
             result <- runExceptT checkRegexEquivalence
             case result of
                 Left message -> printErrorAndExit message
-                Right True -> exitSuccess
-                Right False -> exitWith (ExitFailure 1)
+                Right True   -> exitSuccess
+                Right False  -> exitWith (ExitFailure 1)
 
 printErrorAndExit :: String -> IO a
 printErrorAndExit msg = hPutStrLn stderr msg >> exitWith (ExitFailure 2)

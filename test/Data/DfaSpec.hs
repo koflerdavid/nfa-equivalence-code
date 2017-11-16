@@ -3,13 +3,13 @@ module Data.DfaSpec
     , spec
     ) where
 
-import           Control.Monad ( forM_ )
-import           Data.IntSet   as IS
-import           Data.Set      as Set
+import Control.Monad ( forM_ )
+import Data.IntSet   as IS
+import Data.Set      as Set
 
-import           Test.Hspec
+import Test.Hspec
 
-import           Data.Dfa
+import Data.Dfa
 
 main :: IO ()
 main = hspec spec
