@@ -1,5 +1,7 @@
 *.lhs.tex
 /.idea
+# hlint report
+*report.html
 
 /ideaHaskellLib
 
