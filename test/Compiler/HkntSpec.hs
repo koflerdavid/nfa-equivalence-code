@@ -23,7 +23,7 @@ spec = do
   where
     compiledDfa input = do
         Result transitions acceptingStates _ <- parseHknt input
-        fmap fst $ compileHkntToDfa transitions acceptingStates
+        fst <$> compileHkntToDfa transitions acceptingStates
 
 cases :: [(String, Dfa Char)]
 cases = [ ("accept: a b", buildDfaUnsafe [ 0, 1 ] []) ]

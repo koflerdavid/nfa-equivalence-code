@@ -20,7 +20,7 @@ spec = do
                     , (Sequence (Atom 'a') (Atom 'b'), "a", Atom 'b')
                     , (Sequence (Atom 'a') (Atom 'b'), "c", Empty)
                     , (Asterisk (Atom 'c'), "c", Asterisk (Atom 'c'))
-                    ] :: [(Regex Char, [Char], Regex Char)]
+                    ] :: [(Regex Char, String, Regex Char)]
         forM_ cases $
             \(from, by, to) -> do
                 it ("(" ++ show from ++ ")_{" ++ by ++ "} = " ++ show to) $ do

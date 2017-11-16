@@ -3,13 +3,12 @@ module Data.DfaSpec
     , spec
     ) where
 
-import Control.Monad ( forM_ )
-import Data.IntSet   as IS
-import Data.Set      as Set
-
-import Test.Hspec
-
 import Data.Dfa
+
+import Control.Monad ( forM_ )
+import Data.IntSet   ( isSubsetOf )
+import Data.Set      as Set hiding ( isSubsetOf )
+import Test.Hspec
 
 main :: IO ()
 main = hspec spec
@@ -30,7 +29,7 @@ spec = do
     describe "buildDfa" $ do
         it "dfaStates should contain the accepting state(s) of the DFA" $ do
             let builtDfa = buildDfaUnsafe [ 1 ] [ ((0, 'a'), 1) ]
-            dfaAcceptingStates builtDfa `shouldSatisfy` (`IS.isSubsetOf` dfaStates builtDfa)
+            dfaAcceptingStates builtDfa `shouldSatisfy` (`isSubsetOf` dfaStates builtDfa)
 
     describe "dfaAlphabet" $ do
         it "the alphabet of the sample DFA should be {'a','b'}" $ do

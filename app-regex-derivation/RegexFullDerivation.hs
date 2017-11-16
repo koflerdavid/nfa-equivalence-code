@@ -13,7 +13,7 @@ import           Control.Monad.Trans.Except    ( ExceptT, throwE )
 
 parseAndDeriveRegexToDfa :: OutputFormat -> Bool -> ExceptT String IO ()
 parseAndDeriveRegexToDfa outputFormat withoutSkeleton = do
-    input <- lift $ getContents
+    input <- lift getContents
     case parseRegex "<stdin>" input of
         Left parseError -> throwE parseError
         Right regex -> do

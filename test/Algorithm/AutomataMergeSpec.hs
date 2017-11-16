@@ -3,12 +3,12 @@ module Algorithm.AutomataMergeSpec
     , spec
     ) where
 
+import Algorithm.AutomataMerge
+import Data.Dfa
+
 import Control.Monad           ( forM_ )
 import Data.Maybe              ( fromJust )
 import Test.Hspec
-
-import Algorithm.AutomataMerge
-import Data.Dfa
 
 main :: IO ()
 main = hspec spec

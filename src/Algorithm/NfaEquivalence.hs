@@ -12,12 +12,12 @@ import           Control.Monad.Trans.RWS.Lazy    as RWS
 import           Control.Monad.Trans.Writer.Lazy as Writer
 import           Data.Equivalence.Monad
 import           Data.Foldable                   ( toList )
-import qualified Data.IntSet                     as IS
+import qualified Data.IntSet                     as ISet
 import           Data.Maybe                      ( isNothing )
 import           Data.Sequence                   as Seq
-import qualified Data.Set                        as S
+import qualified Data.Set                        as Set
 
-type NfaStates = IS.IntSet
+type NfaStates = ISet.IntSet
 
 type Error = String
 
@@ -53,7 +53,7 @@ nfaStatesDifferencesHk nfa set1 set2 =
             alreadyEqual <- xs `equivalent` ys
             if alreadyEqual
                 then skip constraint >> check queue'
-                else if (nfa `accepts` IS.toList xs) /= (nfa `accepts` IS.toList ys)
+                else if (nfa `accepts` ISet.toList xs) /= (nfa `accepts` ISet.toList ys)
                      then return (Just constraint)
                      else do
                          equate xs ys
@@ -63,7 +63,7 @@ nfaStatesDifferencesHk nfa set1 set2 =
         todo (w, xs, ys) = [ (w ++ [ c ], xs `nfaStep'` c, ys `nfaStep'` c)
                            | c <- alphabet ]
 
-    alphabet = S.toList (nfaAlphabet nfa)
+    alphabet = Set.toList (nfaAlphabet nfa)
     nfaStep' = nfaStep nfa
 
     trace :: Constraint c -> HkEquivM s c () -- Necessary to help the type checker
@@ -104,7 +104,7 @@ nfaStatesDifferencesHkC nfa set1 set2 =
             alreadyEqual <- xs `equivalentM` ys
             if alreadyEqual
                 then skip constraint >> check queue'
-                else if (nfa `accepts` IS.toList xs) /= (nfa `accepts` IS.toList ys)
+                else if (nfa `accepts` ISet.toList xs) /= (nfa `accepts` ISet.toList ys)
                      then return (Just constraint)
                      else do
                          equateM xs ys
@@ -114,7 +114,7 @@ nfaStatesDifferencesHkC nfa set1 set2 =
         todo (w, xs, ys) = [ (w ++ [ c ], xs `nfaStep'` c, ys `nfaStep'` c)
                            | c <- alphabet ]
 
-    alphabet = S.toList (nfaAlphabet nfa)
+    alphabet = Set.toList (nfaAlphabet nfa)
     nfaStep' = nfaStep nfa
 
     equivalentM :: NfaStates -> NfaStates -> HkcM c Bool

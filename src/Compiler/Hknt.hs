@@ -56,4 +56,4 @@ compileHkntToNfa transitions acceptingStates = do
 translateNfaStates :: Ord s => Map s Int -> Transition s c -> Maybe ((Int, c), [Int])
 translateNfaStates mapping (origin, c, destination) =
     (,) <$> ((,) <$> origin `Map.lookup` mapping <*> pure c)
-        <*> (fmap (\x -> [ x ]) $ destination `Map.lookup` mapping)
+        <*> fmap (: []) (destination `Map.lookup` mapping)

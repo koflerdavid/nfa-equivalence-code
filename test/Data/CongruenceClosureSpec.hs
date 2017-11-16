@@ -5,7 +5,7 @@ module Data.CongruenceClosureSpec
 
 import qualified Data.CongruenceClosure as CC
 
-import qualified Data.IntSet            as IS
+import           Data.IntSet            ( fromList )
 import           Test.Hspec
 
 main :: IO ()
@@ -64,13 +64,13 @@ spec = do
         it "should consider {3, 4} and {3, 5} as equal" $ do
             equal [ 3, 4 ] [ 3, 5 ] relation' `shouldBe` True
 
-        let relation'' = CC.unequate relation' (IS.fromList [3, 4]) (IS.fromList [3, 5])
+        let relation'' = CC.unequate relation' (fromList [3, 4]) (fromList [3, 5])
 
         it "should not, after unequating, consider {3, 4} and {4, 5} as equal anymore" $ do
             equal [ 3, 4 ] [ 3, 5 ] relation'' `shouldBe` False
 
 equal :: [Int] -> [Int] -> CC.CongruenceClosure -> Bool
-equal is1 is2 rel = CC.equivalent (IS.fromList is1) (IS.fromList is2) rel
+equal is1 is2 = CC.equivalent (fromList is1) (fromList is2)
 
 equate :: CC.CongruenceClosure -> [Int] -> [Int] -> CC.CongruenceClosure
-equate rel is1 is2 = CC.equate rel (IS.fromList is1) (IS.fromList is2)
+equate rel is1 is2 = CC.equate rel (fromList is1) (fromList is2)

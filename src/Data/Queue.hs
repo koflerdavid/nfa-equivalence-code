@@ -14,7 +14,7 @@ class Queue q where
     pop :: q a -> Maybe (a, q a)
 
     pushAll :: q a -> [a] -> q a
-    pushAll q es = foldr (flip push) q es
+    pushAll = foldr (flip push)
 
     singleton :: a -> q a
 

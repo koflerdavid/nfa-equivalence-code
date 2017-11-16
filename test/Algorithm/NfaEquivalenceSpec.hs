@@ -3,12 +3,12 @@ module Algorithm.NfaEquivalenceSpec
     , spec
     ) where
 
-import Control.Monad            ( forM_ )
-import Data.IntSet              as IS
-import Test.Hspec
-
 import Algorithm.NfaEquivalence
 import HkntSamples
+
+import Control.Monad            ( forM_ )
+import Data.IntSet              ( singleton )
+import Test.Hspec
 
 main :: IO ()
 main = hspec spec
@@ -20,9 +20,9 @@ spec = forM_ [ ("HK naive", nfaStatesEquivalentHk)
     \(name, nfaEquivalent) ->
         describe name $ do
             it "should prove the first example in the HKNT paper as equal" $ do
-                let result = nfaEquivalent introductionNfaMerged (IS.singleton 3) (IS.singleton 0)
+                let result = nfaEquivalent introductionNfaMerged (singleton 3) (singleton 0)
                 result `shouldBe` True
 
             it "should prove figure 3 in the HKNT paper as equal" $ do
-                let result = nfaEquivalent figure3NfaMerged (IS.singleton 0) (IS.singleton 1)
+                let result = nfaEquivalent figure3NfaMerged (singleton 0) (singleton 1)
                 result `shouldBe` True

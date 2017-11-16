@@ -1,5 +1,6 @@
 module Language.Automata.HkntParser
     ( parseHknt
+    , Check
     , Result(..)
     , Operation(..)
     ) where

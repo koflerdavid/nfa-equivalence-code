@@ -16,7 +16,7 @@ import           Control.DeepSeq          ( NFData, force )
 import           Control.Monad            ( forM, forM_ )
 import           Control.Monad.Random     ( evalRandT )
 import           Criterion.Main
-import qualified Data.IntSet              as IntSet
+import qualified Data.IntSet              as ISet
 import           Data.IORef
 import           Data.Maybe               ( isNothing )
 import qualified Data.Text.Lazy.IO        as TIO
@@ -54,8 +54,8 @@ createBench timings item@(i, _) =
 
 runTest :: IORef [(Int, Bool, Int)] -> (Int, Nfa Char) -> IO (Bool, Int)
 runTest refTimings (i, nfa) = do
-    let stateSet1 = IntSet.singleton 0
-        stateSet2 = IntSet.singleton 1
+    let stateSet1 = ISet.singleton 0
+        stateSet2 = ISet.singleton 1
         (result, trace) = nfaStatesDifferencesHkC nfa stateSet1 stateSet2
         areStateSetsEqual = isNothing result
         processedPairsCount = length trace
@@ -89,7 +89,7 @@ printAutomata automata template =
     forM_ automata $
         \(i, nfa) -> do
             let renderedNfaGraph = renderAutomata nfa
-                name = I.unsafeInterpolate template [ (show i) ]
+                name = I.unsafeInterpolate template [ show i ]
             TIO.writeFile name renderedNfaGraph
 
 printErrorAndExit :: String -> IO a

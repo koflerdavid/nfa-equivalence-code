@@ -20,7 +20,7 @@ checkRegexEquivalence = do
                 putChar '\t'
                 putStr (show r1)
                 putChar '\t'
-                putStrLn (show r2)
+                print r2
     return (null witnesses)
 
 exceptM :: Monad m => Either e a -> ExceptT e m a

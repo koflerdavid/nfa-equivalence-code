@@ -2,19 +2,18 @@ module NfaChecking ( checkNfaEquivalence ) where
 
 import Util
 
-import Control.Monad                      ( forM, forM_, mapM, when )
-import Control.Monad.Trans.Class          ( lift )
-import Control.Monad.Trans.Except         ( ExceptT, runExceptT, throwE )
-import Data.IntSet                        as IS
-import Data.List                          as List
-import Data.Map                           as Map
+import Control.Monad                ( forM, forM_, mapM, when )
+import Control.Monad.Trans.Class    ( lift )
+import Control.Monad.Trans.Except   ( ExceptT, runExceptT, throwE )
+import Data.IntSet                  ( fromList, toList )
+import Data.List                    as List
+import Data.Map                     as Map hiding ( fromList, toList )
 import System.IO
 
 import Algorithm.NfaEquivalence
 import Compiler.Hknt
 import Data.Nfa
 import Language.Automata.HkntParser
-import Language.Automata.HkntParser.Class
 
 type IOWithError a = ExceptT String IO a
 
@@ -31,8 +30,8 @@ checkNfaEquivalence filename = do
             stateSet1' <- mapM (translateState stateMapping) stateSet1
             stateSet2' <- mapM (translateState stateMapping) stateSet2
             let (maybeWitness, trace) = nfaStatesDifferencesHkC nfa
-                                                                (IS.fromList stateSet1')
-                                                                (IS.fromList stateSet2')
+                                                                (fromList stateSet1')
+                                                                (fromList stateSet2')
 
             let invStateMapping = invertMap stateMapping
             forM_ trace (printConstraint invStateMapping)
@@ -46,8 +45,8 @@ checkNfaEquivalence filename = do
 
 printConstraint :: Map Int String -> (Bool, Constraint Char) -> IOWithError ()
 printConstraint stateMapping (skipped, (w, xs, ys)) = do
-    xs' <- mapM (translateState stateMapping) (IS.toList xs)
-    ys' <- mapM (translateState stateMapping) (IS.toList ys)
+    xs' <- mapM (translateState stateMapping) (toList xs)
+    ys' <- mapM (translateState stateMapping) (toList ys)
     lift $ do
         when skipped $ putStr "skipped"
         putChar '\t'
@@ -63,7 +62,6 @@ parseInput :: Maybe String -> IOWithError (Nfa Char, Map.Map String Int, [Check 
 parseInput = maybe (relift $ parseInput' stdin) $
     \file -> relift $ withFile file ReadMode parseInput'
   where
-    parseInput' :: Handle -> IO (Either String (Nfa Char, Map.Map String Int, [Check String]))
     parseInput' stream = runExceptT $ do
         fileContents <- lift $ hGetContents stream
         either throwE return $ do

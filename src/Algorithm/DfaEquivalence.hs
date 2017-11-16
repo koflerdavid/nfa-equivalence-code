@@ -13,10 +13,10 @@ import           Control.Monad                   ( when )
 import           Control.Monad.Trans.Class       ( lift )
 import           Control.Monad.Trans.Writer.Lazy
 import           Data.Foldable
-import qualified Data.IntSet                     as IS
+import qualified Data.IntSet                     as ISet
 import           Data.Maybe                      ( isNothing )
 import           Data.Sequence                   as Seq
-import qualified Data.Set                        as S
+import qualified Data.Set                        as Set
 
 data Error = NotDfaState Int
     deriving (Eq, Show)
@@ -27,7 +27,7 @@ type HkNaiveM c = Writer (Seq (Bool, Constraint c))
 
 dfaStatesEquivalentHkNaive :: (Ord c) => Dfa c -> DfaState -> DfaState -> Either Error Bool
 dfaStatesEquivalentHkNaive dfa s1 s2 =
-    fmap (isNothing . fst) $ dfaStatesDifferencesHkNaive dfa s1 s2
+    (isNothing . fst) <$> dfaStatesDifferencesHkNaive dfa s1 s2
 
 -- | Find an input word which disproves the equality of the given DFA states,
 -- Also the states the automata are in (after reading the input word) is returned.
@@ -45,27 +45,27 @@ dfaStatesDifferencesHkNaive :: forall c.
 dfaStatesDifferencesHkNaive dfa s1 s2 = do
     s1 `assertIsStateOf` dfa
     s2 `assertIsStateOf` dfa
-    let (witness, traces) = runWriter $ check S.empty (Q.singleton ([], s1, s2))
+    let (witness, traces) = runWriter $ check Set.empty (Q.singleton ([], s1, s2))
     return (witness, toList traces)
   where
-    check :: S.Set (DfaState, DfaState)
+    check :: Set.Set (DfaState, DfaState)
           -> FifoQueue (Constraint c)
           -> HkNaiveM c (Maybe (Constraint c))
     check bisim queue = (flip . maybe) (return Nothing) (Q.pop queue) $
         \case
             (constraint@(_w, x, y), queue')
-                | (x, y) `S.member` bisim ->
+                | (x, y) `Set.member` bisim ->
                       skip constraint >> check bisim queue'
                 | (dfa `dfaAccepts` x) /= (dfa `dfaAccepts` y) ->
                       return (Just constraint)
                 | otherwise -> do
                       trace constraint
-                      check ((x, y) `S.insert` bisim) (queue' `Q.pushAll` todo constraint)
+                      check ((x, y) `Set.insert` bisim) (queue' `Q.pushAll` todo constraint)
       where
         todo (w, x, y) = [ (w ++ [ c ], x `dfaStep'` c, y `dfaStep'` c)
                          | c <- alphabet ]
 
-    alphabet = S.toList (dfaAlphabet dfa)
+    alphabet = Set.toList (dfaAlphabet dfa)
     dfaStep' = dfaStep dfa
 
     trace :: Constraint c -> HkNaiveM c () -- Necessary to help the type checker
@@ -76,7 +76,7 @@ dfaStatesDifferencesHkNaive dfa s1 s2 = do
 
 dfaStatesEquivalentHk :: forall c. (Ord c) => Dfa c -> DfaState -> DfaState -> Either Error Bool
 dfaStatesEquivalentHk dfa s1 s2 =
-    fmap (isNothing . fst) $ dfaStatesDifferencesHk dfa s1 s2
+    (isNothing . fst) <$> dfaStatesDifferencesHk dfa s1 s2
 
 type HkEquivM c s = EquivT' s DfaState (Writer (Seq (Bool, Constraint c)))
 
@@ -116,7 +116,7 @@ dfaStatesDifferencesHk dfa s1 s2 = do
         todo (w, x, y) = [ (w ++ [ c ], x `dfaStep'` c, y `dfaStep'` c)
                          | c <- alphabet ]
 
-    alphabet = S.toList (dfaAlphabet dfa)
+    alphabet = Set.toList (dfaAlphabet dfa)
     dfaStep' = dfaStep dfa
 
     trace :: Constraint c -> HkEquivM c s () -- Necessary to help the type checker
@@ -129,7 +129,7 @@ assertIsStateOf :: DfaState -> Dfa c -> Either Error ()
 assertIsStateOf Nothing _ =
     return ()
 assertIsStateOf (Just q) dfa =
-    when (q `IS.notMember` dfaStates dfa) $ Left (NotDfaState q)
+    when (q `ISet.notMember` dfaStates dfa) $ Left (NotDfaState q)
 
 dfaEquivalentHkNaive :: Ord c => (Int, Dfa c) -> (Int, Dfa c) -> Either Error Bool
 dfaEquivalentHkNaive (p, dfa1) (q, dfa2) =

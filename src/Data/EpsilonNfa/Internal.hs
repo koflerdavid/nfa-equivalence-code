@@ -1,10 +1,10 @@
 module Data.EpsilonNfa.Internal where
 
-import           Control.Monad.Trans.RWS.Strict
-import           Data.IntSet                    as IS
-import qualified Data.Map                       as M
+import Control.Monad.Trans.RWS.Strict
+import Data.IntSet                    as ISet
+import Data.Map                       ( Map, findWithDefault )
 
-type Transitions c = M.Map (Int, Maybe c) IntSet
+type Transitions c = Map (Int, Maybe c) IntSet
 
 type NfaState c a = RWS (Transitions c) () IntSet a
 
@@ -16,22 +16,22 @@ enfaStep c = do
 
 -- This function is just supposed to query the table
 step :: Ord c => Transitions c -> IntSet -> Maybe c -> IntSet
-step table qs c = mergeMap (\q -> M.findWithDefault IS.empty (q, c) table) qs
+step table qs c = mergeMap (\q -> findWithDefault ISet.empty (q, c) table) qs
 
-closure :: Ord c => (Transitions c) -> IntSet -> IntSet
+closure :: Ord c => Transitions c -> IntSet -> IntSet
 closure transitions states =
     computeClosure states states
   where
     computeClosure current visited =
-        if IS.null toVisit then visited' else computeClosure toVisit visited'
+        if ISet.null toVisit then visited' else computeClosure toVisit visited'
       where
         epsilonReachable = mergeMap (getEpsilonReachableStates transitions) current
-        visited' = visited `IS.union` epsilonReachable
-        toVisit = epsilonReachable IS.\\ visited
+        visited' = visited `ISet.union` epsilonReachable
+        toVisit = epsilonReachable ISet.\\ visited
 
 getEpsilonReachableStates :: Ord c => Transitions c -> Int -> IntSet
 getEpsilonReachableStates transitions q =
-    M.findWithDefault IS.empty (q, Nothing) transitions
+    findWithDefault ISet.empty (q, Nothing) transitions
 
 mergeMap :: (Int -> IntSet) -> IntSet -> IntSet
-mergeMap f set = IS.foldr (\x y -> f x `IS.union` y) IS.empty set
+mergeMap f = ISet.foldr (\x y -> f x `ISet.union` y) ISet.empty

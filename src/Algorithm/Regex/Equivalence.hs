@@ -50,7 +50,7 @@ check combinedAlphabet queue =
             alreadyEqual <- Equiv.equivalent r1 r2
             if alreadyEqual || r1 == r2
                 then Equiv.equate r1 r2 >> check combinedAlphabet queue'
-                else if (matchesEmptyWord r1) /= (matchesEmptyWord r2)
+                else if matchesEmptyWord r1 /= matchesEmptyWord r2
                      then recordMismatch constraint >> check combinedAlphabet queue'
                      else do
                          Equiv.equate r1 r2

@@ -3,17 +3,17 @@ module Compiler.RegexSpec
     , spec
     ) where
 
+import Control.Monad   ( forM_ )
+import Test.Hspec
+
 import Compiler.Regex
 import Data.EpsilonNfa
 import Data.Regex
 
-import Control.Monad   ( forM_ )
-import Test.Hspec
-
 main :: IO ()
 main = do
     let regexENfa = compileRegex (Atom 'a')
-    putStrLn (show regexENfa)
+    print regexENfa
     hspec spec
 
 spec :: Spec

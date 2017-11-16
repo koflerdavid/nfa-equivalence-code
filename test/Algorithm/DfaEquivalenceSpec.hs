@@ -3,11 +3,11 @@ module Algorithm.DfaEquivalenceSpec
     , spec
     ) where
 
-import Control.Monad            ( forM_ )
-import Test.Hspec
-
 import Algorithm.DfaEquivalence
 import Data.Dfa
+
+import Control.Monad            ( forM_ )
+import Test.Hspec
 
 main :: IO ()
 main = hspec spec

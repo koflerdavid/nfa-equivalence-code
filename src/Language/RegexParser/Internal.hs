@@ -7,6 +7,7 @@ import Language.RegexParser.Class
 import Language.RegexParser.Tokeniser
 
 import Data.Either.Combinators        ( mapLeft )
+import Data.Functor                   ( ($>) )
 import Data.Functor.Identity
 import Text.Parsec                    hiding ( Empty )
 import Text.Parsec.Expr
@@ -16,12 +17,12 @@ tokeniseAndParse parser name input =
     mapLeft show $ tokenise name input >>= parse parser name
 
 regexOperatorTable :: OperatorTable [(SourcePos, Token)] u Identity (Regex Char)
-regexOperatorTable = [ [ Postfix $ justToken ZeroOrMoreTimesToken *> pure Asterisk -- ZeroOrMore
-                       , Postfix $ justToken OneOrMoreTimesToken *> pure oneOrMore -- OneOrMore
-                       , Postfix $ justToken ZeroOrOneTimesToken *> pure zeroOrMore -- ZeroOrOne
+regexOperatorTable = [ [ Postfix $ justToken ZeroOrMoreTimesToken $> Asterisk -- ZeroOrMore
+                       , Postfix $ justToken OneOrMoreTimesToken $> oneOrMore -- OneOrMore
+                       , Postfix $ justToken ZeroOrOneTimesToken $> zeroOrMore -- ZeroOrOne
                        ]
                      , [ Infix (pure Sequence) AssocRight ] -- Sequence
-                     , [ Infix (justToken AlternativeToken *> pure Alternative) AssocRight ] -- Alternative
+                     , [ Infix (justToken AlternativeToken $> Alternative) AssocRight ] -- Alternative
                      ]
 
 zeroOrMore :: Regex c -> Regex c
@@ -35,8 +36,8 @@ regex = buildExpressionParser regexOperatorTable primitiveRegex
 
 primitiveRegex :: RegexTokenParser () (Regex Char)
 primitiveRegex = atom
-    <|> justToken EpsilonToken *> pure Epsilon
-    <|> justToken EmptyToken *> pure Empty
+    <|> (justToken EpsilonToken $> Epsilon)
+    <|> (justToken EmptyToken $> Empty)
     <|> between (justToken LeftParentheseToken) (justToken RightParentheseToken) regex
 
 atom :: RegexTokenParser () (Regex Char)

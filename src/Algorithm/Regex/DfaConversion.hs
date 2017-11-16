@@ -39,7 +39,7 @@ deriveRegexForAlphabet regexAlphabet regex =
     modify $
         \(transitions, queue) ->
             let derivations = List.map (\c -> (c, derive c regex)) regexAlphabet
-                regexesToQueue = List.filter (`Map.notMember` transitions) $ snd (unzip derivations)
+                regexesToQueue = List.filter (`Map.notMember` transitions) $ List.map snd derivations
                 transitions' = Map.insert regex (Map.fromAscList derivations) transitions
             in
                 (transitions', Queue.pushAll queue regexesToQueue)

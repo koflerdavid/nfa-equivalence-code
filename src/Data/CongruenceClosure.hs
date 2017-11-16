@@ -6,28 +6,28 @@ module Data.CongruenceClosure
     , equivalent
     ) where
 
-import           Data.CongruenceClosure.Internal
+import Data.CongruenceClosure.Internal
 
-import qualified Data.IntSet                     as IS
-import           Data.List                       as List
+import Data.IntSet                     ( IntSet )
+import Data.List                       as List
 
-type Rule = (IS.IntSet, IS.IntSet)
+type Rule = (IntSet, IntSet)
 
 data CongruenceClosure = CongruenceClosure [Rule]
 
 empty :: CongruenceClosure
 empty = CongruenceClosure []
 
-equate :: CongruenceClosure -> IS.IntSet -> IS.IntSet -> CongruenceClosure
+equate :: CongruenceClosure -> IntSet -> IntSet -> CongruenceClosure
 equate relation@(CongruenceClosure rules) iset1 iset2 =
     if equivalent iset1 iset2 relation
     then relation
     else CongruenceClosure ((iset1, iset2) : (iset2, iset1) : rules)
 
-equivalent :: IS.IntSet -> IS.IntSet -> CongruenceClosure -> Bool
+equivalent :: IntSet -> IntSet -> CongruenceClosure -> Bool
 equivalent is1 is2 (CongruenceClosure rules) =
     normalForm rules is1 == normalForm rules is2
 
-unequate :: CongruenceClosure -> IS.IntSet -> IS.IntSet -> CongruenceClosure
+unequate :: CongruenceClosure -> IntSet -> IntSet -> CongruenceClosure
 unequate (CongruenceClosure rules) iset1 iset2 =
     CongruenceClosure $ List.delete (iset1, iset2) $ List.delete (iset2, iset1) rules

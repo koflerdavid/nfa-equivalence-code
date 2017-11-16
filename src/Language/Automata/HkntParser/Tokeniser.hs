@@ -4,6 +4,7 @@ import Language.Automata.HkntParser.Class
 
 import Control.Monad                      ( forM )
 import Data.Char
+import Data.Functor                       ( ($>) )
 import Text.Parsec                        hiding ( token )
 
 tokenise :: String -> Either ParseError [(SourcePos, Token)]
@@ -31,12 +32,12 @@ lineTokeniser (lineNumber, line) =
         return (lineTokens ++ [ newlineToken ])
 
 token :: Parsec String () Token
-token = try (string "accept" *> notFollowedBy alphaNum *> pure Accept)
-    <|> try (string "check" *> notFollowedBy alphaNum *> pure Check)
+token = try ((string "accept" *> notFollowedBy alphaNum) $> Accept)
+    <|> try ((string "check" *> notFollowedBy alphaNum) $> Check)
     <|> Identifier <$> many1 alphaNum
-    <|> char ':' *> pure Colon
-    <|> try (string "=>" *> pure GreaterEquals)
-    <|> char '=' *> pure Equals
+    <|> (char ':' $> Colon)
+    <|> try (string "=>" $> GreaterEquals)
+    <|> (char '=' $> Equals)
     <|> char '-' *> (Arrow <$> (anyChar `sepBy` char '+')) <* string "->"
 
 tokeniseAndParse :: Parsec [(SourcePos, Token)] () a -> SourceName -> String -> Either ParseError a

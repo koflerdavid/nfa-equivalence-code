@@ -8,10 +8,10 @@ import Control.Monad.Trans.Except ( ExceptT, throwE )
 
 parseAndDeriveRegexByWord :: String -> ExceptT String IO ()
 parseAndDeriveRegexByWord word = do
-    input <- lift $ getContents
+    input <- lift getContents
     case parseRegex "<stdin>" input of
         Left parseError -> throwE parseError
         Right regex -> do
-            lift $ putStrLn (show regex)
+            lift $ print regex
             let regex' = wordDerive word regex
-            lift $ putStrLn (show regex')
+            lift $ print regex'

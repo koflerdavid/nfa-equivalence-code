@@ -120,7 +120,7 @@ instance (Show c) =>
     showsPrec _ Epsilon = ('ε' :)
     showsPrec _ (Atom c) = (show c ++)
     showsPrec prec (Alternative r s) =
-        let inner = (showsPrec 6 r) . (" | " ++) . showsPrec 6 s
+        let inner = showsPrec 6 r . (" | " ++) . showsPrec 6 s
         in
             if prec > 6 then ('(' :) . inner . (')' :) else inner
     showsPrec prec (Sequence r s) =

@@ -4,6 +4,7 @@ module Language.Automata.HkntParser.Internal where
 
 import Language.Automata.HkntParser.Class
 
+import Data.Functor                       ( ($>) )
 import Text.Parsec                        hiding ( label, labels )
 
 transitions :: Parsec [(SourcePos, Token)] () [Transition]
@@ -28,7 +29,7 @@ checks = check `sepEndBy` newlineToken
 check :: Parsec [(SourcePos, Token)] () (Check String)
 check = checkKeyword *> colonToken *> ((,,) <$> many1 identifier <*> operation <*> many1 identifier)
   where
-    operation = equalsOperator *> pure Equivalence <|> greaterEqualsOperator *> pure Inclusion
+    operation = equalsOperator $> Equivalence <|> greaterEqualsOperator $> Inclusion
 
 -- Parser combinators for single tokens
 identifier :: Parsec [(SourcePos, Token)] s String
@@ -73,7 +74,7 @@ greaterEqualsOperator = token (show . snd)
                                    (_, GreaterEquals) -> Just ()
                                    _ -> Nothing)
 
-transitionArrow :: Parsec [(SourcePos, Token)] s [Char]
+transitionArrow :: Parsec [(SourcePos, Token)] s String
 transitionArrow = token (show . snd)
                         fst
                         (\case
