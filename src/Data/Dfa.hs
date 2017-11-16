@@ -1,3 +1,6 @@
+{-# LANGUAGE FlexibleInstances     #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+
 module Data.Dfa
     ( Dfa
     , DfaState
@@ -14,10 +17,12 @@ module Data.Dfa
     , runDfa
     ) where
 
-import qualified Data.Foldable as Foldable
-import qualified Data.IntSet   as ISet
-import qualified Data.Map      as Map
-import qualified Data.Set      as Set
+import           Data.FiniteAutomaton
+
+import qualified Data.Foldable        as Foldable
+import qualified Data.IntSet          as ISet
+import qualified Data.Map             as Map
+import qualified Data.Set             as Set
 
 type DfaState = Maybe Int
 
@@ -54,6 +59,21 @@ dfaAccepts :: Dfa c -> DfaState -> Bool
 dfaAccepts _ Nothing = False
 dfaAccepts (Dfa acceptingStates _) (Just q) =
     q `ISet.member` acceptingStates
+
+instance Ord c => FiniteAutomaton (Dfa c) DfaState c Bool where
+    faStates = Set.union (Set.singleton Nothing) . Set.map Just . Set.fromAscList . ISet.toAscList . dfaStates
+    faOutput = dfaAccepts
+    faInputs = dfaAlphabet
+    faTransitions dfa (Just q) =
+        Map.map (Set.singleton . Just) -- Wrap each state into a singleton set
+        . Map.mapKeys snd -- Remove the state
+        . Map.filterWithKey (const . (== q) . fst) -- Pick the transitions from state p
+        . dfaTransitions
+        $ dfa
+    faTransitions dfa Nothing =
+        Map.fromSet (const (Set.singleton Nothing)) -- Each input leads to `Nothing`
+        . faInputs
+        $ dfa
 
 -- | This function builds a DFA and returns the initial state. This is a convenience to explicitly
 -- start the DFA from the initial state, allowing it to be treated uniformly with other states.

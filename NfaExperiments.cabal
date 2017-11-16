@@ -29,6 +29,7 @@ library
                      , Data.Dfa.Regex
                      , Data.EpsilonNfa
                      , Data.EpsilonNfa.Internal
+                     , Data.FiniteAutomaton
                      , Data.Nfa
                      , Data.Queue
                      , Data.Regex

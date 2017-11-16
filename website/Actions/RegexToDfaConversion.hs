@@ -2,13 +2,12 @@
 
 module Actions.RegexToDfaConversion  ( action ) where
 
-import Algorithm.Regex.DfaConversion ( deriveRegexToDfa )
-import Data.Dfa.Format.Html          ( asHtml )
-import Language.RegexParser          ( parseRegex )
+import           Data.Dfa.Format.Html (asHtml)
+import           Language.RegexParser (parseRegex)
 
-import Data.ByteString.UTF8          as UTF8
-import Data.Maybe                    ( isJust )
-import Snap.Core
+import           Data.ByteString.UTF8 as UTF8
+import           Data.Maybe           (isJust)
+import           Snap.Core
 
 action :: Snap ()
 action =
@@ -22,7 +21,6 @@ action =
         case parseRegex "<param>" (UTF8.toString regexString) of
           Left _parseError -> writeBS "Regex parse error"
           Right regex -> do
-            let transitions = deriveRegexToDfa regex
             withoutSkeleton <-
               fmap (isJust . getHeader "X-Embeddable") getRequest
-            writeLazyText (asHtml withoutSkeleton regex transitions)
+            writeLazyText (asHtml withoutSkeleton regex)

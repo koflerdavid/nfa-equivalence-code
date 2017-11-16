@@ -2,17 +2,18 @@
 
 module Data.Dfa.Format.Html ( asHtml ) where
 
-import           Data.Dfa.Regex ( RegexDfaTransitions )
+import           Data.Dfa.Regex
+import           Data.FiniteAutomaton (faInputs)
 import           Data.Regex
 
-import           Control.Monad     ( forM_ )
-import qualified Data.Text.Lazy as T
-import           Data.Map       as Map
-import           Data.Set       as Set
+import           Control.Monad        (forM_)
+import           Data.Map             as Map
+import           Data.Set             as Set
+import qualified Data.Text.Lazy       as T
 import           Lucid
 
-asHtml :: Bool -> Regex Char -> RegexDfaTransitions -> T.Text
-asHtml withoutSkeleton regex transitions =
+asHtml :: Bool -> Regex Char -> T.Text
+asHtml withoutSkeleton regex =
     renderText $
         if withoutSkeleton
         then transitionTable
@@ -33,19 +34,20 @@ asHtml withoutSkeleton regex transitions =
   where
     transitionTable :: Html ()
     transitionTable = table_ $ do
+        let regexDfa = fromRegex regex
         thead_ $
             tr_ $ do
                 th_ "state"
                 th_ "initial state?"
                 th_ "final state?"
-                forM_ (Set.toAscList $ alphabet regex) $
+                forM_ (Set.toAscList . faInputs $ regexDfa) $ -- Ascending order
                     \c ->
                         th_ (toHtml . show $ c)
         tbody_ $
-            forM_ (Map.toList transitions) $
+            forM_ (Map.toList . transitions $ regexDfa) $
                 \(r, ts) ->
                     tr_ $ do
                         td_ $ toHtml . show $ r
                         td_ $ if regex == r then "->" else " "
                         td_ $ if matchesEmptyWord r then "*" else " "
-                        forM_ (Map.elems ts) $ td_ . toHtml . show
+                        forM_ (Map.elems ts) $ td_ . toHtml . show -- Map.elems yields ascending order

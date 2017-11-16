@@ -1,22 +1,23 @@
-{-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE OverloadedStrings #-}
 
 module RegexDfaOutput.LaTeX ( printTransitionTable ) where
 
-import Data.Dfa.Regex               ( RegexDfaTransitions )
-import Data.Regex
+import           Data.Regex
 
-import Data.List                    as List
-import Data.Map                     as Map
-import Data.Set                     as Set
-import Text.LaTeX
-import Text.LaTeX.Base.Class
-import Text.LaTeX.Base.Pretty
-import Text.LaTeX.Packages.AMSMath
-import Text.LaTeX.Packages.AMSSymb
-import Text.LaTeX.Packages.Inputenc
+import           Data.List                    as List
+import           Data.Map                     as Map
+import           Data.Set                     as Set
+import           Text.LaTeX
+import           Text.LaTeX.Base.Class
+import           Text.LaTeX.Base.Pretty
+import           Text.LaTeX.Packages.AMSMath
+import           Text.LaTeX.Packages.AMSSymb
+import           Text.LaTeX.Packages.Inputenc
 
-printTransitionTable :: Bool -> Regex Char -> RegexDfaTransitions -> IO ()
+type RegexDfaTransitions c = Map (Regex c) (Map c (Regex c))
+
+printTransitionTable :: Bool -> Regex Char -> RegexDfaTransitions Char -> IO ()
 printTransitionTable withoutSkeleton regex transitions = do
     let regexAlphabet = alphabet regex
         firstColumn = [ LeftColumn, DVerticalLine ]
@@ -35,7 +36,7 @@ thePreamble = mconcat [ documentclass [] article
                       ]
 
 tableHeader :: Set Char -> LaTeX
-tableHeader inputs = do
+tableHeader inputs =
     List.foldl1 (&) $ "state" : (List.map stateName . Set.toAscList $ inputs)
 
 stateName :: Char -> LaTeX
@@ -44,7 +45,7 @@ stateName s = fromString (show s)
 regexRepr :: Regex Char -> LaTeX
 regexRepr = texy . TexyRegex
 
-tableBody :: RegexDfaTransitions -> LaTeX
+tableBody :: RegexDfaTransitions Char -> LaTeX
 tableBody transitions = mconcat $ List.map (uncurry stateTransitions) (Map.toList transitions)
 
 stateTransitions :: Regex Char -> Map Char (Regex Char) -> LaTeX

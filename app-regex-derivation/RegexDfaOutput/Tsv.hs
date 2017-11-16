@@ -1,13 +1,14 @@
 module RegexDfaOutput.Tsv ( printTransitionTable ) where
 
-import Data.Dfa.Regex ( RegexDfaTransitions )
-import Data.Regex     ( Regex, alphabet, matchesEmptyWord )
+import           Data.Regex    (Regex, alphabet, matchesEmptyWord)
 
-import Control.Monad  ( forM_ )
-import Data.Map       as Map
-import Data.Set       as Set
+import           Control.Monad (forM_)
+import           Data.Map      as Map
+import           Data.Set      as Set
 
-printTransitionTable :: Bool -> Regex Char -> RegexDfaTransitions -> IO ()
+type RegexDfaTransitions c = Map (Regex c) (Map c (Regex c))
+
+printTransitionTable :: Bool -> Regex Char -> RegexDfaTransitions Char -> IO ()
 printTransitionTable _ regex transitions = do
     forM_ (Set.toAscList $ alphabet regex) $ \c -> putStr ('\t' : show c)
     putStr "\n"

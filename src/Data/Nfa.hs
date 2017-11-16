@@ -1,3 +1,6 @@
+{-# LANGUAGE FlexibleInstances     #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+
 module Data.Nfa
     ( Nfa(..)
     , nfaAlphabet
@@ -8,11 +11,14 @@ module Data.Nfa
     , accepts
     ) where
 
-import           Data.Foldable as Foldable
-import           Data.IntSet   as ISet
-import           Data.List     as List
-import           Data.Map      as Map
-import           Data.Set      as Set
+import           Data.FiniteAutomaton
+
+import           Control.Arrow        (second)
+import           Data.Foldable        as Foldable
+import           Data.IntSet          as ISet
+import           Data.List            as List
+import           Data.Map             as Map
+import           Data.Set             as Set
 
 data Nfa c = Nfa { nfaAcceptingStates :: ISet.IntSet
                  , nfaTransitions     :: Map.Map (Int, c) ISet.IntSet
@@ -25,7 +31,7 @@ buildNfa :: (Ord c) => [Int] -> [((Int, c), [Int])] -> Nfa c
 buildNfa acceptingStates
     = Nfa (ISet.fromList acceptingStates)
     . Map.fromListWith ISet.union
-    . List.map (mapSnd ISet.fromList) -- Use sets to represent target states
+    . List.map (second ISet.fromList) -- Use sets to represent target states
 
 nfaAlphabet :: (Ord c) => Nfa c -> Set.Set c
 nfaAlphabet
@@ -57,5 +63,13 @@ accepts :: Nfa c -> [Int] -> Bool
 accepts nfa possibleStates =
     not . ISet.null $ nfaAcceptingStates nfa `ISet.intersection` ISet.fromList possibleStates
 
-mapSnd :: (b -> c) -> (a, b) -> (a, c)
-mapSnd f (a, b) = (a, f b)
+instance Ord c => FiniteAutomaton (Nfa c) Int c Bool where
+    faStates = Set.fromDistinctAscList . ISet.toAscList . nfaStates
+    faInputs = nfaAlphabet
+    faOutput nfa = (`ISet.member` nfaAcceptingStates nfa)
+    faTransitions nfa q =
+        Map.map (Set.fromDistinctAscList . ISet.toAscList) -- Convert IntSets to Sets
+        . Map.mapKeys snd -- Remove the state
+        . Map.filterWithKey (const . (== q) . fst) -- Select only the relevant transitions
+        . nfaTransitions
+        $ nfa
