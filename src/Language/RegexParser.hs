@@ -1,4 +1,6 @@
-module Language.RegexParser ( parseRegex ) where
+module Language.RegexParser
+    ( parseRegex
+    ) where
 
 import Data.Regex
 import Language.RegexParser.Internal

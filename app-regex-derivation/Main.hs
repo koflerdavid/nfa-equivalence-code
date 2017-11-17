@@ -13,11 +13,11 @@ import Options.Generic
 import System.Exit
 import System.IO
 
-data Action = RegexFullDerivation { outputFormat    :: OutputFormat
-                                  , withoutSkeleton :: Bool
-                                  }
-            | RegexDerivation String
-            | RegexEquivalence
+data Action
+    = RegexFullDerivation { outputFormat    :: OutputFormat
+                          , withoutSkeleton :: Bool }
+    | RegexDerivation String
+    | RegexEquivalence
     deriving (Generic, Show)
 
 instance ParseRecord Action
@@ -31,13 +31,11 @@ main = do
             case result of
                 Left message -> printErrorAndExit message
                 Right _      -> exitSuccess
-
         RegexDerivation word -> do
             result <- runExceptT (parseAndDeriveRegexByWord word)
             case result of
                 Left message -> printErrorAndExit message
                 Right _      -> exitSuccess
-
         RegexEquivalence -> do
             result <- runExceptT checkRegexEquivalence
             case result of

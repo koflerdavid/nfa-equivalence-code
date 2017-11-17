@@ -21,26 +21,21 @@ spec = do
     describe "run a" $ do
         let enfa = compileRegex (Atom 'a')
         it "accepts \"a\"" $ do
-            (enfa `accepts` runEnfa enfa [ 0 ] "a") `shouldBe` True
+            (enfa `accepts` runEnfa enfa [0] "a") `shouldBe` True
         it "does not accept \"\", \"b\", \"aa\", \"ab\"" $ do
-            forM_ [ "", "b", "aa", "ab" ] $
-                \input -> do
-                    (enfa `accepts` runEnfa enfa [ 0 ] input) `shouldBe` False
-
+            forM_ ["", "b", "aa", "ab"] $ \input -> do
+                (enfa `accepts` runEnfa enfa [0] input) `shouldBe` False
     describe "run (a|b)*" $ do
         let enfa = compileRegex (Asterisk (Alternative (Atom 'a') (Atom 'b')))
         it "accepts the empty string, \"a\", \"b\" and \"ab\"" $ do
-            forM_ [ "", "a", "b", "ab" ] $
-                \input -> do
-                    (enfa `accepts` runEnfa enfa [ 0 ] input) `shouldBe` True
-
+            forM_ ["", "a", "b", "ab"] $ \input -> do
+                (enfa `accepts` runEnfa enfa [0] input) `shouldBe` True
         it "does not accept \"d\"" $ do
-            (enfa `accepts` runEnfa enfa [ 0 ] "d") `shouldBe` False
-
+            (enfa `accepts` runEnfa enfa [0] "d") `shouldBe` False
     describe "run a*" $ do
         let enfa = compileRegex (Asterisk (Atom 'a'))
         it "accepts \"\", \"a\", \"aa\", \"aaa\"" $ do
-            forM_ [ "", "a", "aa", "aaa" ] $
-                \input -> enfa `accepts` runEnfa enfa [ 0 ] input `shouldBe` True
+            forM_ ["", "a", "aa", "aaa"] $ \input ->
+                enfa `accepts` runEnfa enfa [0] input `shouldBe` True
         it "does not accept \"b\"" $ do
-            (enfa `accepts` runEnfa enfa [ 0 ] "b") `shouldBe` False
+            (enfa `accepts` runEnfa enfa [0] "b") `shouldBe` False

@@ -15,9 +15,8 @@ main = hspec spec
 
 spec :: Spec
 spec = do
-    forM_ tokenCases $
-        \(input, expected) -> do
-            it ("should parse " ++ show input ++ " to " ++ show expected) $ do
-                parse regexToken "textcase" input `shouldBe` Right expected
+    forM_ tokenCases $ \(input, expected) -> do
+        it ("should parse " ++ show input ++ " to " ++ show expected) $ do
+            parse regexToken "textcase" input `shouldBe` Right expected
   where
-    tokenCases = [ ("a", CharToken 'a') ]
+    tokenCases = [("a", CharToken 'a')]

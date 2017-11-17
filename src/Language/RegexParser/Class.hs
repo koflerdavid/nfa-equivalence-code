@@ -5,15 +5,16 @@ module Language.RegexParser.Class
 
 import Text.Parsec
 
-data Token = CharToken Char
-           | EpsilonToken
-           | EmptyToken
-           | ZeroOrMoreTimesToken
-           | OneOrMoreTimesToken
-           | ZeroOrOneTimesToken
-           | AlternativeToken
-           | LeftParentheseToken
-           | RightParentheseToken
+data Token
+    = CharToken Char
+    | EpsilonToken
+    | EmptyToken
+    | ZeroOrMoreTimesToken
+    | OneOrMoreTimesToken
+    | ZeroOrOneTimesToken
+    | AlternativeToken
+    | LeftParentheseToken
+    | RightParentheseToken
     deriving (Eq)
 
 instance Show Token where

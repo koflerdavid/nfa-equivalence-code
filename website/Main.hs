@@ -13,9 +13,9 @@ main = quickHttpServe site
 
 site :: Snap ()
 site =
-  ifTop (sendFile "website/static/index.html") <|>
-  route
-    [ ("regex/derivation", Derivation.action)
-    , ("regex/dfa_conversion", RegexToDfaConversion.action)
-    ] <|>
-  dir "static" (serveDirectory "website/static")
+    ifTop (sendFile "website/static/index.html") <|>
+    route
+        [ ("regex/derivation", Derivation.action)
+        , ("regex/dfa_conversion", RegexToDfaConversion.action)
+        ] <|>
+    dir "static" (serveDirectory "website/static")

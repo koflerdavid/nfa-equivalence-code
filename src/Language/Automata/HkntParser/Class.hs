@@ -4,25 +4,28 @@ import Data.List ( intersperse )
 
 type Transition = (String, Char, String)
 
-data Operation = Inclusion | Equivalence
+data Operation
+    = Inclusion
+    | Equivalence
     deriving (Enum, Eq, Show)
 
 type Check s = ([s], Operation, [s])
 
-data Result = Result { resTransitions     :: [Transition]
-                     , resAcceptingStates :: [String]
-                     , resChecks          :: [Check String]
-                     }
-    deriving (Eq, Show)
+data Result = Result
+    { resTransitions     :: [Transition]
+    , resAcceptingStates :: [String]
+    , resChecks          :: [Check String]
+    } deriving (Eq, Show)
 
-data Token = Identifier { tkIdentifierName :: String }
-           | Accept
-           | Check
-           | Colon
-           | Equals
-           | GreaterEquals
-           | Arrow { tkLabels :: [Char] }
-           | Newline
+data Token
+    = Identifier { tkIdentifierName :: String }
+    | Accept
+    | Check
+    | Colon
+    | Equals
+    | GreaterEquals
+    | Arrow { tkLabels :: [Char] }
+    | Newline
     deriving (Eq)
 
 instance (Show Token) where
@@ -32,5 +35,5 @@ instance (Show Token) where
     show Colon             = ":"
     show Equals            = "="
     show GreaterEquals     = "=>"
-    show (Arrow labels)    = concat [ "-", intersperse '+' labels, "->" ]
+    show (Arrow labels)    = concat ["-", intersperse '+' labels, "->"]
     show Newline           = "<newline>"

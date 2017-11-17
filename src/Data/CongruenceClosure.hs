@@ -13,7 +13,8 @@ import Data.List                       as List
 
 type Rule = (IntSet, IntSet)
 
-data CongruenceClosure = CongruenceClosure [Rule]
+data CongruenceClosure =
+    CongruenceClosure [Rule]
 
 empty :: CongruenceClosure
 empty = CongruenceClosure []
@@ -21,8 +22,8 @@ empty = CongruenceClosure []
 equate :: CongruenceClosure -> IntSet -> IntSet -> CongruenceClosure
 equate relation@(CongruenceClosure rules) iset1 iset2 =
     if equivalent iset1 iset2 relation
-    then relation
-    else CongruenceClosure ((iset1, iset2) : (iset2, iset1) : rules)
+        then relation
+        else CongruenceClosure ((iset1, iset2) : (iset2, iset1) : rules)
 
 equivalent :: IntSet -> IntSet -> CongruenceClosure -> Bool
 equivalent is1 is2 (CongruenceClosure rules) =
@@ -30,4 +31,5 @@ equivalent is1 is2 (CongruenceClosure rules) =
 
 unequate :: CongruenceClosure -> IntSet -> IntSet -> CongruenceClosure
 unequate (CongruenceClosure rules) iset1 iset2 =
-    CongruenceClosure $ List.delete (iset1, iset2) $ List.delete (iset2, iset1) rules
+    CongruenceClosure $
+    List.delete (iset1, iset2) $ List.delete (iset2, iset1) rules

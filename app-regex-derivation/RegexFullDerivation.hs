@@ -17,8 +17,9 @@ parseAndDeriveRegexToDfa outputFormat withoutSkeleton = do
     case parseRegex "<stdin>" input of
         Left parseError -> throwE parseError
         Right regex -> do
-            let printer = case outputFormat of
-                    Html  -> HtmlOutput.printTransitionTable
-                    Latex -> LaTeXOutput.printTransitionTable
-                    Tsv   -> TsvOutput.printTransitionTable
+            let printer =
+                    case outputFormat of
+                        Html  -> HtmlOutput.printTransitionTable
+                        Latex -> LaTeXOutput.printTransitionTable
+                        Tsv   -> TsvOutput.printTransitionTable
             lift $ printer withoutSkeleton regex (deriveRegexToDfa regex)

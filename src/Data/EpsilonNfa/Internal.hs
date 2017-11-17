@@ -19,13 +19,15 @@ step :: Ord c => Transitions c -> IntSet -> Maybe c -> IntSet
 step table qs c = mergeMap (\q -> findWithDefault ISet.empty (q, c) table) qs
 
 closure :: Ord c => Transitions c -> IntSet -> IntSet
-closure transitions states =
-    computeClosure states states
+closure transitions states = computeClosure states states
   where
     computeClosure current visited =
-        if ISet.null toVisit then visited' else computeClosure toVisit visited'
+        if ISet.null toVisit
+            then visited'
+            else computeClosure toVisit visited'
       where
-        epsilonReachable = mergeMap (getEpsilonReachableStates transitions) current
+        epsilonReachable =
+            mergeMap (getEpsilonReachableStates transitions) current
         visited' = visited `ISet.union` epsilonReachable
         toVisit = epsilonReachable ISet.\\ visited
 

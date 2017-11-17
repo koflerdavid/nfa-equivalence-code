@@ -14,11 +14,9 @@ spec = do
             runEquivT' $ do
                 equate "2" "4"
                 equate "6" "8"
-
                 "2" `shouldBeEqualTo` "4"
                 "6" `shouldBeEqualTo` "8"
                 "2" `shouldNotBeEqualTo` "8"
-
                 equate "4" "6"
                 "2" `shouldBeEqualTo` "8"
 

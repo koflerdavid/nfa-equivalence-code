@@ -1,4 +1,6 @@
-module RegexDfaOutput.Html ( printTransitionTable ) where
+module RegexDfaOutput.Html
+    ( printTransitionTable
+    ) where
 
 import           Data.Dfa.Format.Html ( asHtml )
 import           Data.Regex

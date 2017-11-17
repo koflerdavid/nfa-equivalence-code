@@ -1,11 +1,11 @@
 {-# LANGUAGE FunctionalDependencies #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 
-module Data.FiniteAutomaton (
-    FiniteAutomaton(..)
-  , Data.Set.Set
-  , Data.Map.Map
-) where
+module Data.FiniteAutomaton
+    ( FiniteAutomaton(..)
+    , Data.Set.Set
+    , Data.Map.Map
+    ) where
 
 import Data.Map
 import Data.Set

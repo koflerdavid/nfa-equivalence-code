@@ -6,3 +6,5 @@ steps:
       space_surround: true
   - language_pragmas:
       align: false
+  - tabs:
+      spaces: 4
