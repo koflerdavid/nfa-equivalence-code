@@ -1,5 +1,3 @@
-{-# LANGUAGE OverloadedStrings #-}
-
 module Actions.RegexToDfaConversion  ( action ) where
 
 import Data.Dfa.Format.Html ( asHtml )

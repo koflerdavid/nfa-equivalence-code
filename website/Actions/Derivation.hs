@@ -1,5 +1,3 @@
-{-# LANGUAGE OverloadedStrings #-}
-
 module Actions.Derivation ( action ) where
 
 import Algorithm.Regex.Derivation ( wordDerive )
