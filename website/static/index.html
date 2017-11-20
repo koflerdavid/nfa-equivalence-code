@@ -151,11 +151,13 @@
 </form>
 
 <script type="application/javascript">
+    'use strict';
+
     ajaxifyForm('frmWordDerivation',
         function () {
-            const word = byId('txtWord').value || '';
-            const regex = byId('txtRegex').value || 'ε';
-            return encodeURI('word=' + word) + '&' + encodeURI('regex=' + regex);
+            const word = encodeURIComponent(byId('txtWord').value || '');
+            const regex = encodeURIComponent(byId('txtRegex').value || 'ε');
+            return 'word=' + word + '&' + 'regex=' + regex;
         },
         function (request, form) {
             hideErrorMessages(form);
@@ -177,8 +179,8 @@
 
     ajaxifyForm('frmRegexToDfa',
         function () {
-            const regex = byId('txtInputRegex').value || '';
-            return encodeURI('regex=' + regex);
+            const regex = encodeURIComponent(byId('txtInputRegex').value || '');
+            return 'regex=' + regex;
         },
         function (request, form) {
             hideErrorMessages(form);
@@ -227,7 +229,7 @@
             , action = form.getAttribute('action')
             , method = form.getAttribute('method');
 
-        form.addEventListener('submit',function (e) {
+        form.addEventListener('submit', function (e) {
             const request = createRequest(action, method);
             request.addEventListener('load', function () {
                 onSuccess(request, form);
