@@ -1,0 +1,43 @@
+body {
+    background-color: palegreen;
+    font-size: 13pt;
+}
+
+.form-rows input, form textarea, form output, form button {
+    display: block;
+    margin-bottom: 1em;
+}
+
+.error-message {
+    color: red;
+    font-weight: bold;
+}
+
+code {
+    font-weight: bold;
+}
+
+@media (min-width: 500px) {
+    body {
+        padding-left: 20%;
+        padding-right: 20%;
+    }
+
+    .form-rows {
+        display: table;
+    }
+
+    .form-rows label {
+        display: table-cell;
+        vertical-align: top;
+        padding-right: 1em;
+    }
+
+    .form-rows input, .form-rows textarea, .form-rows output {
+        display: table-cell;
+    }
+
+    .form-rows .form-row {
+        display: table-row;
+    }
+}
