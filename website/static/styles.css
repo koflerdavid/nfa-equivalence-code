@@ -2,10 +2,22 @@
     visibility: hidden;
 }
 
+.output-container.visible {
+    visibility: visible;
+}
+
 .error-message {
-    display: none;
+    visibility: collapse;
 }
 
 .error-message.visible {
-    display: block;
+    visibility: visible;
+}
+
+.equivalence-result {
+    visibility: collapse;
+}
+
+.equivalence-result.visible {
+    visibility: visible;
 }

@@ -1,6 +1,7 @@
 module Main where
 
 import Actions.Derivation           as Derivation
+import Actions.RegexEquivalence     as RegexEquivalence
 import Actions.RegexToDfaConversion as RegexToDfaConversion
 
 import Control.Applicative          ( (<|>) )
@@ -17,5 +18,6 @@ site =
     route
         [ ("regex/derivation", Derivation.action)
         , ("regex/dfa_conversion", RegexToDfaConversion.action)
+        , ("regex/equivalence", RegexEquivalence.action)
         ] <|>
     dir "static" (serveDirectory "website/static")
