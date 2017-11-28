@@ -135,6 +135,59 @@ The second and third column contain the derivation of each input regular
 expression by that word.
 
 
+### Webservice ###
+
+The subdirectory `webservice` contains a webservice implemented using the
+Snap framework. 
+It makes it possible to use the above tools via a REST-style interface.
+By default it opens a HTTP server on `0.0.0.0:8000`.
+At `/` there is a HTML page that makes it possible to try out the following 
+endpoints:
+
+ * `/regex/derivation`: Expects a POST request with content type 
+   `application/x-www-form-urlencoded` and two parameters: 
+    * `regex`, which is a valid UTF-8 string obeying the aforementioned syntax 
+      for regular expressions, 
+    * and `word`, a valid UTF-8 string.
+    
+   If parameters are missing, the regular expression has syntax errors or 
+   if UTF-8 decoding errors occur, a `400 Bad Request` status message will
+   be returned.
+   In that case the response body will be a short UTF-8 text 
+   describing the error.
+   If derivation is successful, the resulting regular expression is returned.
+    
+ * `/regex/equivalence`: Expects a POST request with content type 
+   `application/x-www-form-urlencoded` and two parameters: `regex1` and `regex2`.
+   Both are expected to be valid UTF-8 strings of regular expressions according to 
+   the aforementioned syntax.
+   If parameters are missing or UTF-8 decoding errors or syntax errors occur,
+   a `400 Bad Request` status message will be returned.
+   The response body will be a short UTF-8 string describing the error.
+   In case of success, a JSON document will be returned.
+   It will be an object that always has at least the field `equivalent`.
+   It is always a boolean stating whether the two regular expressions are equivalent.
+   In case the regular expressions are not equivalent, 
+   an additional field `witnesses`, containing an array of strings, will be present.
+   Each of these strings would be accepted by one of the regular expressions, 
+   but not by the other one.
+   
+ * `/regex/dfa_conversion`: Expects a POST request with content type 
+   `application/x-www-form-urlencoded` and a parameter `regex`.
+   The parameter is expected to be a valid UTF-8 string obeying the aforementioned
+   syntax of regular expressions.
+   The endpoint will return a HTML page describing a DFA that accepts the
+   same language as the given regular expression.
+   For the user's convenience, the states are named after regular expression
+   derivatives whose language they accept.
+   If the HTTP header `X-Embeddable` is specified, the output will be restricted
+   to a HTML fragment since it looks like there is no MIME type for partial
+   HTML documents.
+   If the parameter is missing or if UTF-8 decoding errors or syntax errors occur,
+   a `400 Bad Request` status message will be returned.
+   The response body will be a short UTF-8 string describing the error. 
+
+
 Technical Report
 ----------------
 
