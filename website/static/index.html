@@ -187,60 +187,61 @@
     </div>
 </form>
 
+<script type="application/javascript" src="./static/ajax_form_utilities.js"></script>
 <script type="application/javascript">
     'use strict';
 
-    ajaxifyForm('frmWordDerivation',
-        function (form) {
-            const word = encodeURIComponent(byId('txtWord').value || '');
-            const regex = encodeURIComponent(byId('txtRegex').value || 'ε');
+    FormUtilities.ajaxifyForm('frmWordDerivation',
+        function () {
+            const word = encodeURIComponent(FormUtilities.byId('txtWord').value || '');
+            const regex = encodeURIComponent(FormUtilities.byId('txtRegex').value || 'ε');
             return 'word=' + word + '&' + 'regex=' + regex;
         },
         function (request, form) {
-            hideErrorMessages(form);
+            FormUtilities.hideErrorMessages(form);
 
             if (request.status === 200) {
-                byId('wordDerivationOutput').innerText = request.responseText;
-                byId('divDerivationOutput').style = "visibility: visible;";
+                FormUtilities.byId('wordDerivationOutput').innerText = request.responseText;
+                FormUtilities.byId('divDerivationOutput').style = "visibility: visible;";
             } else if (request.status === 400) {
-                showErrorMessage(form, request.responseText);
+                FormUtilities.showErrorMessage(form, request.responseText);
             } else {
-                showErrorMessage(form, "Regex derivation error");
+                FormUtilities.showErrorMessage(form, "Regex derivation error");
                 console.error("Regex derivation request error", request);
             }
         },
         function (e, request, form) {
-            showErrorMessage(form, "Request error");
+            FormUtilities.showErrorMessage(form, "Request error");
             console.error("Regex derivation request error", request, e);
         });
 
-    ajaxifyForm('frmRegexEquivalence', function (form) {
-        const regex1 = encodeURIComponent(byId('txtInputRegex1').value || '')
-            , regex2 = encodeURIComponent(byId('txtInputRegex2').value || '');
+    FormUtilities.ajaxifyForm('frmRegexEquivalence', function (form) {
+        const regex1 = encodeURIComponent(FormUtilities.byId('txtInputRegex1').value || '')
+            , regex2 = encodeURIComponent(FormUtilities.byId('txtInputRegex2').value || '');
         return 'regex1=' + regex1 + '&regex2=' + regex2;
     }, function (request, form) {
-        hideErrorMessages(form);
-        byClassName(form, 'equivalence-result')
+        FormUtilities.hideErrorMessages(form);
+        FormUtilities.byClassName(form, 'equivalence-result')
             .forEach(function (element) { element.classList.remove('visible'); });
-        firstByClassName(form, 'output-container').classList.remove('visible');
+        FormUtilities.firstByClassName(form, 'output-container').classList.remove('visible');
 
         if (request.status === 200) {
             try {
                 const result = JSON.parse(request.responseText)
-                    , witnessesContainer = firstByClassName(form, 'witnesses-list');
+                    , witnessesContainer = FormUtilities.firstByClassName(form, 'witnesses-list');
 
                 while (witnessesContainer.firstChild) {
                     witnessesContainer.removeChild(witnessesContainer.firstChild);
                 }
 
-                firstByClassName(form, 'output-container').classList.add('visible');
+                FormUtilities.firstByClassName(form, 'output-container').classList.add('visible');
 
-                if (result.equivalent) {
-                    firstByClassName(form, 'equivalent').classList.add('visible');
+                if (result['equivalent']) {
+                    FormUtilities.firstByClassName(form, 'equivalent').classList.add('visible');
                 } else {
-                    firstByClassName(form, 'not-equivalent').classList.add('visible');
+                    FormUtilities.firstByClassName(form, 'not-equivalent').classList.add('visible');
 
-                    result.witnesses.forEach(function (witness) {
+                    result['witnesses'].forEach(function (witness) {
                         const code = document.createElement('code');
 
                         if (witness === '') {
@@ -257,120 +258,43 @@
 
             } catch (e) {
                 if (e.name === 'SyntaxError') {
-                    showErrorMessage(form, "Invalid response from server");
+                    FormUtilities.showErrorMessage(form, "Invalid response from server");
                     console.error("Invalid response from server", request);
                 }
             }
 
         } else if (request.status === 400) {
-            showErrorMessage(form, request.responseText);
+            FormUtilities.showErrorMessage(form, request.responseText);
         } else {
-            showErrorMessage(form, "Request error");
+            FormUtilities.showErrorMessage(form, "Request error");
             console.error("Request error", request);
         }
     });
 
-    ajaxifyForm('frmRegexToDfa',
+    FormUtilities.ajaxifyForm('frmRegexToDfa',
         function () {
-            const regex = encodeURIComponent(byId('txtInputRegex').value || '');
+            const regex = encodeURIComponent(FormUtilities.byId('txtInputRegex').value || '');
             return 'regex=' + regex;
         },
         function (request, form) {
-            hideErrorMessages(form);
+            FormUtilities.hideErrorMessages(form);
 
             if (request.status === 200) {
-                byId('dfaRepresentation').innerHTML = request.responseText;
-                byId('divDfaOutput').style = "visibility: visible;";
+                FormUtilities.byId('dfaRepresentation').innerHTML = request.responseText;
+                FormUtilities.byId('divDfaOutput').style = "visibility: visible;";
             } else {
-                showErrorMessage(form, "Regex conversion error");
+                FormUtilities.showErrorMessage(form, "Regex conversion error");
                 console.error("Regex conversion error", request);
             }
         },
         function (e, request, form) {
-            showErrorMessage(form);
+            FormUtilities.showErrorMessage(form);
             console.error("Regex conversion request error", request, e);
         },
         function (request) {
             // Request a HTML fragment from the server instead of full HTML
             request.setRequestHeader('X-Embeddable', 'true');
         });
-
-    function showErrorMessage(form, message) {
-        if (message == null) {
-            byClassName(form, 'generic-error-message')
-                .forEach(function (element) {
-                    element.classList.add('visible');
-                });
-        } else {
-            byClassName(form, 'custom-error-message')
-                .forEach(function (element) {
-                    element.classList.add('visible');
-                    element.innerText = message;
-                });
-        }
-    }
-
-    function hideErrorMessages(form) {
-        byClassName(form, 'error-message')
-            .forEach(function (element) {
-                element.classList.remove('visible');
-            });
-    }
-
-    function ajaxifyForm(id, formParser, onSuccess, onError, requestConfigurator) {
-        const form = byId(id)
-            , action = form.getAttribute('action')
-            , method = form.getAttribute('method');
-
-        form.addEventListener('submit', function (e) {
-            const request = createRequest(action, method);
-            request.addEventListener('load', function () {
-                onSuccess(request, form);
-            });
-
-            if (requestConfigurator != null) {
-                requestConfigurator(request);
-            }
-
-            request.addEventListener('error', function (e) {
-                onError(e, request, form);
-            });
-
-            const encodedFormData = formParser(form);
-            request.send(encodedFormData);
-
-            e.preventDefault();
-        });
-    }
-
-    function byId(id) {
-        const element = document.getElementById(id);
-        if (element == null) {
-            throw new DOMError('Element with id ' + id + ' not found');
-        }
-
-        return element;
-    }
-
-    function firstByClassName(element, className) {
-        const matches = byClassName(element, className);
-        if (matches.length > 0) {
-            return matches[0];
-        }
-
-        throw new DOMError('Element with class ' + className + 'not found');
-    }
-
-    function byClassName(element, className) {
-        return Array.from(element.getElementsByClassName(className));
-    }
-
-    function createRequest(url, method) {
-        const request = new XMLHttpRequest();
-        request.open(method || 'POST', url, true);
-        request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-        return request;
-    }
 </script>
 </body>
 </html>
