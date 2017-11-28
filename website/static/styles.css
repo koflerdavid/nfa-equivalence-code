@@ -7,11 +7,11 @@
 }
 
 .error-message {
-    visibility: collapse;
+    display: none;
 }
 
 .error-message.visible {
-    visibility: visible;
+    display: block;
 }
 
 .equivalence-result {
