@@ -17,6 +17,18 @@ code {
     font-weight: bold;
 }
 
+.top-link {
+    font-size: 60%;
+}
+
+.top-link:before {
+    content: "[";
+}
+
+.top-link:after {
+    content: "]";
+}
+
 @media (min-width: 500px) {
     body {
         padding-left: 20%;

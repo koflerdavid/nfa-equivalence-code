@@ -7,7 +7,8 @@
     <link rel="stylesheet" type="text/css" href="./static/styles.css">
 </head>
 <body>
-<h1>Algorithms on Regular Expression and Finite Automata</h1>
+
+<h1><span id="top">Algorithms on Regular Expression and Finite Automata</span></h1>
 
 <p>
     This website was created to let students use the algorithms developed as part of my
@@ -17,6 +18,15 @@
     protect my webspace and to ensure the user experience of other students.
 </p>
 
+<nav>
+    <ul>
+        <li><a href="#sectionRegularExpressionLanguage">Regular Expression Language</a></li>
+        <li><a href="#sectionDerivativesRegularExpressions">Derivatives of Regular Expressions</a></li>
+        <li><a href="#sectionRegularExpressionEquivalence">Regular Expression Equivalence</a></li>
+        <li><a href="#sectionConvertingToDfas">Converting Regular Expressions to DFAs</a></li>
+    </ul>
+</nav>
+
 <p>
     The code is licenced under a BSD3-license and available on
     <a target="_blank"
@@ -24,7 +34,10 @@
     Issue reports and pull requests are always welcome :)
 </p>
 
-<h2>Regular Expression Language</h2>
+<h2>
+    <span id="sectionRegularExpressionLanguage">Regular Expression Language</span>
+    <a class="top-link" href="#top">Top</a>
+</h2>
 
 <p>
     Regular expressions are composed of the tokens in the following list.
@@ -95,7 +108,10 @@
     <code>b&plus;&quest;</code>, <code>'(' (')' | '(' ')' ) ')'</code>.
 </p>
 
-<h2>Derivatives of Regular Expressions</h2>
+<h2>
+    <span id="sectionDerivativesRegularExpressions">Derivatives of Regular Expressions</span>
+    <a class="top-link" href="#top">Top</a>
+</h2>
 
 <form id="frmWordDerivation" method="POST" action="/regex/derivation">
     <p class="error-message generic-error-message">
@@ -128,7 +144,10 @@
     </div>
 </form>
 
-<h2>Regular Expression Equivalence</h2>
+<h2>
+    <span id="sectionRegularExpressionEquivalence">Regular Expression Equivalence</span>
+    <a class="top-link" href="#top">Top</a>
+</h2>
 
 <form id="frmRegexEquivalence" method="post" action="regex/equivalence">
     <p class="error-message generic-error-message">
@@ -164,7 +183,10 @@
     </div>
 </form>
 
-<h2>Converting Regular Expressions to DFAs</h2>
+<h2>
+    <span id="sectionConvertingToDfas">Converting Regular Expressions to DFAs</span>
+    <a class="top-link" href="#top">Top</a>
+</h2>
 
 <form id="frmRegexToDfa" method="post" action="regex/dfa_conversion">
     <p class="error-message generic-error-message">
@@ -222,7 +244,9 @@
     }, function (request, form) {
         FormUtilities.hideErrorMessages(form);
         FormUtilities.byClassName(form, 'equivalence-result')
-            .forEach(function (element) { element.classList.remove('visible'); });
+            .forEach(function (element) {
+                element.classList.remove('visible');
+            });
         FormUtilities.firstByClassName(form, 'output-container').classList.remove('visible');
 
         if (request.status === 200) {
