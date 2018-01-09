@@ -1,4 +1,6 @@
-window.FormUtilities = (function (document) {
+'use strict';
+
+window.FormUtilities = (function (window) {
     function showErrorMessage(form, message) {
         if (message == null) {
             byClassName(form, 'generic-error-message')
@@ -12,6 +14,30 @@ window.FormUtilities = (function (document) {
                     element.innerText = message;
                 });
         }
+    }
+
+    /**
+     * Encodes all key/value pairs of a HTML form into the `application/x-www-form-urlencoded` format.
+     * @param form HTMLFormElement
+     * @returns {string} `application/x-www-form-urlencoded`-encoded representation of the form.
+     */
+    function encodeForm(form) {
+        const formData = new FormData(form)
+            , parts = [];
+
+        for (let key of formData.keys()) {
+            let values = formData.getAll(key);
+            if (values.length === 0) {
+                values = [formData.get(key)];
+            }
+
+            for (let value of values) {
+                const keyValuePair = window.encodeURIComponent(key) + '=' + window.encodeURIComponent(value);
+                parts.push(keyValuePair);
+            }
+        }
+
+        return parts.join('&');
     }
 
     function hideErrorMessages(form) {
@@ -40,7 +66,7 @@ window.FormUtilities = (function (document) {
                 onError(e, request, form);
             });
 
-            const encodedFormData = formParser(form);
+            const encodedFormData = (formParser || encodeForm)(form);
             request.send(encodedFormData);
 
             e.preventDefault();
@@ -48,7 +74,7 @@ window.FormUtilities = (function (document) {
     }
 
     function byId(id) {
-        const element = document.getElementById(id);
+        const element = window.document.getElementById(id);
         if (element == null) {
             throw new DOMError('Element with id ' + id + ' not found');
         }
@@ -84,4 +110,4 @@ window.FormUtilities = (function (document) {
         'hideErrorMessages': hideErrorMessages,
         'showErrorMessage': showErrorMessage
     };
-})(window.document);
+})(window);

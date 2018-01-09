@@ -213,12 +213,7 @@
 <script type="application/javascript">
     'use strict';
 
-    FormUtilities.ajaxifyForm('frmWordDerivation',
-        function () {
-            const word = encodeURIComponent(FormUtilities.byId('txtWord').value || '');
-            const regex = encodeURIComponent(FormUtilities.byId('txtRegex').value || 'ε');
-            return 'word=' + word + '&' + 'regex=' + regex;
-        },
+    FormUtilities.ajaxifyForm('frmWordDerivation', null,
         function (request, form) {
             FormUtilities.hideErrorMessages(form);
 
@@ -237,69 +232,62 @@
             console.error("Regex derivation request error", request, e);
         });
 
-    FormUtilities.ajaxifyForm('frmRegexEquivalence', function (form) {
-        const regex1 = encodeURIComponent(FormUtilities.byId('txtInputRegex1').value || '')
-            , regex2 = encodeURIComponent(FormUtilities.byId('txtInputRegex2').value || '');
-        return 'regex1=' + regex1 + '&regex2=' + regex2;
-    }, function (request, form) {
-        FormUtilities.hideErrorMessages(form);
-        FormUtilities.byClassName(form, 'equivalence-result')
-            .forEach(function (element) {
-                element.classList.remove('visible');
-            });
-        FormUtilities.firstByClassName(form, 'output-container').classList.remove('visible');
+    FormUtilities.ajaxifyForm('frmRegexEquivalence', null,
+        function (request, form) {
+            FormUtilities.hideErrorMessages(form);
+            FormUtilities.byClassName(form, 'equivalence-result')
+                .forEach(function (element) {
+                    element.classList.remove('visible');
+                });
+            FormUtilities.firstByClassName(form, 'output-container').classList.remove('visible');
 
-        if (request.status === 200) {
-            try {
-                const result = JSON.parse(request.responseText)
-                    , witnessesContainer = FormUtilities.firstByClassName(form, 'witnesses-list');
+            if (request.status === 200) {
+                try {
+                    const result = JSON.parse(request.responseText)
+                        , witnessesContainer = FormUtilities.firstByClassName(form, 'witnesses-list');
 
-                while (witnessesContainer.firstChild) {
-                    witnessesContainer.removeChild(witnessesContainer.firstChild);
+                    while (witnessesContainer.firstChild) {
+                        witnessesContainer.removeChild(witnessesContainer.firstChild);
+                    }
+
+                    FormUtilities.firstByClassName(form, 'output-container').classList.add('visible');
+
+                    if (result['equivalent']) {
+                        FormUtilities.firstByClassName(form, 'equivalent').classList.add('visible');
+                    } else {
+                        FormUtilities.firstByClassName(form, 'not-equivalent').classList.add('visible');
+
+                        result['witnesses'].forEach(function (witness) {
+                            const code = document.createElement('code');
+
+                            if (witness === '') {
+                                code.innerText = '\u03B5'; // Small Greek Character Epsilon
+                            } else {
+                                code.innerText = ['"', witness, '"'].join('');
+                            }
+
+                            const li = document.createElement('li');
+                            li.appendChild(code);
+                            witnessesContainer.appendChild(li);
+                        });
+                    }
+
+                } catch (e) {
+                    if (e.name === 'SyntaxError') {
+                        FormUtilities.showErrorMessage(form, "Invalid response from server");
+                        console.error("Invalid response from server", request);
+                    }
                 }
 
-                FormUtilities.firstByClassName(form, 'output-container').classList.add('visible');
-
-                if (result['equivalent']) {
-                    FormUtilities.firstByClassName(form, 'equivalent').classList.add('visible');
-                } else {
-                    FormUtilities.firstByClassName(form, 'not-equivalent').classList.add('visible');
-
-                    result['witnesses'].forEach(function (witness) {
-                        const code = document.createElement('code');
-
-                        if (witness === '') {
-                            code.innerText = '\u03B5'; // Small Greek Character Epsilon
-                        } else {
-                            code.innerText = ['"', witness, '"'].join('');
-                        }
-
-                        const li = document.createElement('li');
-                        li.appendChild(code);
-                        witnessesContainer.appendChild(li);
-                    });
-                }
-
-            } catch (e) {
-                if (e.name === 'SyntaxError') {
-                    FormUtilities.showErrorMessage(form, "Invalid response from server");
-                    console.error("Invalid response from server", request);
-                }
+            } else if (request.status === 400) {
+                FormUtilities.showErrorMessage(form, request.responseText);
+            } else {
+                FormUtilities.showErrorMessage(form, "Request error");
+                console.error("Request error", request);
             }
+        });
 
-        } else if (request.status === 400) {
-            FormUtilities.showErrorMessage(form, request.responseText);
-        } else {
-            FormUtilities.showErrorMessage(form, "Request error");
-            console.error("Request error", request);
-        }
-    });
-
-    FormUtilities.ajaxifyForm('frmRegexToDfa',
-        function () {
-            const regex = encodeURIComponent(FormUtilities.byId('txtInputRegex').value || '');
-            return 'regex=' + regex;
-        },
+    FormUtilities.ajaxifyForm('frmRegexToDfa', null,
         function (request, form) {
             FormUtilities.hideErrorMessages(form);
 
