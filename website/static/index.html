@@ -215,8 +215,6 @@
 
     FormUtilities.ajaxifyForm('frmWordDerivation', null,
         function (request, form) {
-            FormUtilities.hideErrorMessages(form);
-
             if (request.status === 200) {
                 FormUtilities.byId('wordDerivationOutput').innerText = request.responseText;
                 FormUtilities.byId('divDerivationOutput').style = "visibility: visible;";
@@ -234,7 +232,6 @@
 
     FormUtilities.ajaxifyForm('frmRegexEquivalence', null,
         function (request, form) {
-            FormUtilities.hideErrorMessages(form);
             FormUtilities.byClassName(form, 'equivalence-result')
                 .forEach(function (element) {
                     element.classList.remove('visible');
@@ -289,8 +286,6 @@
 
     FormUtilities.ajaxifyForm('frmRegexToDfa', null,
         function (request, form) {
-            FormUtilities.hideErrorMessages(form);
-
             if (request.status === 200) {
                 FormUtilities.byId('dfaRepresentation').innerHTML = request.responseText;
                 FormUtilities.byId('divDfaOutput').style = "visibility: visible;";

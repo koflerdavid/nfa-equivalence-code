@@ -67,6 +67,8 @@ window.FormUtilities = (function (window) {
             });
 
             const encodedFormData = (formParser || encodeForm)(form);
+
+            FormUtilities.hideErrorMessages(form);
             request.send(encodedFormData);
 
             e.preventDefault();
