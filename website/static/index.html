@@ -22,8 +22,10 @@
     <ul>
         <li><a href="#sectionRegularExpressionLanguage">Regular Expression Language</a></li>
         <li><a href="#sectionDerivativesRegularExpressions">Derivatives of Regular Expressions</a></li>
-        <li><a href="#sectionRegularExpressionEquivalence">Regular Expression Equivalence</a></li>
+        <li><a href="#sectionRegularExpressionEquivalence">Checking Equivalence of Regular Expressions</a></li>
         <li><a href="#sectionConvertingToDfas">Converting Regular Expressions to DFAs</a></li>
+        <li><a href="#sectionFiniteAutomataLanguage">Language for describing Finite Automata</a></li>
+        <li><a href="#sectionFiniteAutomataEquivalence">Checking Equivalence of Finite Automata</a></li>
     </ul>
 </nav>
 
@@ -145,7 +147,7 @@
 </form>
 
 <h2>
-    <span id="sectionRegularExpressionEquivalence">Regular Expression Equivalence</span>
+    <span id="sectionRegularExpressionEquivalence">Checking Equivalence of Regular Expressions</span>
     <a class="top-link" href="#top">Top</a>
 </h2>
 
@@ -204,6 +206,95 @@
         <div class="form-row output-container" id="divDfaOutput">
             <label>DFA:</label>
             <div id="dfaRepresentation"></div>
+        </div>
+    </div>
+</form>
+
+<h2>
+    <span id="sectionFiniteAutomataLanguage">Language for describing Finite Automata</span>
+    <a class="top-link" href="#top">Top</a>
+</h2>
+
+<p>
+    Finite automata are specified by listing their transitions and by specifying which states are
+    accepting states.
+    Each transition consists of an origin state, a transition label,
+    which is the input symbol necessary for the transition.
+    The transition descriptions are written on their own lines each.
+    This is represented by an arrow that points from the origin state to the destination states.
+    The input symbol is embedded into the arrow.
+    to take place, and one or more destination states.
+    A valid transition looks like the following: <code>a -b-> c d</code>, which declares that
+    the automaton transitions from <code>a</code> to <code>b</code> (or to <code>c</code>)
+    when it receives the input symbol <code>b</code>.
+</p>
+
+<p>
+    After the transitions and the list of accepting states,
+    the user can specify a single constraint that shall be checked.
+    The only currently supported constraint is equivalence.
+    Two states are considered equivalent if the same sets of input symbol sequences lead to accepting states.
+    This is more commonly known as two states accepting the same language.
+</p>
+
+<p>
+    The following input would be a full example.
+    It defines an automaton that consists of six states that are connected
+    by transitions labeled by the input symbol <code>a</code>.
+    The states <code>x</code> and <code>z</code> both lead to <code>y</code>.
+    The state <code>y</code> leads to <code>z</code>,
+    and there is also a transition from <code>y</code> to <code>z</code>.
+    The states <code>u</code>, <code>v</code>, and <code>w</code> are connected similarly
+    (A closer look will reveal that these are actually two automata that were merged
+    for the purpose of checking their equivalence).
+    Finally, it is established that <code>y</code> and <code>v</code> are accepting states,
+    and checking the equivalence of <code>x</code> and <code>u</code> is requested.
+</p>
+
+<code>
+    x -a-> y<br>
+    y -a-> z<br>
+    z -a-> x y<br>
+    u -a-> w v<br>
+    v -a-> w<br>
+    w -a-> u<br>
+    accept: y v<br>
+    check: x = u
+</code>
+
+<p>
+    For more examples, check out the
+    <a href="https://perso.ens-lyon.fr/damien.pous/hknt/">web-appendix of Bonchi and Pous' paper</a>.
+</p>
+
+<h2>
+    <span id="sectionFiniteAutomataEquivalence">Checking Equivalence of Finite Automata</span>
+    <a class="top-link" href="#top">Top</a>
+</h2>
+
+<form id="frmAutomataEquivalence" method="post" action="finiteAutomata/equivalence" enctype="text/plain">
+    <p class="error-message generic-error-message">
+        An error occurred when performing the request. Please try again.
+        If the problem persists, contact the site administrator.
+    </p>
+    <p class="error-message custom-error-message"></p>
+
+    <div class="form-rows">
+        <div class="form-row">
+            <label for="txtAutomatonEquivalenceSpecification">Automaton and Equivalence Specification:</label>
+            <textarea name="input" rows="10" cols="30" id="txtAutomatonEquivalenceSpecification"></textarea>
+        </div>
+        <button type="submit">Check Equivalence</button>
+
+        <div class="form-row output-container">
+            <label>Result:</label>
+            <span class="equivalence-result equivalent">Equivalent</span>
+            <div class="equivalence-result not-equivalent">
+                Not equivalent.
+                The following strings are accepted by one of the states, but not by the other:
+                <ul class="witnesses-list">
+                </ul>
+            </div>
         </div>
     </div>
 </form>
@@ -300,6 +391,64 @@
         function (request) {
             // Request a HTML fragment from the server instead of full HTML
             request.setRequestHeader('X-Embeddable', 'true');
+        });
+
+    FormUtilities.ajaxifyForm('frmAutomataEquivalence', null,
+        function (request, form) {
+            FormUtilities.byClassName(form, 'equivalence-result')
+                .forEach(function (element) {
+                    element.classList.remove('visible');
+                });
+            FormUtilities.firstByClassName(form, 'output-container').classList.remove('visible');
+
+            if (request.status === 200) {
+                try {
+                    const result = JSON.parse(request.responseText)
+                        , witnessesContainer = FormUtilities.firstByClassName(form, 'witnesses-list');
+
+                    while (witnessesContainer.firstChild) {
+                        witnessesContainer.removeChild(witnessesContainer.firstChild);
+                    }
+
+                    FormUtilities.firstByClassName(form, 'output-container').classList.add('visible');
+
+                    if (result['equivalent']) {
+                        FormUtilities.firstByClassName(form, 'equivalent').classList.add('visible');
+                    } else {
+                        FormUtilities.firstByClassName(form, 'not-equivalent').classList.add('visible');
+
+                        result['witnesses'].forEach(function (witness) {
+                            const code = document.createElement('code');
+
+                            if (witness === '') {
+                                code.innerText = '\u03B5'; // Small Greek Character Epsilon
+                            } else {
+                                code.innerText = ['"', witness, '"'].join('');
+                            }
+
+                            const li = document.createElement('li');
+                            li.appendChild(code);
+                            witnessesContainer.appendChild(li);
+                        });
+                    }
+
+                } catch (e) {
+                    if (e.name === 'SyntaxError') {
+                        FormUtilities.showErrorMessage(form, "Invalid response from server");
+                        console.error("Invalid response from server", request);
+                    }
+                }
+
+            } else if (request.status === 400) {
+                FormUtilities.showErrorMessage(form, request.responseText);
+            } else {
+                FormUtilities.showErrorMessage(form, "Request error");
+                console.error("Request error", request);
+            }
+        },
+        function (e, request, form) {
+            FormUtilities.showErrorMessage(form);
+            console.error("Regex conversion request error", request, e);
         });
 </script>
 </body>

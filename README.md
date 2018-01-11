@@ -47,8 +47,8 @@ Running the tool
 
 ### Equality checking ###
 
-The tool receives its input in the format used by Bonchi and Pous at
-[the web=appendix of their paper](https://perso.ens-lyon.fr/damien.pous/hknt/).
+The tool receives its input in the format used by Bonchi and Pous at the
+[web-appendix of their paper](https://perso.ens-lyon.fr/damien.pous/hknt/).
 
 Example for checking equality of two NFAs:
 
@@ -170,7 +170,7 @@ endpoints:
    In case the regular expressions are not equivalent, 
    an additional field `witnesses`, containing an array of strings, will be present.
    Each of these strings would be accepted by one of the regular expressions, 
-   but not by the other one.
+   but not by the other.
    
  * `/regex/dfa_conversion`: Expects a POST request with content type 
    `application/x-www-form-urlencoded` and a parameter `regex`.
@@ -187,6 +187,24 @@ endpoints:
    a `400 Bad Request` status message will be returned.
    The response body will be a short UTF-8 string describing the error. 
 
+ * `/finiteAutomata/equivalence`: Expects a POST request with content type
+   `application/x-www-form-urlencoded` and a parameter `input`.
+   The value of this parameter has to be a UTF-8 string matching the syntax 
+   specified by Bonchi and Pous at the
+   [web-appendix of their paper](https://perso.ens-lyon.fr/damien.pous/hknt/).
+   If there is a syntax error, a UTF-8 text message describing the error is 
+   returned.
+   Only the last `check:` clause in the input will be considered. 
+   Currently, it is always going to be interpreted as an equality check.
+   It is performed by the server and a JSON document containing the result
+   will be returned to the client.
+   It will represent an object that always has at least the field `equivalent`.
+   It is always a boolean stating whether the two states are equivalent.
+   In case they are not equivalent, an additional field `witnesses`, 
+   containing an array of strings, will be present.
+   Each of these strings belongs to the language of one of the states, 
+   but not of the other.
+   
 
 Technical Report
 ----------------

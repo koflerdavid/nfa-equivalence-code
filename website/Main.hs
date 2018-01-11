@@ -1,10 +1,11 @@
 module Main where
 
-import Actions.Derivation           as Derivation
-import Actions.RegexEquivalence     as RegexEquivalence
-import Actions.RegexToDfaConversion as RegexToDfaConversion
+import Actions.Derivation                as Derivation
+import Actions.FiniteAutomataEquivalence as FiniteAutomataEquivalence
+import Actions.RegexEquivalence          as RegexEquivalence
+import Actions.RegexToDfaConversion      as RegexToDfaConversion
 
-import Control.Applicative          ( (<|>) )
+import Control.Applicative               ( (<|>) )
 import Snap.Core
 import Snap.Http.Server
 import Snap.Util.FileServe
@@ -16,7 +17,8 @@ site :: Snap ()
 site =
     ifTop (sendFile "website/static/index.html") <|>
     route
-        [ ("regex/derivation", Derivation.action)
+        [ ("finiteAutomata/equivalence", FiniteAutomataEquivalence.action)
+        , ("regex/derivation", Derivation.action)
         , ("regex/dfa_conversion", RegexToDfaConversion.action)
         , ("regex/equivalence", RegexEquivalence.action)
         ] <|>

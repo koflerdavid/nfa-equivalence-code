@@ -104,20 +104,18 @@ executable website
   default-extensions:  OverloadedStrings
   main-is:             Main.hs
   other-modules:       Actions.Derivation
+                     , Actions.FiniteAutomataEquivalence
                      , Actions.RegexEquivalence
                      , Actions.RegexToDfaConversion
   build-depends:
                        base                      >= 4     && < 5
                      , bytestring                >= 0.9.1 && < 0.11
---                     , containers
                      , aeson
-                     , lucid
-                     , monad-control             >= 1.0   && < 1.1
---                     , mtl                       >= 2     && < 3
+                     , containers
+                     , either
                      , snap-core                 >= 1.0   && < 1.1
                      , snap-server               >= 1.0   && < 1.1
                      , text
---                     , transformers
                      , utf8-string
                      , NfaExperiments
 
