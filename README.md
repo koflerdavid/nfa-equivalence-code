@@ -19,17 +19,8 @@ installed packages do not disturb this project.
 To build the code install `stack` first.
 For that, go to
 [the install instructions](http://docs.haskellstack.org/en/stable/README/#how-to-install) and follow them.
-
-Check the version with `stack --version`.
-If it is `v1.3.0` or `v1.3.2`, either upgrade to another version
-(with `stack upgrade`) or downgrade with
-`stack upgrade --binary-version 1.2.0` to the previous version.
-The reason is that the above versions deactivate line buffering for
-stdin, that is, it would be difficult to terminate the input with
-`Ctrl-D` or correct mistakes in the current line (with backspace).
-See
-[Stack exec incorrectly setting no buffering #2884](https://github.com/commercialhaskell/stack/issues/2884)
-for details.
+Afterwards check which version you are using by executing `stack --version`.
+Version 1.5 fixed a bug that made using the terminal impossible.
 
 Execute
 
