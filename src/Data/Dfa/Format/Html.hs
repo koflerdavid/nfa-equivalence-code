@@ -7,6 +7,7 @@ module Data.Dfa.Format.Html
 import           Data.Dfa.Regex
 import           Data.FiniteAutomaton ( faInputs )
 import           Data.Regex
+import           Data.Regex.Formats   (FullyQuotedRegex(..))
 
 import           Control.Monad        ( forM_ )
 import           Data.Map             as Map
@@ -28,7 +29,7 @@ asHtml withoutSkeleton regex =
                      p_ $ do
                          "The following is the state transition table for an "
                          "automata accepting the same language as the regular expression "
-                         code_ $ toHtml . show $ regex
+                         code_ $ toHtml . show . FullyQuotedRegex $ regex
                      p_ $ do
                          "It was calculated by computing all the derivatives "
                          "of the regular expression."
@@ -58,9 +59,9 @@ asHtml withoutSkeleton regex =
                 if regex == r
                     then "->"
                     else " "
-            td_ $ toHtml . show $ r
+            td_ $ toHtml . show . FullyQuotedRegex $ r
             td_ $
                 if matchesEmptyWord r
                     then "*"
                     else " "
-            forM_ (Map.elems ts) $ td_ . toHtml . show -- Map.elems yields ascending order
+            forM_ (Map.elems ts) $ td_ . toHtml . show . FullyQuotedRegex -- Map.elems yields ascending order

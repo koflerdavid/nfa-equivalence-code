@@ -33,6 +33,7 @@ library
                      , Data.Nfa
                      , Data.Queue
                      , Data.Regex
+                     , Data.Regex.Formats
                      , Algorithm.Regex.DfaConversion
                      , Data.CongruenceClosure
                      , Data.CongruenceClosure.Internal

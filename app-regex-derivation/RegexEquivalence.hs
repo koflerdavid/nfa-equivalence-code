@@ -2,6 +2,7 @@ module RegexEquivalence where
 
 import Algorithm.Regex.Equivalence
 import Language.RegexParser
+import Data.Regex.Formats          ( FullyQuotedRegex(..) )
 
 import Control.Monad               ( forM_ )
 import Control.Monad.Trans.Class   ( lift )
@@ -16,9 +17,9 @@ checkRegexEquivalence = do
         forM_ witnesses $ \(w, r1, r2) -> do
             putStr (show w)
             putChar '\t'
-            putStr (show r1)
+            putStr (show (FullyQuotedRegex r1))
             putChar '\t'
-            print r2
+            print (FullyQuotedRegex r2)
     return (null witnesses)
 
 exceptM :: Monad m => Either e a -> ExceptT e m a

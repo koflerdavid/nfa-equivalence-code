@@ -2,11 +2,12 @@ module RegexDfaOutput.Tsv
     ( printTransitionTable
     ) where
 
-import Data.Regex    ( Regex, alphabet, matchesEmptyWord )
+import Data.Regex         ( Regex, alphabet, matchesEmptyWord )
+import Data.Regex.Formats ( FullyQuotedRegex(..) )
 
-import Control.Monad ( forM_ )
-import Data.Map      as Map
-import Data.Set      as Set
+import Control.Monad      ( forM_ )
+import Data.Map           as Map
+import Data.Set           as Set
 
 type RegexDfaTransitions c = Map (Regex c) (Map c (Regex c))
 
@@ -23,6 +24,6 @@ printTransitionTable _ regex transitions = do
             if matchesEmptyWord r
                 then " * "
                 else " "
-        putStr (show r)
-        forM_ (Map.elems ts) $ \r' -> putStr ('\t' : show r')
+        putStr . show . FullyQuotedRegex $ r
+        forM_ (Map.elems ts) $ \r' -> putStr ('\t' : show (FullyQuotedRegex r'))
         putStr "\n"
