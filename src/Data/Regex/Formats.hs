@@ -14,52 +14,44 @@ newtype FullyQuotedRegex c =
     FullyQuotedRegex (Regex c)
 
 instance (Show c) => Show (FullyQuotedRegex c) where
-    showsPrec _ (FullyQuotedRegex Empty) = ('∅' :)
-    showsPrec _ (FullyQuotedRegex Epsilon) = ('ε' :)
-    showsPrec _ (FullyQuotedRegex (Atom c)) = (show c ++)
+    showsPrec _ (FullyQuotedRegex Empty) = showChar '∅'
+    showsPrec _ (FullyQuotedRegex Epsilon) = showChar 'ε'
+    showsPrec _ (FullyQuotedRegex (Atom c)) = shows c
     showsPrec prec (FullyQuotedRegex (Alternative r s)) =
-        let inner =
-                showsPrec 6 (FullyQuotedRegex r) .
-                (" | " ++) . showsPrec 6 (FullyQuotedRegex s)
-        in if prec > 6
-               then ('(' :) . inner . (')' :)
-               else inner
+        showParen (prec > 6) $
+            showsPrec 6 (FullyQuotedRegex r) .
+            showString " | " .
+            showsPrec 6 (FullyQuotedRegex s)
     showsPrec prec (FullyQuotedRegex (Sequence r s)) =
-        let inner =
-                showsPrec 7 (FullyQuotedRegex r) .
-                (' ' :) . showsPrec 7 (FullyQuotedRegex s)
-        in if prec > 7
-               then ('(' :) . inner . (')' :)
-               else inner
+        showParen (prec > 7) $
+            showsPrec 7 (FullyQuotedRegex r) .
+            showChar ' ' .
+            showsPrec 7 (FullyQuotedRegex s)
     showsPrec _ (FullyQuotedRegex (Asterisk r)) =
-        showsPrec 8 (FullyQuotedRegex r) . ('*' :)
+        showsPrec 8 (FullyQuotedRegex r) . showChar '*'
 
 newtype MinimallyQuotedRegex c =
     MinimallyQuotedRegex (Regex c)
 
 instance Show (MinimallyQuotedRegex Char) where
-    showsPrec _ (MinimallyQuotedRegex Empty) = ('∅' :)
-    showsPrec _ (MinimallyQuotedRegex Epsilon) = ('ε' :)
+    showsPrec _ (MinimallyQuotedRegex Empty) = showChar '∅'
+    showsPrec _ (MinimallyQuotedRegex Epsilon) = showChar 'ε'
     showsPrec _ (MinimallyQuotedRegex (Atom c)) =
         if hasToBeEscaped c
-            then (show c ++)
-            else ([c] ++)
+            then shows c
+            else showChar c
     showsPrec prec (MinimallyQuotedRegex (Alternative r s)) =
-        let inner =
-                showsPrec 6 (MinimallyQuotedRegex r) .
-                (" | " ++) . showsPrec 6 (MinimallyQuotedRegex s)
-        in if prec > 6
-               then ('(' :) . inner . (')' :)
-               else inner
+        showParen (prec > 6) $
+            showsPrec 6 (MinimallyQuotedRegex r) .
+            showString " | " .
+            showsPrec 6 (MinimallyQuotedRegex s)
     showsPrec prec (MinimallyQuotedRegex (Sequence r s)) =
-        let inner =
-                showsPrec 7 (MinimallyQuotedRegex r) .
-                (' ' :) . showsPrec 7 (MinimallyQuotedRegex s)
-        in if prec > 7
-               then ('(' :) . inner . (')' :)
-               else inner
+        showParen (prec > 7) $
+            showsPrec 7 (MinimallyQuotedRegex r) .
+            showChar ' ' .
+            showsPrec 7 (MinimallyQuotedRegex s)
     showsPrec _ (MinimallyQuotedRegex (Asterisk r)) =
-        showsPrec 8 (MinimallyQuotedRegex r) . ('*' :)
+        showsPrec 8 (MinimallyQuotedRegex r) . showChar '*'
 
 hasToBeEscaped :: Char -> Bool
 hasToBeEscaped c = isSpace c || ord c `Data.IntSet.member` charsToBeEscaped
