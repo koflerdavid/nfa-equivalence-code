@@ -29,6 +29,14 @@ code {
     content: "]";
 }
 
+.dagger-input-addon {
+    display: inline-block;
+}
+
+textarea + .dagger-input-addon {
+    vertical-align: top;
+}
+
 @media (min-width: 500px) {
     body {
         padding-left: 20%;

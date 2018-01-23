@@ -135,6 +135,7 @@
                 Regular expression:
             </label>
             <textarea name="regex" rows="5" cols="30" id="txtRegex"></textarea>
+            <button type="button" class="dagger-input-addon" data-for="txtRegex">&#x2020;</button>
         </div>
 
         <button type="submit">Derive!</button>
@@ -162,11 +163,13 @@
         <div class="form-row">
             <label for="txtInputRegex1">Regex 1:</label>
             <input type="text" name="regex1" id="txtInputRegex1">
+            <button type="button" class="dagger-input-addon" data-for="txtInputRegex1">&#x2020;</button>
         </div>
 
         <div class="form-row">
             <label for="txtInputRegex2">Regex 2:</label>
             <input type="text" name="regex2" id="txtInputRegex2">
+            <button type="button" class="dagger-input-addon" data-for="txtInputRegex2">&#x2020;</button>
         </div>
 
         <button type="submit">Check Equivalence</button>
@@ -200,6 +203,7 @@
         <div class="form-row">
             <label for="txtInputRegex">Regex:</label>
             <textarea name="regex" rows="5" cols="30" id="txtInputRegex"></textarea>
+            <button type="button" class="dagger-input-addon" data-for="txtInputRegex">&#x2020;</button>
         </div>
         <button type="submit">Convert!</button>
 
@@ -450,6 +454,19 @@
             FormUtilities.showErrorMessage(form);
             console.error("Regex conversion request error", request, e);
         });
+</script>
+<script type="application/javascript" src="./static/input_addon.js"></script>
+<script type="application/javascript">
+    FormUtilities.byClassName(document, 'dagger-input-addon').forEach(function (button) {
+        const inputFieldId = button.dataset['for']
+            , inputField = FormUtilities.byId(inputFieldId);
+
+        if (inputField) {
+            setupInputAddon('\u2020', inputField, button); // This is the Dagger character.
+        } else {
+            console.error('The input field with the id ' + inputFieldId + ' was not found');
+        }
+    });
 </script>
 </body>
 </html>
