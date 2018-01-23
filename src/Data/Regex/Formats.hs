@@ -12,6 +12,7 @@ import Data.IntSet ( fromList, member )
 
 newtype FullyQuotedRegex c =
     FullyQuotedRegex (Regex c)
+    deriving (Eq)
 
 instance (Show c) => Show (FullyQuotedRegex c) where
     showsPrec _ (FullyQuotedRegex Empty) = showChar '∅'
@@ -32,6 +33,7 @@ instance (Show c) => Show (FullyQuotedRegex c) where
 
 newtype MinimallyQuotedRegex c =
     MinimallyQuotedRegex (Regex c)
+    deriving (Eq)
 
 instance Show (MinimallyQuotedRegex Char) where
     showsPrec _ (MinimallyQuotedRegex Empty) = showChar '∅'

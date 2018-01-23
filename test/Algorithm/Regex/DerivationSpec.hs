@@ -8,6 +8,8 @@ import Test.Hspec
 
 import Algorithm.Regex.Derivation
 import Data.Regex
+import Data.Regex.Formats         ( MinimallyQuotedRegex(..) )
+
 
 main :: IO ()
 main = hspec spec
@@ -23,5 +25,9 @@ spec = do
                 , (Asterisk (Atom 'c'), "c", Asterisk (Atom 'c'))
                 ] :: [(Regex Char, String, Regex Char)]
         forM_ cases $ \(from, by, to) -> do
-            it ("(" ++ show from ++ ")_{" ++ by ++ "} = " ++ show to) $ do
-                wordDerive by from `shouldBe` to
+            let shouldConvertFromTo =
+                    "(" ++ show (MinimallyQuotedRegex from) ++
+                    ")_{" ++ by ++ "} = " ++
+                    show (MinimallyQuotedRegex to)
+            it shouldConvertFromTo $ do
+                MinimallyQuotedRegex (wordDerive by from) `shouldBe` (MinimallyQuotedRegex to)
