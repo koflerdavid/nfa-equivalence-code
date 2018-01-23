@@ -1,4 +1,4 @@
-name:                cl-automata
+name:                cl-regexes
 version:             2.0.0.0
 synopsis:            A collection of more or less efficient algorithms for simplifying finite automata and proving their equivalence.
 description:         Please see README.md
@@ -14,36 +14,37 @@ build-type:          Simple
 cabal-version:       >=1.22
 
 library
-  default-language:    Haskell2010
+  hs-source-dirs:      src
   ghc-options:         -Wall -O2
 
-  hs-source-dirs:      src
-  exposed-modules:     Algorithm.AutomataMerge
-                     , Algorithm.DfaEquivalence
-                     , Algorithm.NfaEquivalence
-                     , Compiler.Hknt
-                     , Data.Dfa
-                     , Data.EpsilonNfa
-                     , Data.EpsilonNfa.Internal
-                     , Data.FiniteAutomaton
-                     , Data.Nfa
-                     , Language.Automata.HkntParser
-                     , Language.Automata.HkntParser.Class
-                     , Language.Automata.HkntParser.Internal
-                     , Language.Automata.HkntParser.Tokeniser
+  exposed-modules:     Algorithm.Regex.Derivation
+                     , Algorithm.Regex.DfaConversion
+                     , Algorithm.Regex.Equivalence
+                     , Compiler.Regex
+                     , Data.Dfa.Format.Hknt
+                     , Data.Dfa.Format.Html
+                     , Data.Dfa.Regex
+                     , Data.Regex
+                     , Data.Regex.Formats
+                     , Language.RegexParser
+                     , Language.RegexParser.Class
+                     , Language.RegexParser.Internal
+                     , Language.RegexParser.Tokeniser
 
   build-depends:       base >= 4.7 && < 5
-                     , bimap
+                     , cl-automata
                      , cl-data-structures
-                     -- For Data.Map.!?
-                     , containers >= 0.5.9.1
+                     , containers
+                     , either
                      , equivalence
                      , lucid
                      , parsec >= 3 && < 4
                      , text
                      , transformers
 
-test-suite cl-automata-test
+  default-language:    Haskell2010
+
+test-suite cl-regexes-test
   type:                exitcode-stdio-1.0
   default-language:    Haskell2010
   ghc-options:         -threaded -rtsopts -with-rtsopts=-N -Wall
@@ -56,24 +57,18 @@ test-suite cl-automata-test
                      , hspec-discover
                      , QuickCheck
                      , cl-automata
+                     , cl-regexes
                      , containers
                      , equivalence
                      , parsec >= 3 && < 4
                      , text
                      , transformers
 
-  other-modules:       Algorithm.AutomataMergeSpec
-                     , Algorithm.DfaEquivalenceSpec
-                     , Algorithm.NfaEquivalenceSpec
-                     , Compiler.HkntSpec
-                     , Data.DfaSpec
-                     , Data.EpsilonNfaSpec
-                     , Data.EpsilonNfa.InternalSpec
-                     , Data.NfaSpec
-                     , HkntSamples
-                     , Language.Automata.HkntParserSpec
-                     , Language.Automata.HkntParser.InternalSpec
-                     , Language.Automata.HkntParser.TokeniserSpec
+  other-modules:       Algorithm.Regex.DerivationSpec
+                     , Compiler.RegexSpec
+                     , Language.RegexParserSpec
+                     , Language.RegexParser.InternalSpec
+                     , Language.RegexParser.TokeniserSpec
 
 source-repository head
   type:     git

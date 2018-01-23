@@ -28,10 +28,11 @@ executable regex-derivation
                      , Types
 
   build-depends:       base
+                     , cl-automata
+                     , cl-regexes
                      , containers
                      , HaTeX
                      , lucid
-                     , cl-automata
                      , optparse-generic
                      , text
                      -- For the Control.Monad.Trans.Except module

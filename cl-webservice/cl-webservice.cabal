@@ -28,16 +28,11 @@ library
                      , bimap
                      , bytestring                >= 0.9.1 && < 0.11
                      , cl-automata
+                     , cl-regexes
                      , containers
                      , snap-core                 >= 1.0   && < 1.1
                      , snap-server               >= 1.0   && < 1.1
                      , text
-
-  if impl(ghc >= 6.12.0)
-    ghc-options: -threaded -Wall -fwarn-tabs -funbox-strict-fields -O2
-                 -fno-warn-unused-do-bind
-  else
-    ghc-options: -threaded -Wall -fwarn-tabs -funbox-strict-fields -O2
 
 source-repository head
   type:     git
