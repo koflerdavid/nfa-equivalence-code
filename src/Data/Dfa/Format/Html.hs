@@ -48,7 +48,7 @@ asHtml withoutSkeleton regex =
                      \c -> th_ (toHtml . show $ c)
             tbody_ $ do
                 transitionTableRow (regex, transitions regexDfa ! regex)
-            -- Leave out the initial regex, as it has been printed before
+                -- Leave out the initial regex, as it has been printed before
                 forM_
                     (Map.toList . Map.delete regex . transitions $ regexDfa)
                     transitionTableRow

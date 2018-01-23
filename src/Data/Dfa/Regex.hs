@@ -3,6 +3,7 @@
 
 module Data.Dfa.Regex
     ( RegexDfa
+    , RegexDfaTransitions
     , fromRegex
     , transitions
     ) where
@@ -16,13 +17,15 @@ import Data.List                     as List
 import Data.Map                      as Map
 import Data.Set                      as Set
 
+type RegexDfaTransitions c = Map (Regex c) (Map c (Regex c))
+
 data RegexDfa c = RegexDfa
-    { _transitions  :: Map (Regex c) (Map c (Regex c))
+    { _transitions  :: RegexDfaTransitions c
     , _inputSymbols :: Set c
     }
 
 -- Hack to keep the record from being modified
-transitions :: RegexDfa c -> Map (Regex c) (Map c (Regex c))
+transitions :: RegexDfa c -> RegexDfaTransitions c
 transitions = _transitions
 
 instance Ord c => FiniteAutomaton (RegexDfa c) (Regex c) c Bool where
@@ -30,20 +33,17 @@ instance Ord c => FiniteAutomaton (RegexDfa c) (Regex c) c Bool where
         Map.keysSet (_transitions regexDfa) `Set.union` destinationRegexes
       where
         destinationRegexes =
-            Set.unions .
-            List.map (Set.fromList . Map.elems) . Map.elems . _transitions $
+            Set.unions . -- Unify all sets of destination regexes
+            List.map (Set.fromList . Map.elems) . -- Get destination regexes
+            Map.elems . -- Get transition mapping for each regex
+            _transitions $ -- Convert regex to transition system using derivatives
             regexDfa
     faInputs = _inputSymbols
     faOutput _ = matchesEmptyWord
     faTransitions regexDfa r =
         case r `Map.lookup` _transitions regexDfa of
             Just ts -> Map.map Set.singleton ts
-            Nothing ->
-                Map.fromSet
-                    (\c -> Set.singleton $ derive c r)
-                    (_inputSymbols regexDfa)
+            Nothing -> Map.fromSet (\c -> Set.singleton $ derive c r) (_inputSymbols regexDfa)
 
 fromRegex :: Ord c => Regex c -> RegexDfa c
-fromRegex regex =
-    RegexDfa
-    {_transitions = deriveRegexToDfa regex, _inputSymbols = alphabet regex}
+fromRegex regex = RegexDfa {_transitions = deriveRegexToDfa regex, _inputSymbols = alphabet regex}
