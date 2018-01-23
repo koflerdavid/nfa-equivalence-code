@@ -18,9 +18,9 @@ regexToken :: Parsec String () Token
 regexToken = do
     (oneOf "0∅" $> EmptyToken) <|> (oneOf "1ε" $> EpsilonToken) <|>
         (char '*' $> ZeroOrMoreTimesToken) <|>
-        (char '+' $> OneOrMoreTimesToken) <|>
+        (char '\x2020' $> OneOrMoreTimesToken) <|>
         (char '?' $> ZeroOrOneTimesToken) <|>
-        (char '|' $> AlternativeToken) <|>
+        (char '+' $> AlternativeToken) <|>
         (char '(' $> LeftParentheseToken) <|>
         (char ')' $> RightParentheseToken) <|>
         char '\'' *>

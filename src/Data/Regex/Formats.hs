@@ -20,7 +20,7 @@ instance (Show c) => Show (FullyQuotedRegex c) where
     showsPrec prec (FullyQuotedRegex (Alternative r s)) =
         showParen (prec > 6) $
             showsPrec 6 (FullyQuotedRegex r) .
-            showString " | " .
+            showString " + " .
             showsPrec 6 (FullyQuotedRegex s)
     showsPrec prec (FullyQuotedRegex (Sequence r s)) =
         showParen (prec > 7) $
@@ -43,7 +43,7 @@ instance Show (MinimallyQuotedRegex Char) where
     showsPrec prec (MinimallyQuotedRegex (Alternative r s)) =
         showParen (prec > 6) $
             showsPrec 6 (MinimallyQuotedRegex r) .
-            showString " | " .
+            showString " + " .
             showsPrec 6 (MinimallyQuotedRegex s)
     showsPrec prec (MinimallyQuotedRegex (Sequence r s)) =
         showParen (prec > 7) $
@@ -56,4 +56,4 @@ instance Show (MinimallyQuotedRegex Char) where
 hasToBeEscaped :: Char -> Bool
 hasToBeEscaped c = isSpace c || ord c `Data.IntSet.member` charsToBeEscaped
   where
-    charsToBeEscaped = fromList . map ord $ "\"'+?*|∅ε()01"
+    charsToBeEscaped = fromList . map ord $ "\"'+?*∅ε()01\x2020"

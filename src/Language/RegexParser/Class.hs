@@ -22,9 +22,9 @@ instance Show Token where
     show EpsilonToken         = "ε"
     show EmptyToken           = "∅"
     show ZeroOrMoreTimesToken = "*"
-    show OneOrMoreTimesToken  = "+"
+    show OneOrMoreTimesToken  = "\x2020"
     show ZeroOrOneTimesToken  = "?"
-    show AlternativeToken     = "|"
+    show AlternativeToken     = "+"
     show LeftParentheseToken  = "("
     show RightParentheseToken = ")"
 
