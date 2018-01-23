@@ -15,14 +15,14 @@ main = quickHttpServe site
 
 site :: Snap ()
 site =
-    ifTop (modifyResponse (setContentType "text/html; charset=utf-8") >> sendFile "website/static/index.html") <|>
+    ifTop (modifyResponse (setContentType "text/html; charset=utf-8") >> sendFile "static/index.html") <|>
     route
         [ ("finiteAutomata/equivalence", FiniteAutomataEquivalence.action)
         , ("regex/derivation", Derivation.action)
         , ("regex/dfa_conversion", RegexToDfaConversion.action)
         , ("regex/equivalence", RegexEquivalence.action)
         ] <|>
-    dir "static" (serveDirectory "website/static") <|>
+    dir "static" (serveDirectory "static") <|>
     notFoundError
 
 notFoundError :: Snap ()
