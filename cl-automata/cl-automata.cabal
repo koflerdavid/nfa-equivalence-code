@@ -1,5 +1,5 @@
-name:                NfaExperiments
-version:             1.1.0.0
+name:                cl-automata
+version:             2.0.0.0
 synopsis:            A collection of more or less efficient algorithms for simplifying finite automata and proving their equivalence.
 description:         Please see README.md
 homepage:            https://github.com/koflerdavid/nfa-equivalence-code#readme
@@ -14,9 +14,10 @@ build-type:          Simple
 cabal-version:       >=1.22
 
 library
-  hs-source-dirs:      src
+  default-language:    Haskell2010
   ghc-options:         -Wall -O2
 
+  hs-source-dirs:      src
   exposed-modules:     Algorithm.AutomataMerge
                      , Algorithm.DfaEquivalence
                      , Algorithm.NfaEquivalence
@@ -57,44 +58,31 @@ library
                      , text
                      , transformers
 
-  default-language:    Haskell2010
 
 executable automata-equivalence
+  default-language:    Haskell2010
   ghc-options:         -threaded -rtsopts -with-rtsopts=-N -Wall
 
   hs-source-dirs:      app-automata-equivalence
   main-is:             Main.hs
+  other-modules:       DfaChecking
+                     , NfaChecking
 
   build-depends:       base
                      , bimap
                      , containers
-                     , NfaExperiments
+                     , cl-automata
                      , optparse-generic
                      , text
                      -- For the Control.Monad.Trans.Except module
                      , transformers >= 0.4
 
-  other-modules:       DfaChecking
-                     , NfaChecking
-
-  default-language:    Haskell2010
-
 executable regex-derivation
+  default-language:    Haskell2010
   ghc-options:         -threaded -rtsopts -with-rtsopts=-N -Wall
 
   hs-source-dirs:      app-regex-derivation
   main-is:             Main.hs
-
-  build-depends:       base
-                     , containers
-                     , HaTeX
-                     , lucid
-                     , NfaExperiments
-                     , optparse-generic
-                     , text
-                     -- For the Control.Monad.Trans.Except module
-                     , transformers >= 0.4
-
   other-modules:       RegexDerivation
                      , RegexEquivalence
                      , RegexFullDerivation
@@ -103,7 +91,15 @@ executable regex-derivation
                      , RegexDfaOutput.Html
                      , Types
 
-  default-language:    Haskell2010
+  build-depends:       base
+                     , containers
+                     , HaTeX
+                     , lucid
+                     , cl-automata
+                     , optparse-generic
+                     , text
+                     -- For the Control.Monad.Trans.Except module
+                     , transformers >= 0.4
 
 executable website
   default-language:    Haskell2010
@@ -119,14 +115,14 @@ executable website
 
   build-depends:
                        base                      >= 4     && < 5
+                     , aeson
                      , bimap
                      , bytestring                >= 0.9.1 && < 0.11
-                     , aeson
+                     , cl-automata
                      , containers
                      , snap-core                 >= 1.0   && < 1.1
                      , snap-server               >= 1.0   && < 1.1
                      , text
-                     , NfaExperiments
 
   if impl(ghc >= 6.12.0)
     ghc-options: -threaded -Wall -fwarn-tabs -funbox-strict-fields -O2
@@ -146,22 +142,21 @@ executable benchmark
 
   build-depends:       base
                      , containers
+                     , cl-automata
                      , criterion
                      , deepseq
                      , graphviz
-                     , NfaExperiments
-                     , optparse-generic
                      , MonadRandom
+                     , optparse-generic
                      , random
                      , text
                      , time
                      -- For the Control.Monad.Trans.Except module
                      , transformers >= 0.4
 
-test-suite NfaExperiments-test
+test-suite cl-automata-test
   type:                exitcode-stdio-1.0
   default-language:    Haskell2010
---  default-extensions:  OverloadedStrings
   ghc-options:         -threaded -rtsopts -with-rtsopts=-N -Wall
 
   hs-source-dirs:      test
@@ -171,7 +166,7 @@ test-suite NfaExperiments-test
                      , hspec
                      , hspec-discover
                      , QuickCheck
-                     , NfaExperiments
+                     , cl-automata
                      , containers
                      , equivalence
                      , parsec >= 3 && < 4
