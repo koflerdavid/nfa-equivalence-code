@@ -3,7 +3,7 @@ module RegexDfaOutput.Tsv
     ) where
 
 import Data.Regex         ( Regex, alphabet, matchesEmptyWord )
-import Data.Regex.Formats ( FullyQuotedRegex(..) )
+import Data.Regex.Formats ( MinimallyQuotedRegex(..) )
 
 import Control.Monad      ( forM_ )
 import Data.Map           as Map
@@ -13,7 +13,7 @@ type RegexDfaTransitions c = Map (Regex c) (Map c (Regex c))
 
 printTransitionTable :: Bool -> Regex Char -> RegexDfaTransitions Char -> IO ()
 printTransitionTable _ regex transitions = do
-    forM_ (Set.toAscList $ alphabet regex) $ \c -> putStr ('\t' : show c)
+    forM_ (Set.toAscList $ alphabet regex) $ putStr . ('\t' :)  . show
     putStr "\n"
     forM_ (Map.toList transitions) $ \(r, ts) -> do
         putStr $
@@ -24,6 +24,6 @@ printTransitionTable _ regex transitions = do
             if matchesEmptyWord r
                 then " * "
                 else " "
-        putStr . show . FullyQuotedRegex $ r
-        forM_ (Map.elems ts) $ \r' -> putStr ('\t' : show (FullyQuotedRegex r'))
+        putStr . show . MinimallyQuotedRegex $ r
+        forM_ (Map.elems ts) $ putStr . ('\t' :) . show . MinimallyQuotedRegex
         putStr "\n"

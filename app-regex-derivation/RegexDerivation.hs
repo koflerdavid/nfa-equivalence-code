@@ -2,7 +2,7 @@ module RegexDerivation where
 
 import Algorithm.Regex.Derivation
 import Language.RegexParser
-import Data.Regex.Formats         ( FullyQuotedRegex(..) )
+import Data.Regex.Formats         ( MinimallyQuotedRegex(..) )
 
 import Control.Monad.Trans.Class  ( lift )
 import Control.Monad.Trans.Except ( ExceptT, throwE )
@@ -13,6 +13,6 @@ parseAndDeriveRegexByWord word = do
     case parseRegex "<stdin>" input of
         Left parseError -> throwE parseError
         Right regex -> do
-            lift $ print (FullyQuotedRegex regex)
+            lift . print . MinimallyQuotedRegex $ regex
             let regex' = wordDerive word regex
-            lift . print . FullyQuotedRegex $ regex'
+            lift . print . MinimallyQuotedRegex $ regex'

@@ -4,7 +4,7 @@ module Actions.Derivation
 
 import Algorithm.Regex.Derivation ( wordDerive )
 import Data.Regex                 ( Regex )
-import Data.Regex.Formats         ( FullyQuotedRegex(..) )
+import Data.Regex.Formats         ( MinimallyQuotedRegex(..) )
 import Language.RegexParser       ( parseRegex )
 
 import Control.Monad              ( when )
@@ -28,7 +28,7 @@ action =
         result <- derive <$> getParam "regex" <*> getParam "word"
         modifyResponse $ setContentType "text/plain; charset=utf-8"
         case result of
-            Right derivedRegex -> writeBS $ UTF8.fromString (show (FullyQuotedRegex derivedRegex))
+            Right derivedRegex -> writeBS . UTF8.fromString . show . MinimallyQuotedRegex $ derivedRegex
             Left e -> do
                 modifyResponse $ setResponseCode 400
                 case e of
