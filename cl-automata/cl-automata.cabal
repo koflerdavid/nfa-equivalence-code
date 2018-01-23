@@ -33,12 +33,9 @@ library
                      , Data.EpsilonNfa.Internal
                      , Data.FiniteAutomaton
                      , Data.Nfa
-                     , Data.Queue
                      , Data.Regex
                      , Data.Regex.Formats
                      , Algorithm.Regex.DfaConversion
-                     , Data.CongruenceClosure
-                     , Data.CongruenceClosure.Internal
                      , Language.Automata.HkntParser
                      , Language.Automata.HkntParser.Class
                      , Language.Automata.HkntParser.Internal
@@ -50,6 +47,7 @@ library
 
   build-depends:       base >= 4.7 && < 5
                      , bimap
+                     , cl-data-structures
                      -- For Data.Map.!?
                      , containers >= 0.5.9.1
                      , equivalence
@@ -111,8 +109,6 @@ test-suite cl-automata-test
                      , Data.EpsilonNfaSpec
                      , Data.EpsilonNfa.InternalSpec
                      , Data.NfaSpec
-                     , Data.EquivalenceSpec
-                     , Data.CongruenceClosureSpec
                      , HkntSamples
                      , Language.Automata.HkntParserSpec
                      , Language.Automata.HkntParser.InternalSpec

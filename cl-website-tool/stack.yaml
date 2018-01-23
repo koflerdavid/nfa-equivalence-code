@@ -7,8 +7,9 @@ resolver: lts-10.9
 # Local packages, usually specified by relative directory name
 packages:
 - '.'
-- '../cl-webservice'
 - '../cl-automata'
+- '../cl-data-structures'
+- '../cl-webservice'
 # Packages to be pulled from upstream that are not in the resolver (e.g., acme-missiles-0.3)
 extra-deps:
 - lhs2tex-1.19
