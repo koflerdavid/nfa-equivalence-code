@@ -15,7 +15,6 @@ import Algorithm.DfaEquivalence
 import Compiler.Hknt
 import Data.Dfa
 import Language.Automata.HkntParser
-import Language.Automata.HkntParser.Class
 
 type IOWithError a = ExceptT String IO a
 

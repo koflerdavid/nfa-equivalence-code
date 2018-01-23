@@ -15,13 +15,16 @@ checkRegexEquivalence = do
     let witnesses = getDifferences regex1 regex2
     lift $
         forM_ witnesses $ \(w, r1, r2) -> do
-            putStr (show w)
+            printSameLine w
             putChar '\t'
-            putStr . show . MinimallyQuotedRegex $ r1
+            printSameLine . MinimallyQuotedRegex $ r1
             putChar '\t'
-            print (MinimallyQuotedRegex r2)
+            print . MinimallyQuotedRegex $ r2
     return (null witnesses)
 
 exceptM :: Monad m => Either e a -> ExceptT e m a
 exceptM (Left e)  = throwE e
 exceptM (Right a) = return a
+
+printSameLine :: Show a => a -> IO ()
+printSameLine = putStr . show

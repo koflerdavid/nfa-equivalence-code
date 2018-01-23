@@ -39,5 +39,5 @@ main = do
                         then exitSuccess
                         else exitWith (ExitFailure 1)
 
-printErrorAndExit :: String -> IO a
+printErrorAndExit :: String -> IO ()
 printErrorAndExit msg = hPutStrLn stderr msg >> exitWith (ExitFailure 2)
