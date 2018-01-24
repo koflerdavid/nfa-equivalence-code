@@ -1,7 +1,12 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE TupleSections #-}
 
-module Algorithm.NfaEquivalence where
+module Algorithm.NfaEquivalence
+    ( Constraint
+    , nfaStatesDifferencesHkC
+    , nfaStatesEquivalentHk
+    , nfaStatesEquivalentHkC
+    ) where
 
 import qualified Data.CongruenceClosure          as CC
 import           Data.Nfa
@@ -52,16 +57,14 @@ nfaStatesDifferencesHk nfa set1 set2 =
             alreadyEqual <- xs `equivalent` ys
             if alreadyEqual
                 then skip constraint >> check queue'
-                else if (nfa `accepts` ISet.toList xs) /=
-                        (nfa `accepts` ISet.toList ys)
+                else if (nfa `accepts` ISet.toList xs) /= (nfa `accepts` ISet.toList ys)
                          then return (Just constraint)
                          else do
                              equate xs ys
                              trace constraint
                              check (queue' `Q.pushAll` todo constraint)
       where
-        todo (w, xs, ys) =
-            [(w ++ [c], xs `nfaStep'` c, ys `nfaStep'` c) | c <- alphabet]
+        todo (w, xs, ys) = [(w ++ [c], xs `nfaStep'` c, ys `nfaStep'` c) | c <- alphabet]
     alphabet = Set.toList (nfaAlphabet nfa)
     nfaStep' = nfaStep nfa
     trace :: Constraint c -> HkEquivM s c () -- Necessary to help the type checker
@@ -88,8 +91,7 @@ nfaStatesDifferencesHkC ::
     -> NfaStates
     -> (Maybe (Constraint c), [(Bool, Constraint c)])
 nfaStatesDifferencesHkC nfa set1 set2 =
-    let (witness, traces) =
-            evalRWS (check (Q.singleton ([], set1, set2))) () CC.empty
+    let (witness, traces) = evalRWS (check (Q.singleton ([], set1, set2))) () CC.empty
     in (witness, toList traces)
   where
     check :: FifoQueue (Constraint c) -> HkcM c (Maybe (Constraint c))
@@ -100,21 +102,25 @@ nfaStatesDifferencesHkC nfa set1 set2 =
             alreadyEqual <- xs `equivalentM` ys
             if alreadyEqual
                 then skip constraint >> check queue'
-                else if (nfa `accepts` ISet.toList xs) /=
-                        (nfa `accepts` ISet.toList ys)
+                else if (nfa `accepts` ISet.toList xs) /= (nfa `accepts` ISet.toList ys)
                          then return (Just constraint)
                          else do
                              equateM xs ys
                              trace constraint
                              check (queue' `Q.pushAll` todo constraint)
       where
-        todo (w, xs, ys) =
-            [(w ++ [c], xs `nfaStep'` c, ys `nfaStep'` c) | c <- alphabet]
+        todo (w, xs, ys) = [(w ++ [c], xs `nfaStep'` c, ys `nfaStep'` c) | c <- alphabet]
+
     alphabet = Set.toList (nfaAlphabet nfa)
+
     nfaStep' = nfaStep nfa
+
     equivalentM :: NfaStates -> NfaStates -> HkcM c Bool
     equivalentM s1 s2 = gets $ \relation -> CC.equivalent s1 s2 relation
+
     equateM :: NfaStates -> NfaStates -> HkcM c ()
     equateM s1 s2 = modify $ \relation -> CC.equate relation s1 s2
+
     trace = RWS.tell . Seq.singleton . (False, )
+
     skip = RWS.tell . Seq.singleton . (True, )
