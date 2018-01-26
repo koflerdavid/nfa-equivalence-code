@@ -326,10 +326,9 @@
 
     FormUtilities.ajaxifyForm('frmRegexEquivalence', null,
         function (request, form) {
-            FormUtilities.byClassName(form, 'equivalence-result')
-                .forEach(function (element) {
-                    element.classList.remove('visible');
-                });
+            for (let element of form.getElementsByClassName('equivalence-result')) {
+                element.classList.remove('visible');
+            }
             FormUtilities.firstByClassName(form, 'output-container').classList.remove('visible');
 
             if (request.status === 200) {
@@ -394,10 +393,9 @@
 
     FormUtilities.ajaxifyForm('frmAutomataEquivalence', null,
         function (request, form) {
-            FormUtilities.byClassName(form, 'equivalence-result')
-                .forEach(function (element) {
-                    element.classList.remove('visible');
-                });
+            for (let element of form.getElementsByClassName('equivalence-result')) {
+                element.classList.remove('visible');
+            }
             FormUtilities.firstByClassName(form, 'output-container').classList.remove('visible');
 
             if (request.status === 200) {
@@ -457,7 +455,7 @@
 </script>
 <script type="application/javascript" src="./static/input_addon.js"></script>
 <script type="application/javascript">
-    FormUtilities.byClassName(document, 'dagger-input-addon').forEach(function (button) {
+    for (let button of document.getElementsByClassName('dagger-input-addon')) {
         const inputFieldId = button.dataset['for']
             , inputField = FormUtilities.byId(inputFieldId);
 
@@ -466,7 +464,7 @@
         } else {
             console.error('The input field with the id ' + inputFieldId + ' was not found');
         }
-    });
+    }
 </script>
 </body>
 </html>

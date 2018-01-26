@@ -3,16 +3,14 @@
 window.FormUtilities = (function (window) {
     function showErrorMessage(form, message) {
         if (message == null) {
-            byClassName(form, 'generic-error-message')
-                .forEach(function (element) {
-                    element.classList.add('visible');
-                });
+            for (let element of form.getElementsByClassName('generic-error-message')) {
+                element.classList.add('visible');
+            }
         } else {
-            byClassName(form, 'custom-error-message')
-                .forEach(function (element) {
-                    element.classList.add('visible');
-                    element.innerText = message;
-                });
+            for (let element of form.getElementsByClassName('custom-error-message')) {
+                element.classList.add('visible');
+                element.innerText = message;
+            }
         }
     }
 
@@ -41,10 +39,9 @@ window.FormUtilities = (function (window) {
     }
 
     function hideErrorMessages(form) {
-        byClassName(form, 'error-message')
-            .forEach(function (element) {
-                element.classList.remove('visible');
-            });
+        for (let element of form.getElementsByClassName('error-message')) {
+            element.classList.remove('visible');
+        }
     }
 
     function ajaxifyForm(id, formParser, onSuccess, onError, requestConfigurator) {
@@ -85,16 +82,12 @@ window.FormUtilities = (function (window) {
     }
 
     function firstByClassName(element, className) {
-        const matches = byClassName(element, className);
+        const matches = element.getElementsByClassName(className);
         if (matches.length > 0) {
             return matches[0];
         }
 
         throw new DOMError('Element with class ' + className + 'not found');
-    }
-
-    function byClassName(element, className) {
-        return Array.from(element.getElementsByClassName(className));
     }
 
     function createRequest(url, method) {
@@ -106,7 +99,6 @@ window.FormUtilities = (function (window) {
 
     return {
         'ajaxifyForm': ajaxifyForm,
-        'byClassName': byClassName,
         'byId': byId,
         'firstByClassName': firstByClassName,
         'hideErrorMessages': hideErrorMessages,
