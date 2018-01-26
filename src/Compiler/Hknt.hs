@@ -1,4 +1,8 @@
-module Compiler.Hknt where
+module Compiler.Hknt (
+    compileHkntToDfa
+    , compileHkntToNfa
+    , invertedStateMapping
+) where
 
 import Data.List as List
 import Data.Map  as Map
@@ -78,3 +82,6 @@ translateNfaStates ::
 translateNfaStates mapping (origin, c, destination) =
     (,) <$> ((,) <$> origin `Map.lookup` mapping <*> pure c) <*>
     fmap (: []) (destination `Map.lookup` mapping)
+
+invertedStateMapping :: Map s Int -> Map Int s
+invertedStateMapping m = Map.fromList [(s, name) | (name, s) <- Map.toList m]
