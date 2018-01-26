@@ -1,4 +1,4 @@
-.output-container {
+.output-container.hidden {
     visibility: hidden;
 }
 

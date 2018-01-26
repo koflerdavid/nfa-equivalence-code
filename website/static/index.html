@@ -140,7 +140,7 @@
 
         <button type="submit">Derive!</button>
 
-        <div class="form-row output-container" id="divDerivationOutput">
+        <div class="form-row output-container hidden" id="divDerivationOutput">
             <label for="wordDerivationOutput">Result:</label>
             <output id="wordDerivationOutput"></output>
         </div>
@@ -174,7 +174,7 @@
 
         <button type="submit">Check Equivalence</button>
 
-        <div class="form-row output-container">
+        <div class="form-row output-container hidden">
             <label>Result:</label>
             <span class="equivalence-result equivalent">Equivalent</span>
             <div class="equivalence-result not-equivalent">
@@ -207,7 +207,7 @@
         </div>
         <button type="submit">Convert!</button>
 
-        <div class="form-row output-container" id="divDfaOutput">
+        <div class="form-row output-container hidden" id="divDfaOutput">
             <label>DFA:</label>
             <div id="dfaRepresentation"></div>
         </div>
@@ -290,7 +290,7 @@
         </div>
         <button type="submit">Check Equivalence</button>
 
-        <div class="form-row output-container">
+        <div class="form-row output-container hidden">
             <label>Result:</label>
             <span class="equivalence-result equivalent">Equivalent</span>
             <div class="equivalence-result not-equivalent">
@@ -311,7 +311,7 @@
         function (request, form) {
             if (request.status === 200) {
                 document.getElementById('wordDerivationOutput').innerText = request.responseText;
-                document.getElementById('divDerivationOutput').style = "visibility: visible;";
+                makeElementVisible(document.getElementById('divDerivationOutput'));
             } else if (request.status === 400) {
                 FormUtilities.showErrorMessage(form, request.responseText);
             } else {
@@ -326,26 +326,22 @@
 
     FormUtilities.ajaxifyForm('#frmRegexEquivalence', null,
         function (request, form) {
-            for (let element of form.getElementsByClassName('equivalence-result')) {
-                element.classList.remove('visible');
-            }
-            form.querySelector('.output-container').classList.remove('visible');
+            hideElement(form.querySelector('.output-container'));
+            hideElement(form.querySelector('.equivalence-result.equivalent'));
+            hideElement(form.querySelector('.equivalence-result.not-equivalent'));
 
             if (request.status === 200) {
                 try {
                     const result = JSON.parse(request.responseText)
                         , witnessesContainer = form.querySelector('.witnesses-list');
 
-                    while (witnessesContainer.firstChild) {
-                        witnessesContainer.removeChild(witnessesContainer.firstChild);
-                    }
-
-                    form.querySelector('.output-container').classList.add('visible');
+                    removeImmediateChildNodes(witnessesContainer);
+                    makeElementVisible(form.querySelector('.output-container'));
 
                     if (result['equivalent']) {
-                        form.querySelector('.equivalent').classList.add('visible');
+                        makeElementVisible(form.querySelector('.equivalent'));
                     } else {
-                        form.querySelector('.not-equivalent').classList.add('visible');
+                        makeElementVisible(form.querySelector('.not-equivalent'))
 
                         result['witnesses'].forEach(function (witness) {
                             const code = document.createElement('code');
@@ -376,7 +372,7 @@
         function (request, form) {
             if (request.status === 200) {
                 document.getElementById('dfaRepresentation').innerHTML = request.responseText;
-                document.getElementById('divDfaOutput').style = "visibility: visible;";
+                makeElementVisible(document.getElementById('divDfaOutput'));
             } else {
                 FormUtilities.showErrorMessage(form, "Regex conversion error");
                 console.error("Regex conversion error", request);
@@ -393,26 +389,22 @@
 
     FormUtilities.ajaxifyForm('#frmAutomataEquivalence', null,
         function (request, form) {
-            for (let element of form.getElementsByClassName('equivalence-result')) {
-                element.classList.remove('visible');
-            }
-            form.querySelector('.output-container').classList.remove('visible');
+            hideElement(form.querySelector('.output-container'));
+            hideElement(form.querySelector('.equivalent'));
+            hideElement(form.querySelector('.not-equivalent'));
 
             if (request.status === 200) {
                 try {
                     const result = JSON.parse(request.responseText)
                         , witnessesContainer = form.querySelector('.witnesses-list');
 
-                    while (witnessesContainer.firstChild) {
-                        witnessesContainer.removeChild(witnessesContainer.firstChild);
-                    }
-
-                    form.querySelector('.output-container').classList.add('visible');
+                    removeImmediateChildNodes(witnessesContainer);
+                    makeElementVisible(form.querySelector('.output-container'));
 
                     if (result['equivalent']) {
-                        form.querySelector('.equivalent').classList.add('visible');
+                        makeElementVisible(form.querySelector('.equivalent'));
                     } else {
-                        form.querySelector('.not-equivalent').classList.add('visible');
+                        makeElementVisible(form.querySelector('.not-equivalent'))
 
                         result['witnesses'].forEach(function (witness) {
                             const code = document.createElement('code');
@@ -428,6 +420,8 @@
                     if (e.name === 'SyntaxError') {
                         FormUtilities.showErrorMessage(form, "Invalid response from server");
                         console.error("Invalid response from server", request);
+                    } else {
+                        console.error("Error", e);
                     }
                 }
 
@@ -452,9 +446,27 @@
             return ['"', witness, '"'].join('');
         }
     }
+
+    function removeImmediateChildNodes(element, selector) {
+        while (element.firstChild) {
+            element.removeChild(element.firstChild);
+        }
+    }
+
+    function makeElementVisible(element) {
+        element.classList.remove('hidden');
+        element.classList.add('visible');
+    }
+
+    function hideElement(element) {
+        element.classList.remove('visible');
+        element.classList.add('hidden');
+    }
 </script>
 <script type="application/javascript" src="./static/input_addon.js"></script>
 <script type="application/javascript">
+    'use strict';
+
     for (let button of document.getElementsByClassName('dagger-input-addon')) {
         const inputFieldId = button.dataset['for']
             , inputField = document.getElementById(inputFieldId);
