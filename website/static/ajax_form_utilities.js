@@ -44,8 +44,8 @@ window.FormUtilities = (function (window) {
         }
     }
 
-    function ajaxifyForm(id, formParser, onSuccess, onError, requestConfigurator) {
-        const form = byId(id)
+    function ajaxifyForm(selector, formParser, onSuccess, onError, requestConfigurator) {
+        const form = window.document.querySelector(selector)
             , action = form.getAttribute('action')
             , method = form.getAttribute('method');
 
@@ -72,24 +72,6 @@ window.FormUtilities = (function (window) {
         });
     }
 
-    function byId(id) {
-        const element = window.document.getElementById(id);
-        if (element == null) {
-            throw new DOMError('Element with id ' + id + ' not found');
-        }
-
-        return element;
-    }
-
-    function firstByClassName(element, className) {
-        const matches = element.getElementsByClassName(className);
-        if (matches.length > 0) {
-            return matches[0];
-        }
-
-        throw new DOMError('Element with class ' + className + 'not found');
-    }
-
     function createRequest(url, method) {
         const request = new XMLHttpRequest();
         request.open(method || 'POST', url, true);
@@ -99,8 +81,6 @@ window.FormUtilities = (function (window) {
 
     return {
         'ajaxifyForm': ajaxifyForm,
-        'byId': byId,
-        'firstByClassName': firstByClassName,
         'hideErrorMessages': hideErrorMessages,
         'showErrorMessage': showErrorMessage
     };

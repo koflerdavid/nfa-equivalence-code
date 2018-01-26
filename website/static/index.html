@@ -307,11 +307,11 @@
 <script type="application/javascript">
     'use strict';
 
-    FormUtilities.ajaxifyForm('frmWordDerivation', null,
+    FormUtilities.ajaxifyForm('#frmWordDerivation', null,
         function (request, form) {
             if (request.status === 200) {
-                FormUtilities.byId('wordDerivationOutput').innerText = request.responseText;
-                FormUtilities.byId('divDerivationOutput').style = "visibility: visible;";
+                document.getElementById('wordDerivationOutput').innerText = request.responseText;
+                document.getElementById('divDerivationOutput').style = "visibility: visible;";
             } else if (request.status === 400) {
                 FormUtilities.showErrorMessage(form, request.responseText);
             } else {
@@ -324,28 +324,28 @@
             console.error("Regex derivation request error", request, e);
         });
 
-    FormUtilities.ajaxifyForm('frmRegexEquivalence', null,
+    FormUtilities.ajaxifyForm('#frmRegexEquivalence', null,
         function (request, form) {
             for (let element of form.getElementsByClassName('equivalence-result')) {
                 element.classList.remove('visible');
             }
-            FormUtilities.firstByClassName(form, 'output-container').classList.remove('visible');
+            form.querySelector('.output-container').classList.remove('visible');
 
             if (request.status === 200) {
                 try {
                     const result = JSON.parse(request.responseText)
-                        , witnessesContainer = FormUtilities.firstByClassName(form, 'witnesses-list');
+                        , witnessesContainer = form.querySelector('.witnesses-list');
 
                     while (witnessesContainer.firstChild) {
                         witnessesContainer.removeChild(witnessesContainer.firstChild);
                     }
 
-                    FormUtilities.firstByClassName(form, 'output-container').classList.add('visible');
+                    form.querySelector('.output-container').classList.add('visible');
 
                     if (result['equivalent']) {
-                        FormUtilities.firstByClassName(form, 'equivalent').classList.add('visible');
+                        form.querySelector('.equivalent').classList.add('visible');
                     } else {
-                        FormUtilities.firstByClassName(form, 'not-equivalent').classList.add('visible');
+                        form.querySelector('.not-equivalent').classList.add('visible');
 
                         result['witnesses'].forEach(function (witness) {
                             const code = document.createElement('code');
@@ -372,11 +372,11 @@
             }
         });
 
-    FormUtilities.ajaxifyForm('frmRegexToDfa', null,
+    FormUtilities.ajaxifyForm('#frmRegexToDfa', null,
         function (request, form) {
             if (request.status === 200) {
-                FormUtilities.byId('dfaRepresentation').innerHTML = request.responseText;
-                FormUtilities.byId('divDfaOutput').style = "visibility: visible;";
+                document.getElementById('dfaRepresentation').innerHTML = request.responseText;
+                document.getElementById('divDfaOutput').style = "visibility: visible;";
             } else {
                 FormUtilities.showErrorMessage(form, "Regex conversion error");
                 console.error("Regex conversion error", request);
@@ -391,28 +391,28 @@
             request.setRequestHeader('X-Embeddable', 'true');
         });
 
-    FormUtilities.ajaxifyForm('frmAutomataEquivalence', null,
+    FormUtilities.ajaxifyForm('#frmAutomataEquivalence', null,
         function (request, form) {
             for (let element of form.getElementsByClassName('equivalence-result')) {
                 element.classList.remove('visible');
             }
-            FormUtilities.firstByClassName(form, 'output-container').classList.remove('visible');
+            form.querySelector('.output-container').classList.remove('visible');
 
             if (request.status === 200) {
                 try {
                     const result = JSON.parse(request.responseText)
-                        , witnessesContainer = FormUtilities.firstByClassName(form, 'witnesses-list');
+                        , witnessesContainer = form.querySelector('.witnesses-list');
 
                     while (witnessesContainer.firstChild) {
                         witnessesContainer.removeChild(witnessesContainer.firstChild);
                     }
 
-                    FormUtilities.firstByClassName(form, 'output-container').classList.add('visible');
+                    form.querySelector('.output-container').classList.add('visible');
 
                     if (result['equivalent']) {
-                        FormUtilities.firstByClassName(form, 'equivalent').classList.add('visible');
+                        form.querySelector('.equivalent').classList.add('visible');
                     } else {
-                        FormUtilities.firstByClassName(form, 'not-equivalent').classList.add('visible');
+                        form.querySelector('.not-equivalent').classList.add('visible');
 
                         result['witnesses'].forEach(function (witness) {
                             const code = document.createElement('code');
@@ -457,7 +457,7 @@
 <script type="application/javascript">
     for (let button of document.getElementsByClassName('dagger-input-addon')) {
         const inputFieldId = button.dataset['for']
-            , inputField = FormUtilities.byId(inputFieldId);
+            , inputField = document.getElementById(inputFieldId);
 
         if (inputField) {
             setupInputAddon('\u2020', inputField, button); // This is the Dagger character.
