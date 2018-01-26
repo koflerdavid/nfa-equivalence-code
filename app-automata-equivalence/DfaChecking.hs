@@ -2,8 +2,6 @@ module DfaChecking
     ( checkDfaEquivalence
     ) where
 
-import Util
-
 import Control.Monad                      ( forM, forM_, when )
 import Control.Monad.Trans.Class          ( lift )
 import Control.Monad.Trans.Except         ( ExceptT, runExceptT, throwE )
@@ -35,7 +33,7 @@ checkDfaEquivalence filename = do
             Left (NotDfaState s) ->
                 throwE $ "The following is not a DFA state: " ++ show s
             Right (maybeWitness, trace) -> do
-                let invStateMapping = invertMap stateMapping
+                let invStateMapping = invertedStateMapping stateMapping
                 forM_ trace (printConstraint invStateMapping)
                 case maybeWitness of
                     Nothing -> return True

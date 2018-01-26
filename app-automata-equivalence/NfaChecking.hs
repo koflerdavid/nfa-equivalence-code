@@ -2,8 +2,6 @@ module NfaChecking
     ( checkNfaEquivalence
     ) where
 
-import Util
-
 import Control.Monad                ( forM, forM_, mapM, when )
 import Control.Monad.Trans.Class    ( lift )
 import Control.Monad.Trans.Except   ( ExceptT, runExceptT, throwE )
@@ -35,7 +33,7 @@ checkNfaEquivalence filename = do
                     nfa
                     (fromList stateSet1')
                     (fromList stateSet2')
-        let invStateMapping = invertMap stateMapping
+        let invStateMapping = invertedStateMapping stateMapping
         forM_ trace (printConstraint invStateMapping)
         case maybeWitness of
             Nothing -> return True

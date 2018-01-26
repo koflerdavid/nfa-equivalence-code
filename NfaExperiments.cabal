@@ -71,7 +71,6 @@ executable automata-equivalence
 
   other-modules:       DfaChecking
                      , NfaChecking
-                     , Util
 
   default-language:    Haskell2010
 
