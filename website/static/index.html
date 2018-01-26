@@ -350,12 +350,7 @@
 
                         result['witnesses'].forEach(function (witness) {
                             const code = document.createElement('code');
-
-                            if (witness === '') {
-                                code.innerText = '\u03B5'; // Small Greek Character Epsilon
-                            } else {
-                                code.innerText = ['"', witness, '"'].join('');
-                            }
+                            code.innerText = formatWitness(witness);
 
                             const li = document.createElement('li');
                             li.appendChild(code);
@@ -423,12 +418,7 @@
 
                         result['witnesses'].forEach(function (witness) {
                             const code = document.createElement('code');
-
-                            if (witness === '') {
-                                code.innerText = '\u03B5'; // Small Greek Character Epsilon
-                            } else {
-                                code.innerText = ['"', witness, '"'].join('');
-                            }
+                            code.innerText = formatWitness(witness);
 
                             const li = document.createElement('li');
                             li.appendChild(code);
@@ -454,6 +444,16 @@
             FormUtilities.showErrorMessage(form);
             console.error("Regex conversion request error", request, e);
         });
+
+    function formatWitness(witness) {
+        if (witness === '') {
+            // Small Greek Character Epsilon
+            return '\u03B5';
+        } else {
+            // Put it between double quotes
+            return ['"', witness, '"'].join('');
+        }
+    }
 </script>
 <script type="application/javascript" src="./static/input_addon.js"></script>
 <script type="application/javascript">
