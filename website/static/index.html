@@ -328,31 +328,12 @@
     FormUtilities.ajaxifyForm('#frmRegexEquivalence', null,
         function (request, form) {
             hideElement(form.querySelector('.output-container'));
-            hideElement(form.querySelector('.equivalence-result.equivalent'));
-            hideElement(form.querySelector('.equivalence-result.not-equivalent'));
 
             if (request.status === 200) {
                 try {
-                    const result = JSON.parse(request.responseText)
-                        , witnessesContainer = form.querySelector('.witnesses-list');
-
-                    removeImmediateChildNodes(witnessesContainer);
+                    const result = JSON.parse(request.responseText);
                     makeElementVisible(form.querySelector('.output-container'));
-
-                    if (result['equivalent']) {
-                        makeElementVisible(form.querySelector('.equivalent'));
-                    } else {
-                        makeElementVisible(form.querySelector('.not-equivalent'))
-
-                        result['witnesses'].forEach(function (witness) {
-                            const code = document.createElement('code');
-                            code.innerText = formatWitness(witness);
-
-                            const li = document.createElement('li');
-                            li.appendChild(code);
-                            witnessesContainer.appendChild(li);
-                        });
-                    }
+                    renderEquivalenceCheckingResult(form, result);
 
                 } catch (e) {
                     if (e.name === 'SyntaxError') {
@@ -391,31 +372,12 @@
     FormUtilities.ajaxifyForm('#frmAutomataEquivalence', null,
         function (request, form) {
             hideElement(form.querySelector('.output-container'));
-            hideElement(form.querySelector('.equivalent'));
-            hideElement(form.querySelector('.not-equivalent'));
 
             if (request.status === 200) {
                 try {
-                    const result = JSON.parse(request.responseText)
-                        , witnessesContainer = form.querySelector('.witnesses-list');
-
-                    removeImmediateChildNodes(witnessesContainer);
+                    const result = JSON.parse(request.responseText);
                     makeElementVisible(form.querySelector('.output-container'));
-
-                    if (result['equivalent']) {
-                        makeElementVisible(form.querySelector('.equivalent'));
-                    } else {
-                        makeElementVisible(form.querySelector('.not-equivalent'))
-
-                        result['witnesses'].forEach(function (witness) {
-                            const code = document.createElement('code');
-                            code.innerText = formatWitness(witness);
-
-                            const li = document.createElement('li');
-                            li.appendChild(code);
-                            witnessesContainer.appendChild(li);
-                        });
-                    }
+                    renderEquivalenceCheckingResult(form, result);
 
                 } catch (e) {
                     if (e.name === 'SyntaxError') {
@@ -437,6 +399,28 @@
             FormUtilities.showErrorMessage(form);
             console.error("Regex conversion request error", request, e);
         });
+
+    function renderEquivalenceCheckingResult(form, result) {
+        const witnessesContainer = form.querySelector('.witnesses-list');
+        removeImmediateChildNodes(witnessesContainer);
+
+        if (result['equivalent']) {
+            makeElementVisible(form.querySelector('.equivalence-result.equivalent'));
+            hideElement(form.querySelector('.equivalence-result.not-equivalent'));
+        } else {
+            makeElementVisible(form.querySelector('.equivalence-result.not-equivalent'));
+            hideElement(form.querySelector('.equivalence-result.equivalent'));
+
+            result['witnesses'].forEach(function (witness) {
+                const code = document.createElement('code');
+                code.innerText = formatWitness(witness);
+
+                const li = document.createElement('li');
+                li.appendChild(code);
+                witnessesContainer.appendChild(li);
+            });
+        }
+    }
 
     function formatWitness(witness) {
         if (witness === '') {
