@@ -25,9 +25,6 @@ window.FormUtilities = (function (window) {
 
         for (let key of formData.keys()) {
             let values = formData.getAll(key);
-            if (values.length === 0) {
-                values = [formData.get(key)];
-            }
 
             for (let value of values) {
                 const keyValuePair = window.encodeURIComponent(key) + '=' + window.encodeURIComponent(value);
