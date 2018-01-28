@@ -305,6 +305,7 @@
 
 <script type="application/javascript" src="./static/form_data_polyfill.js"></script>
 <script type="application/javascript" src="./static/ajax_form_utilities.js"></script>
+<script type="application/javascript" src="./static/vendor/lmth/index.js"></script>
 <script type="application/javascript">
     'use strict';
 
@@ -401,6 +402,10 @@
         });
 
     function renderEquivalenceCheckingResult(form, result) {
+        renderWitnesses(form, result);
+    }
+
+    function renderWitnesses(form, result) {
         const witnessesContainer = form.querySelector('.witnesses-list');
         removeImmediateChildNodes(witnessesContainer);
 
@@ -412,12 +417,12 @@
             hideElement(form.querySelector('.equivalence-result.equivalent'));
 
             result['witnesses'].forEach(function (witness) {
-                const code = document.createElement('code');
-                code.innerText = formatWitness(witness);
-
-                const li = document.createElement('li');
-                li.appendChild(code);
-                witnessesContainer.appendChild(li);
+                const formattedWitness = formatWitness(witness);
+                witnessesContainer.appendChild(
+                    lmth.li(null, [
+                        lmth.code(null, formattedWitness)
+                    ]).toDOM()
+                );
             });
         }
     }
