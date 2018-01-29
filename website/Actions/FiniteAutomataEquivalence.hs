@@ -127,9 +127,9 @@ translateState stateMapping state =
         (state `Data.Map.lookup` stateMapping)
 
 translatedTrace :: Map Int String -> (Bool, Constraint Char) -> Trace
-translatedTrace invStateMapping (considered, constraint) =
+translatedTrace invStateMapping (skipped, constraint) =
     Trace
-    { stateSetChecked = considered
+    { stateSetChecked = not skipped
     , stateSetConstraint = translatedConstraint invStateMapping constraint
     }
 
