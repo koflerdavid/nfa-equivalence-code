@@ -1,8 +1,8 @@
-.output-container.hidden {
+.hidden {
     visibility: hidden;
 }
 
-.output-container.visible {
+.visible {
     visibility: visible;
 }
 
@@ -20,4 +20,20 @@
 
 .equivalence-result.visible {
     visibility: visible;
+}
+
+.witness:after {
+    content: ": ";
+}
+
+code.operator:before, code.operator:after {
+    content: " ";
+}
+
+.trace-list .skipped {
+    color: darkgrey;
+}
+
+.trace-list .checked {
+    color: blue;
 }

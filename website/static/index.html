@@ -300,6 +300,20 @@
                 </ul>
             </div>
         </div>
+
+        <div class="form-row trace-container hidden">
+            <label>Trace:</label>
+            <table class="trace-list">
+                <thead>
+                <tr>
+                    <th>Input</th>
+                    <th>Skipped?</th>
+                    <th>Constraint</th>
+                </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
     </div>
 </form>
 
@@ -373,10 +387,12 @@
     FormUtilities.ajaxifyForm('#frmAutomataEquivalence', null,
         function (request, form) {
             hideElement(form.querySelector('.output-container'));
+            hideElement(form.querySelector('.trace-container'));
 
             if (request.status === 200) {
                 try {
                     const result = JSON.parse(request.responseText);
+                    makeElementVisible(form.querySelector('.trace-container'));
                     makeElementVisible(form.querySelector('.output-container'));
                     renderEquivalenceCheckingResult(form, result);
 
@@ -403,6 +419,10 @@
 
     function renderEquivalenceCheckingResult(form, result) {
         renderWitnesses(form, result);
+
+        if (result['trace'] != null) {
+            renderTrace(form, result['trace']);
+        }
     }
 
     function renderWitnesses(form, result) {
@@ -417,7 +437,9 @@
             hideElement(form.querySelector('.equivalence-result.equivalent'));
 
             result['witnesses'].forEach(function (witness) {
-                const formattedWitness = formatWitness(witness);
+                const witnessInput = (typeof witness === 'string') ? witness : witness['input']
+                    , formattedWitness = formatInput(witnessInput);
+
                 witnessesContainer.appendChild(
                     lmth.li(null, [
                         lmth.code(null, formattedWitness)
@@ -427,7 +449,30 @@
         }
     }
 
-    function formatWitness(witness) {
+    function renderTrace(form, traces) {
+        const traceContainer = form.querySelector('.trace-list tbody');
+        removeImmediateChildNodes(traceContainer);
+
+        for (let trace of traces) {
+            traceContainer.appendChild(
+                lmth.tr(null, [
+                    lmth.td(null, [
+                            lmth.code(".witness", formatInput(trace['constraint']['input']))
+                        ]
+                    ),
+                    lmth.td(null, trace['checked'] ? 'No' : 'Yes'),
+                    lmth.td(trace['checked'] ? '.checked' : '.skipped', [
+                            lmth.span(".state-set", formatSet(trace['constraint']['stateSet1'])),
+                            lmth.code(".operator", "="),
+                            lmth.span(".state-set", formatSet(trace['constraint']['stateSet2']))
+                        ]
+                    ),
+                ]).toDOM()
+            );
+        }
+    }
+
+    function formatInput(witness) {
         if (witness === '') {
             // Small Greek Character Epsilon
             return '\u03B5';
@@ -437,7 +482,11 @@
         }
     }
 
-    function removeImmediateChildNodes(element, selector) {
+    function formatSet(set) {
+        return ['{ ', set.join(', '), ' }'].join('');
+    }
+
+    function removeImmediateChildNodes(element) {
         while (element.firstChild) {
             element.removeChild(element.firstChild);
         }
