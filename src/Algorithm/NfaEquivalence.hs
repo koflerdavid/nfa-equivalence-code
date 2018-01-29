@@ -24,8 +24,6 @@ import qualified Data.Set                        as Set
 
 type NfaStates = ISet.IntSet
 
-type Error = String
-
 type Constraint c = ([c], NfaStates, NfaStates)
 
 nfaStatesEquivalentHk :: (Ord c) => Nfa c -> NfaStates -> NfaStates -> Bool
@@ -57,12 +55,13 @@ nfaStatesDifferencesHk nfa set1 set2 =
             alreadyEqual <- xs `equivalent` ys
             if alreadyEqual
                 then skip constraint >> check queue'
-                else if (nfa `accepts` ISet.toList xs) /= (nfa `accepts` ISet.toList ys)
-                         then return (Just constraint)
-                         else do
-                             equate xs ys
-                             trace constraint
-                             check (queue' `Q.pushAll` todo constraint)
+                else do
+                    trace constraint
+                    if (nfa `accepts` ISet.toList xs) /= (nfa `accepts` ISet.toList ys)
+                        then return (Just constraint)
+                        else do
+                            equate xs ys
+                            check (queue' `Q.pushAll` todo constraint)
       where
         todo (w, xs, ys) = [(w ++ [c], xs `nfaStep'` c, ys `nfaStep'` c) | c <- alphabet]
     alphabet = Set.toList (nfaAlphabet nfa)
@@ -102,12 +101,13 @@ nfaStatesDifferencesHkC nfa set1 set2 =
             alreadyEqual <- xs `equivalentM` ys
             if alreadyEqual
                 then skip constraint >> check queue'
-                else if (nfa `accepts` ISet.toList xs) /= (nfa `accepts` ISet.toList ys)
-                         then return (Just constraint)
-                         else do
-                             equateM xs ys
-                             trace constraint
-                             check (queue' `Q.pushAll` todo constraint)
+                else do
+                    trace constraint
+                    if (nfa `accepts` ISet.toList xs) /= (nfa `accepts` ISet.toList ys)
+                        then return (Just constraint)
+                        else do
+                            equateM xs ys
+                            check (queue' `Q.pushAll` todo constraint)
       where
         todo (w, xs, ys) = [(w ++ [c], xs `nfaStep'` c, ys `nfaStep'` c) | c <- alphabet]
 
