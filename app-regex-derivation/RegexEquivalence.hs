@@ -12,7 +12,7 @@ checkRegexEquivalence :: ExceptT String IO Bool
 checkRegexEquivalence = do
     regex1 <- lift getLine >>= (exceptM . parseRegex "first regex")
     regex2 <- lift getLine >>= (exceptM . parseRegex "second regex")
-    let witnesses = getDifferences regex1 regex2
+    let (witnesses, _trace) = getDifferences regex1 regex2
     lift $
         forM_ witnesses $ \(w, r1, r2) -> do
             printSameLine w
