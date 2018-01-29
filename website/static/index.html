@@ -184,6 +184,20 @@
                 </ul>
             </div>
         </div>
+
+        <div class="form-row trace-container hidden">
+            <label>Trace:</label>
+            <table class="trace-list">
+                <thead>
+                <tr>
+                    <th>Input</th>
+                    <th>Skipped?</th>
+                    <th>Constraint</th>
+                </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
     </div>
 </form>
 
@@ -348,12 +362,17 @@
                 try {
                     const result = JSON.parse(request.responseText);
                     makeElementVisible(form.querySelector('.output-container'));
-                    renderEquivalenceCheckingResult(form, result);
+                    makeElementVisible(form.querySelector('.trace-container'));
+                    renderEquivalenceCheckingResult(form, result, function (traceElement) {
+                        return [traceElement['constraint']['regex1'], traceElement['constraint']['regex2']];
+                    });
 
                 } catch (e) {
                     if (e.name === 'SyntaxError') {
                         FormUtilities.showErrorMessage(form, "Invalid response from server");
                         console.error("Invalid response from server", request);
+                    } else {
+                        throw e;
                     }
                 }
 
@@ -394,14 +413,19 @@
                     const result = JSON.parse(request.responseText);
                     makeElementVisible(form.querySelector('.trace-container'));
                     makeElementVisible(form.querySelector('.output-container'));
-                    renderEquivalenceCheckingResult(form, result);
+                    renderEquivalenceCheckingResult(form, result, function (traceElement) {
+                        return [
+                            formatSet(traceElement['constraint']['stateSet1']),
+                            formatSet(traceElement['constraint']['stateSet2'])
+                        ];
+                    });
 
                 } catch (e) {
                     if (e.name === 'SyntaxError') {
                         FormUtilities.showErrorMessage(form, "Invalid response from server");
                         console.error("Invalid response from server", request);
                     } else {
-                        console.error("Error", e);
+                        throw e;
                     }
                 }
 
@@ -417,11 +441,11 @@
             console.error("Regex conversion request error", request, e);
         });
 
-    function renderEquivalenceCheckingResult(form, result) {
+    function renderEquivalenceCheckingResult(form, result, itemsFromConstraint) {
         renderWitnesses(form, result);
 
         if (result['trace'] != null) {
-            renderTrace(form, result['trace']);
+            renderTrace(form, result['trace'], itemsFromConstraint);
         }
     }
 
@@ -449,22 +473,23 @@
         }
     }
 
-    function renderTrace(form, traces) {
+    function renderTrace(form, traces, itemsFromConstraint) {
         const traceContainer = form.querySelector('.trace-list tbody');
         removeImmediateChildNodes(traceContainer);
 
         for (let trace of traces) {
+            let items = itemsFromConstraint(trace);
             traceContainer.appendChild(
                 lmth.tr(null, [
                     lmth.td(null, [
-                            lmth.code(".witness", formatInput(trace['constraint']['input']))
+                            lmth.code('.witness', formatInput(trace['constraint']['input']))
                         ]
                     ),
                     lmth.td(null, trace['checked'] ? 'No' : 'Yes'),
                     lmth.td(trace['checked'] ? '.checked' : '.skipped', [
-                            lmth.span(".state-set", formatSet(trace['constraint']['stateSet1'])),
-                            lmth.code(".operator", "="),
-                            lmth.span(".state-set", formatSet(trace['constraint']['stateSet2']))
+                            lmth.span('.state-set', items[0]),
+                            lmth.code('.operator', "="),
+                            lmth.span('.state-set', items[1])
                         ]
                     ),
                 ]).toDOM()
