@@ -412,8 +412,8 @@
         // Record an ID for every regex
         mapRegexesToIds.set(regexDfa['initialRegex'], 1);
 
-        for (let i = 0, id = 2; i < regexDfa['regexes'].length; ++i) {
-            const regex = regexDfa['regexes'][i]['regex'];
+        let id = 2;
+        for (const {'regex': regex} of regexDfa['regexes']) {
             if (regex !== regexDfa['initialRegex']) {
                 mapRegexesToIds.set(regex, id);
                 ++id;
@@ -430,7 +430,7 @@
         const domTransitionsTableHeader = container.querySelector('table.transitions-table thead tr');
         DomUtiltities.removeChildNodes(domTransitionsTableHeader, '.input-symbol');
 
-        for (let dfaInputSymbol of regexDfa['alphabet']) {
+        for (const dfaInputSymbol of regexDfa['alphabet']) {
             domTransitionsTableHeader.appendChild(
                 lmth.th('.input-symbol', dfaInputSymbol).toDOM()
             );
@@ -442,13 +442,13 @@
         const domTransitionsContainer = container.querySelector('table.transitions-table tbody');
         DomUtiltities.removeChildNodes(domTransitionsContainer, 'tr.transition');
 
-        for (let i = 0; i < regexDfa['regexes'].length; ++i) {
-            const dfaOriginRegex = regexDfa['regexes'][i]['regex'];
+        for (const regex of regexDfa['regexes']) {
+            const dfaOriginRegex = regex['regex'];
             const dfaTransitionsForInput = regexDfa['transitionTable'][dfaOriginRegex];
 
             const arrRowContents = [
                 lmth.th(null, dfaOriginRegex === regexDfa['initialRegex'] ? '\u2192' : ''),
-                lmth.th(null, regexDfa['regexes'][i]['matchesEmptyWord'] ? '*' : ''),
+                lmth.th(null, regex['matchesEmptyWord'] ? '*' : ''),
                 // Use numbers instead of regexes, for better readability.
                 lmth.th(null, mapRegexestoIds.get(dfaOriginRegex))
             ];
@@ -462,19 +462,11 @@
                 arrRowContents.push(lmth.td(null, intRegexIndex));
             }
 
-            const classes = ['.transition'];
-            if (regexDfa['regexes'][i]['matchesEmptyWord']) {
-                classes.push('.matches-empty-word');
-            }
-
+            const row = lmth.tr('.transition', arrRowContents).toDOM();
             if (dfaOriginRegex === regexDfa['initialRegex']) {
-                domTransitionsContainer.insertAdjacentElement('afterbegin',
-                    lmth.tr(classes.join(''), arrRowContents).toDOM()
-                );
+                domTransitionsContainer.insertAdjacentElement('afterbegin', row);
             } else {
-                domTransitionsContainer.appendChild(
-                    lmth.tr(classes.join(''), arrRowContents).toDOM()
-                );
+                domTransitionsContainer.appendChild(row);
             }
         }
     }
@@ -583,7 +575,7 @@
             DomUtiltities.makeElementVisible(form.querySelector('.equivalence-result.not-equivalent'));
             DomUtiltities.hideElement(form.querySelector('.equivalence-result.equivalent'));
 
-            result['witnesses'].forEach(function (witness) {
+            for (const witness of result['witnesses']) {
                 const witnessInput = (typeof witness === 'string') ? witness : witness['input']
                     , formattedWitness = formatInput(witnessInput);
 
@@ -592,7 +584,7 @@
                         lmth.code(null, formattedWitness)
                     ]).toDOM()
                 );
-            });
+            }
         }
     }
 
@@ -600,8 +592,8 @@
         const traceContainer = form.querySelector('.trace-list tbody');
         DomUtiltities.removeImmediateChildNodes(traceContainer);
 
-        for (let trace of traces) {
-            let items = itemsFromConstraint(trace);
+        for (const trace of traces) {
+            const items = itemsFromConstraint(trace);
             traceContainer.appendChild(
                 lmth.tr(null, [
                     lmth.td(null, [

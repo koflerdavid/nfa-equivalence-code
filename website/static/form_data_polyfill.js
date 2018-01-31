@@ -32,7 +32,7 @@ window.FormData = (function (undefined) {
         const formData = new Map();
 
         for (let element of form.querySelectorAll('input, textarea')) {
-            let name = element.getAttribute("name") || null;
+            let name = element.getAttribute('name') || null;
             if (name == null) {
                 continue;
             }
