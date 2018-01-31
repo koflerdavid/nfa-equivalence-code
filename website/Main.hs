@@ -22,4 +22,11 @@ site =
         , ("regex/dfa_conversion", RegexToDfaConversion.action)
         , ("regex/equivalence", RegexEquivalence.action)
         ] <|>
-    dir "static" (serveDirectory "website/static")
+    dir "static" (serveDirectory "website/static") <|>
+    notFoundError
+
+notFoundError :: Snap ()
+notFoundError = do
+    modifyResponse $ setContentType "text/plain; charset=utf-8"
+    modifyResponse $ setResponseCode 404
+    writeLazyText "404 Not Found"
