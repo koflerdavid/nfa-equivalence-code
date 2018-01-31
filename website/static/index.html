@@ -227,7 +227,18 @@
                 <table class="transitions-table">
                     <thead>
                     <tr>
-                        <th colspan="4">Regular expression</th>
+                        <th colspan="3">Regular expression</th>
+                    </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+
+                <h3>Regular expressions:</h3>
+                <table class="regex-table">
+                    <thead>
+                    <tr>
+                        <th>Nr.</th>
+                        <th>Regular expression</th>
                     </tr>
                     </thead>
                     <tbody></tbody>
@@ -341,6 +352,7 @@
 </form>
 
 <script type="application/javascript" src="./static/form_data_polyfill.js"></script>
+<script type="application/javascript" src="./static/dom_utilities.js"></script>
 <script type="application/javascript" src="./static/ajax_form_utilities.js"></script>
 <script type="application/javascript" src="./static/vendor/lmth/index.js"></script>
 <script type="application/javascript">
@@ -350,7 +362,7 @@
         function (request, form) {
             if (request.status === 200) {
                 document.getElementById('wordDerivationOutput').innerText = request.responseText;
-                makeElementVisible(document.getElementById('divDerivationOutput'));
+                DomUtiltities.makeElementVisible(document.getElementById('divDerivationOutput'));
             } else if (request.status === 400) {
                 FormUtilities.showErrorMessage(form, request.responseText);
             } else {
@@ -362,44 +374,17 @@
             FormUtilities.showErrorMessage(form, "Request error");
             console.error("Regex derivation request error", request, e);
         });
-
-    FormUtilities.ajaxifyForm('#frmRegexEquivalence', null,
-        function (request, form) {
-            hideElement(form.querySelector('.output-container'));
-
-            if (request.status === 200) {
-                try {
-                    const result = JSON.parse(request.responseText);
-                    makeElementVisible(form.querySelector('.output-container'));
-                    makeElementVisible(form.querySelector('.trace-container'));
-                    renderEquivalenceCheckingResult(form, result, function (traceElement) {
-                        return [traceElement['constraint']['regex1'], traceElement['constraint']['regex2']];
-                    });
-
-                } catch (e) {
-                    if (e.name === 'SyntaxError') {
-                        FormUtilities.showErrorMessage(form, "Invalid response from server");
-                        console.error("Invalid response from server", request);
-                    } else {
-                        throw e;
-                    }
-                }
-
-            } else if (request.status === 400) {
-                FormUtilities.showErrorMessage(form, request.responseText);
-            } else {
-                FormUtilities.showErrorMessage(form, "Request error");
-                console.error("Request error", request);
-            }
-        });
+</script>
+<script type="application/javascript">
+    'use strict';
 
     FormUtilities.ajaxifyForm('#frmRegexToDfa', null,
         function (request, form) {
             if (request.status === 200) {
                 try {
                     const result = JSON.parse(request.responseText);
-                    renderRegexDfa(document.getElementById('dfaRepresentation'), result);
-                    makeElementVisible(document.getElementById('divDfaOutput'));
+                    renderRegexDfa(document.getElementById('divDfaOutput'), result);
+                    DomUtiltities.makeElementVisible(document.getElementById('divDfaOutput'));
                 } catch (e) {
                     if (e.name === 'SyntaxError') {
                         FormUtilities.showErrorMessage(form, "Invalid response from server");
@@ -422,16 +407,135 @@
             request.setRequestHeader('X-Embeddable', 'true');
         });
 
-    FormUtilities.ajaxifyForm('#frmAutomataEquivalence', null,
+    function renderRegexDfa(container, regexDfa) {
+        const mapRegexesToIds = new Map();
+        // Record an ID for every regex
+        mapRegexesToIds.set(regexDfa['initialRegex'], 1);
+
+        for (let i = 0, id = 2; i < regexDfa['regexes'].length; ++i) {
+            const regex = regexDfa['regexes'][i]['regex'];
+            if (regex !== regexDfa['initialRegex']) {
+                mapRegexesToIds.set(regex, id);
+                ++id;
+            }
+        }
+
+        renderTransitionTableHeader(container, regexDfa);
+        renderTransitionTableRows(container, regexDfa, mapRegexesToIds);
+        renderRegexIndexTable(container, mapRegexesToIds);
+    }
+
+    function renderTransitionTableHeader(container, regexDfa) {
+        // Remove input symbols from table header
+        const domTransitionsTableHeader = container.querySelector('table.transitions-table thead tr');
+        DomUtiltities.removeChildNodes(domTransitionsTableHeader, '.input-symbol');
+
+        for (let dfaInputSymbol of regexDfa['alphabet']) {
+            domTransitionsTableHeader.appendChild(
+                lmth.th('.input-symbol', dfaInputSymbol).toDOM()
+            );
+        }
+    }
+
+    function renderTransitionTableRows(container, regexDfa, mapRegexestoIds) {
+        // Remove transition rows
+        const domTransitionsContainer = container.querySelector('table.transitions-table tbody');
+        DomUtiltities.removeChildNodes(domTransitionsContainer, 'tr.transition');
+
+        for (let i = 0; i < regexDfa['regexes'].length; ++i) {
+            const dfaOriginRegex = regexDfa['regexes'][i]['regex'];
+            const dfaTransitionsForInput = regexDfa['transitionTable'][dfaOriginRegex];
+
+            const arrRowContents = [
+                lmth.th(null, dfaOriginRegex === regexDfa['initialRegex'] ? '\u2192' : ''),
+                lmth.th(null, regexDfa['regexes'][i]['matchesEmptyWord'] ? '*' : ''),
+                // Use numbers instead of regexes, for better readability.
+                lmth.th(null, mapRegexestoIds.get(dfaOriginRegex))
+            ];
+
+            for (const dfaInputSymbol of regexDfa['alphabet']) {
+                // Every destination state is wrappend in an array of length 1
+                const dfaDestinationRegex = dfaTransitionsForInput[dfaInputSymbol][0];
+                // Earlier, we assigned numbers to each regex.
+                const intRegexIndex = mapRegexestoIds.get(dfaDestinationRegex);
+                // Put that number into the cell.
+                arrRowContents.push(lmth.td(null, intRegexIndex));
+            }
+
+            const classes = ['.transition'];
+            if (regexDfa['regexes'][i]['matchesEmptyWord']) {
+                classes.push('.matches-empty-word');
+            }
+
+            if (dfaOriginRegex === regexDfa['initialRegex']) {
+                domTransitionsContainer.insertAdjacentElement('afterbegin',
+                    lmth.tr(classes.join(''), arrRowContents).toDOM()
+                );
+            } else {
+                domTransitionsContainer.appendChild(
+                    lmth.tr(classes.join(''), arrRowContents).toDOM()
+                );
+            }
+        }
+    }
+
+    function renderRegexIndexTable(container, mapRegexesToIds) {
+        const domRegexesContainer = container.querySelector('table.regex-table tbody');
+        DomUtiltities.removeChildNodes(domRegexesContainer, 'tr');
+
+        for (const [regex, id] of mapRegexesToIds) {
+            domRegexesContainer.appendChild(
+                lmth.tr(null, [
+                    lmth.td(null, String(id)),
+                    lmth.td(null, regex)
+                ]).toDOM()
+            );
+        }
+    }
+</script>
+<script type="application/javascript">
+    'use strict';
+
+    FormUtilities.ajaxifyForm('#frmRegexEquivalence', null,
         function (request, form) {
-            hideElement(form.querySelector('.output-container'));
-            hideElement(form.querySelector('.trace-container'));
+            DomUtiltities.hideElement(form.querySelector('.output-container'));
 
             if (request.status === 200) {
                 try {
                     const result = JSON.parse(request.responseText);
-                    makeElementVisible(form.querySelector('.trace-container'));
-                    makeElementVisible(form.querySelector('.output-container'));
+                    DomUtiltities.makeElementVisible(form.querySelector('.output-container'));
+                    DomUtiltities.makeElementVisible(form.querySelector('.trace-container'));
+                    renderEquivalenceCheckingResult(form, result, function (traceElement) {
+                        return [traceElement['constraint']['regex1'], traceElement['constraint']['regex2']];
+                    });
+
+                } catch (e) {
+                    if (e.name === 'SyntaxError') {
+                        FormUtilities.showErrorMessage(form, "Invalid response from server");
+                        console.error("Invalid response from server", request);
+                    } else {
+                        throw e;
+                    }
+                }
+
+            } else if (request.status === 400) {
+                FormUtilities.showErrorMessage(form, request.responseText);
+            } else {
+                FormUtilities.showErrorMessage(form, "Request error");
+                console.error("Request error", request);
+            }
+        });
+
+    FormUtilities.ajaxifyForm('#frmAutomataEquivalence', null,
+        function (request, form) {
+            DomUtiltities.hideElement(form.querySelector('.output-container'));
+            DomUtiltities.hideElement(form.querySelector('.trace-container'));
+
+            if (request.status === 200) {
+                try {
+                    const result = JSON.parse(request.responseText);
+                    DomUtiltities.makeElementVisible(form.querySelector('.trace-container'));
+                    DomUtiltities.makeElementVisible(form.querySelector('.output-container'));
                     renderEquivalenceCheckingResult(form, result, function (traceElement) {
                         return [
                             formatSet(traceElement['constraint']['stateSet1']),
@@ -460,75 +564,6 @@
             console.error("Regex conversion request error", request, e);
         });
 
-    function renderRegexDfa(container, regexDfa) {
-        const mapInvertedIndex = new Map();
-        // Record an ID for every regex
-        mapInvertedIndex.set(regexDfa['initialRegex'], 1);
-
-        for (let i = 0, id = 2; i < regexDfa['regexes'].length; ++i) {
-            const regex = regexDfa['regexes'][i]['regex'];
-            if (regex !== regexDfa['initialRegex']) {
-                mapInvertedIndex.set(regex, id);
-                ++id;
-            }
-        }
-
-        // Remove input symbols from table header
-        const domTransitionsTableHeader = container.querySelector('table.transitions-table thead tr');
-        for (let domInputSymbol of domTransitionsTableHeader.querySelectorAll('.input-symbol')) {
-            domTransitionsTableHeader.removeChild(domInputSymbol);
-        }
-
-        for (let dfaInputSymbol of regexDfa['alphabet']) {
-            domTransitionsTableHeader.appendChild(
-                lmth.th('.input-symbol', dfaInputSymbol).toDOM()
-            );
-        }
-
-        // Remove transition rows
-        const domTransitionsContainer = container.querySelector('table.transitions-table tbody');
-        for (let domTransitionRow of domTransitionsContainer.querySelectorAll('tr.transition')) {
-            domTransitionsContainer.removeChild(domTransitionRow);
-        }
-
-        for (let i = 0; i < regexDfa['regexes'].length; ++i) {
-            const dfaOriginRegex = regexDfa['regexes'][i]['regex'];
-            const dfaTransitionsForInput = regexDfa['transitionTable'][dfaOriginRegex];
-
-            const arrRowContents = [
-                lmth.th(null, dfaOriginRegex === regexDfa['initialRegex'] ? '\u2192' : ''),
-                lmth.th(null, regexDfa['regexes'][i]['matchesEmptyWord'] ? '*' : ''),
-                // Use numbers instead of regexes, for better readability.
-                lmth.th(null, mapInvertedIndex.get(dfaOriginRegex)),
-                lmth.th(null, dfaOriginRegex)
-            ];
-
-            for (const dfaInputSymbol of regexDfa['alphabet']) {
-                // Every destination state is wrappend in an array of length 1
-                const dfaDestinationRegex = dfaTransitionsForInput[dfaInputSymbol][0];
-                // Earlier, we assigned numbers to each regex.
-                const intRegexIndex = mapInvertedIndex.get(dfaDestinationRegex);
-                // Put that number into the cell.
-                arrRowContents.push(lmth.td(null, intRegexIndex));
-            }
-
-            const classes = ['.transition'];
-            if (regexDfa['regexes'][i]['matchesEmptyWord']) {
-                classes.push('.matches-empty-word');
-            }
-
-            if (dfaOriginRegex === regexDfa['initialRegex']) {
-                domTransitionsContainer.insertAdjacentElement('afterbegin',
-                    lmth.tr(classes.join(''), arrRowContents).toDOM()
-                );
-            } else {
-                domTransitionsContainer.appendChild(
-                    lmth.tr(classes.join(''), arrRowContents).toDOM()
-                );
-            }
-        }
-    }
-
     function renderEquivalenceCheckingResult(form, result, itemsFromConstraint) {
         renderWitnesses(form, result);
 
@@ -539,14 +574,14 @@
 
     function renderWitnesses(form, result) {
         const witnessesContainer = form.querySelector('.witnesses-list');
-        removeImmediateChildNodes(witnessesContainer);
+        DomUtiltities.removeImmediateChildNodes(witnessesContainer);
 
         if (result['equivalent']) {
-            makeElementVisible(form.querySelector('.equivalence-result.equivalent'));
-            hideElement(form.querySelector('.equivalence-result.not-equivalent'));
+            DomUtiltities.makeElementVisible(form.querySelector('.equivalence-result.equivalent'));
+            DomUtiltities.hideElement(form.querySelector('.equivalence-result.not-equivalent'));
         } else {
-            makeElementVisible(form.querySelector('.equivalence-result.not-equivalent'));
-            hideElement(form.querySelector('.equivalence-result.equivalent'));
+            DomUtiltities.makeElementVisible(form.querySelector('.equivalence-result.not-equivalent'));
+            DomUtiltities.hideElement(form.querySelector('.equivalence-result.equivalent'));
 
             result['witnesses'].forEach(function (witness) {
                 const witnessInput = (typeof witness === 'string') ? witness : witness['input']
@@ -563,7 +598,7 @@
 
     function renderTrace(form, traces, itemsFromConstraint) {
         const traceContainer = form.querySelector('.trace-list tbody');
-        removeImmediateChildNodes(traceContainer);
+        DomUtiltities.removeImmediateChildNodes(traceContainer);
 
         for (let trace of traces) {
             let items = itemsFromConstraint(trace);
@@ -597,22 +632,6 @@
 
     function formatSet(set) {
         return ['{ ', set.join(', '), ' }'].join('');
-    }
-
-    function removeImmediateChildNodes(element) {
-        while (element.firstChild) {
-            element.removeChild(element.firstChild);
-        }
-    }
-
-    function makeElementVisible(element) {
-        element.classList.remove('hidden');
-        element.classList.add('visible');
-    }
-
-    function hideElement(element) {
-        element.classList.remove('visible');
-        element.classList.add('hidden');
     }
 </script>
 <script type="application/javascript" src="./static/input_addon.js"></script>
