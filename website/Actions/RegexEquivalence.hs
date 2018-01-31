@@ -1,3 +1,5 @@
+{-# LANGUAGE FlexibleInstances #-}
+
 module Actions.RegexEquivalence
     ( action
     ) where
@@ -36,9 +38,6 @@ data TraceElement = TraceElement
     , traceConstraint :: Witness Char
     }
 
-newtype JsonRegex =
-    JsonRegex (Regex Char)
-
 type Trace = [TraceElement]
 
 data EquivalenceResult
@@ -51,8 +50,8 @@ instance ToJSON EquivalenceResult where
     toJSON (NotEquivalent witnesses trace) =
         object ["equivalent" .= False, "witnesses" .= witnesses, "trace" .= trace]
 
-instance ToJSON JsonRegex where
-    toJSON (JsonRegex regex) = String . TS.pack . show $ MinimallyQuotedRegex regex
+instance ToJSON (MinimallyQuotedRegex Char) where
+    toJSON = String . TS.pack . show
 
 instance ToJSON TraceElement where
     toJSON traceElement =
@@ -61,7 +60,7 @@ instance ToJSON TraceElement where
                [ "checked" .= traceConsidered traceElement
                , "constraint" .=
                  object
-                     ["input" .= input, "regex1" .= JsonRegex regex1, "regex2" .= JsonRegex regex2]
+                     ["input" .= input, "regex1" .= MinimallyQuotedRegex regex1, "regex2" .= MinimallyQuotedRegex regex2]
                ]
 
 action :: Snap ()

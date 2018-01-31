@@ -223,7 +223,16 @@
 
         <div class="form-row output-container hidden" id="divDfaOutput">
             <label>DFA:</label>
-            <div id="dfaRepresentation"></div>
+            <div id="dfaRepresentation">
+                <table class="transitions-table">
+                    <thead>
+                    <tr>
+                        <th colspan="4">Regular expression</th>
+                    </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
         </div>
     </div>
 </form>
@@ -387,8 +396,18 @@
     FormUtilities.ajaxifyForm('#frmRegexToDfa', null,
         function (request, form) {
             if (request.status === 200) {
-                document.getElementById('dfaRepresentation').innerHTML = request.responseText;
-                makeElementVisible(document.getElementById('divDfaOutput'));
+                try {
+                    const result = JSON.parse(request.responseText);
+                    renderRegexDfa(document.getElementById('dfaRepresentation'), result);
+                    makeElementVisible(document.getElementById('divDfaOutput'));
+                } catch (e) {
+                    if (e.name === 'SyntaxError') {
+                        FormUtilities.showErrorMessage(form, "Invalid response from server");
+                        console.error("Invalid response from server", request);
+                    } else {
+                        throw e;
+                    }
+                }
             } else {
                 FormUtilities.showErrorMessage(form, "Regex conversion error");
                 console.error("Regex conversion error", request);
@@ -440,6 +459,75 @@
             FormUtilities.showErrorMessage(form);
             console.error("Regex conversion request error", request, e);
         });
+
+    function renderRegexDfa(container, regexDfa) {
+        const mapInvertedIndex = new Map();
+        // Record an ID for every regex
+        mapInvertedIndex.set(regexDfa['initialRegex'], 1);
+
+        for (let i = 0, id = 2; i < regexDfa['regexes'].length; ++i) {
+            const regex = regexDfa['regexes'][i]['regex'];
+            if (regex !== regexDfa['initialRegex']) {
+                mapInvertedIndex.set(regex, id);
+                ++id;
+            }
+        }
+
+        // Remove input symbols from table header
+        const domTransitionsTableHeader = container.querySelector('table.transitions-table thead tr');
+        for (let domInputSymbol of domTransitionsTableHeader.querySelectorAll('.input-symbol')) {
+            domTransitionsTableHeader.removeChild(domInputSymbol);
+        }
+
+        for (let dfaInputSymbol of regexDfa['alphabet']) {
+            domTransitionsTableHeader.appendChild(
+                lmth.th('.input-symbol', dfaInputSymbol).toDOM()
+            );
+        }
+
+        // Remove transition rows
+        const domTransitionsContainer = container.querySelector('table.transitions-table tbody');
+        for (let domTransitionRow of domTransitionsContainer.querySelectorAll('tr.transition')) {
+            domTransitionsContainer.removeChild(domTransitionRow);
+        }
+
+        for (let i = 0; i < regexDfa['regexes'].length; ++i) {
+            const dfaOriginRegex = regexDfa['regexes'][i]['regex'];
+            const dfaTransitionsForInput = regexDfa['transitionTable'][dfaOriginRegex];
+
+            const arrRowContents = [
+                lmth.th(null, dfaOriginRegex === regexDfa['initialRegex'] ? '\u2192' : ''),
+                lmth.th(null, regexDfa['regexes'][i]['matchesEmptyWord'] ? '*' : ''),
+                // Use numbers instead of regexes, for better readability.
+                lmth.th(null, mapInvertedIndex.get(dfaOriginRegex)),
+                lmth.th(null, dfaOriginRegex)
+            ];
+
+            for (const dfaInputSymbol of regexDfa['alphabet']) {
+                // Every destination state is wrappend in an array of length 1
+                const dfaDestinationRegex = dfaTransitionsForInput[dfaInputSymbol][0];
+                // Earlier, we assigned numbers to each regex.
+                const intRegexIndex = mapInvertedIndex.get(dfaDestinationRegex);
+                // Put that number into the cell.
+                arrRowContents.push(lmth.td(null, intRegexIndex));
+            }
+
+            const classes = ['.transition'];
+            if (regexDfa['regexes'][i]['matchesEmptyWord']) {
+                classes.push('.matches-empty-word');
+            }
+
+            if (dfaOriginRegex === regexDfa['initialRegex']) {
+                domTransitionsContainer.insertAdjacentElement('afterbegin',
+                    lmth.tr(classes.join(''), arrRowContents).toDOM()
+                );
+            } else {
+                domTransitionsContainer.appendChild(
+                    lmth.tr(classes.join(''), arrRowContents).toDOM()
+                );
+            }
+        }
+    }
 
     function renderEquivalenceCheckingResult(form, result, itemsFromConstraint) {
         renderWitnesses(form, result);

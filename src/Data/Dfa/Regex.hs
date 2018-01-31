@@ -5,6 +5,7 @@ module Data.Dfa.Regex
     ( RegexDfa
     , RegexDfaTransitions
     , fromRegex
+    , initialRegex
     , transitions
     ) where
 
@@ -22,7 +23,11 @@ type RegexDfaTransitions c = Map (Regex c) (Map c (Regex c))
 data RegexDfa c = RegexDfa
     { _transitions  :: RegexDfaTransitions c
     , _inputSymbols :: Set c
+    , _initialRegex :: Regex c
     }
+
+initialRegex :: RegexDfa c -> Regex c
+initialRegex = _initialRegex
 
 -- Hack to keep the record from being modified
 transitions :: RegexDfa c -> RegexDfaTransitions c
@@ -46,4 +51,8 @@ instance Ord c => FiniteAutomaton (RegexDfa c) (Regex c) c Bool where
             Nothing -> Map.fromSet (\c -> Set.singleton $ derive c r) (_inputSymbols regexDfa)
 
 fromRegex :: Ord c => Regex c -> RegexDfa c
-fromRegex regex = RegexDfa {_transitions = deriveRegexToDfa regex, _inputSymbols = alphabet regex}
+fromRegex regex = RegexDfa {
+            _transitions = deriveRegexToDfa regex
+         , _inputSymbols = alphabet regex
+         , _initialRegex = regex
+         }

@@ -37,3 +37,10 @@ code.operator:before, code.operator:after {
 .trace-list .checked {
     color: blue;
 }
+
+table td, table th {
+    border: 1px solid black;
+    border-collapse: collapse;
+    padding-left: 0.2em;
+    padding-right: 0.2em;
+}
