@@ -5,8 +5,8 @@ module DfaChecking
 import Control.Monad                      ( forM, forM_, when )
 import Control.Monad.Trans.Class          ( lift )
 import Control.Monad.Trans.Except         ( ExceptT, runExceptT, throwE )
+import Data.Bimap                         as Bimap
 import Data.List                          as List
-import Data.Map                           as Map
 import System.IO
 
 import Algorithm.DfaEquivalence
@@ -33,19 +33,18 @@ checkDfaEquivalence filename = do
             Left (NotDfaState s) ->
                 throwE $ "The following is not a DFA state: " ++ show s
             Right (maybeWitness, trace) -> do
-                let invStateMapping = invertedStateMapping stateMapping
-                forM_ trace (printConstraint invStateMapping)
+                forM_ trace (printConstraint stateMapping)
                 case maybeWitness of
                     Nothing -> return True
                     Just witness -> do
                         lift $ putStrLn "\nFailed on:"
-                        printConstraint invStateMapping (False, witness)
+                        printConstraint stateMapping (False, witness)
                         return False
 
-printConstraint :: Map Int String -> (Bool, Constraint Char) -> IOWithError ()
-printConstraint invStateMapping (skipped, (w, x, y)) = do
-    x' <- maybe (return "_|_") (translateState invStateMapping) x
-    y' <- maybe (return "_|_") (translateState invStateMapping) y
+printConstraint :: Bimap String Int -> (Bool, Constraint Char) -> IOWithError ()
+printConstraint stateMapping (skipped, (w, x, y)) = do
+    x' <- maybe (return "_|_") (translateState . Bimap.twist $ stateMapping) x
+    y' <- maybe (return "_|_") (translateState . Bimap.twist $ stateMapping) y
     lift $ do
         when skipped $ putStr "skipped"
         putChar '\t'
@@ -58,14 +57,14 @@ printConstraint invStateMapping (skipped, (w, x, y)) = do
 
 parseInput ::
        Maybe String
-    -> IOWithError (Dfa Char, Map.Map String Int, [Check String])
+    -> IOWithError (Dfa Char, Bimap String Int, [Check String])
 parseInput =
     maybe (relift $ parseInput' stdin) $ \file ->
         relift $ withFile file ReadMode parseInput'
   where
     parseInput' ::
            Handle
-        -> IO (Either String (Dfa Char, Map.Map String Int, [Check String]))
+        -> IO (Either String (Dfa Char, Bimap String Int, [Check String]))
     parseInput' stream =
         runExceptT $ do
             fileContents <- lift $ hGetContents stream
@@ -81,10 +80,10 @@ parseInput =
 equivalenceChecks :: [Check String] -> [Check String]
 equivalenceChecks = List.filter (\(_, operation, _) -> operation == Equivalence)
 
-translateState :: (Ord s, Show s) => Map.Map s s' -> s -> IOWithError s'
+translateState :: (Ord s, Ord s', Show s) => Bimap s s' -> s -> IOWithError s'
 translateState stateMapping state =
     maybe (throwE $ show state ++ " does not exist") return $
-    state `Map.lookup` stateMapping
+    state `Bimap.lookup` stateMapping
 
 ensureSingletonStateSet :: [s] -> IOWithError ()
 ensureSingletonStateSet stateSet =

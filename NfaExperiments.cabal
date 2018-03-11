@@ -47,6 +47,7 @@ library
                      , Language.RegexParser.Tokeniser
 
   build-depends:       base >= 4.7 && < 5
+                     , bimap
                      , containers
                      , either
                      , equivalence
@@ -58,11 +59,13 @@ library
   default-language:    Haskell2010
 
 executable automata-equivalence
-  hs-source-dirs:      app-automata-equivalence
-  main-is:             Main.hs
   ghc-options:         -threaded -rtsopts -with-rtsopts=-N -Wall
 
+  hs-source-dirs:      app-automata-equivalence
+  main-is:             Main.hs
+
   build-depends:       base
+                     , bimap
                      , containers
                      , NfaExperiments
                      , optparse-generic
@@ -75,9 +78,11 @@ executable automata-equivalence
   default-language:    Haskell2010
 
 executable regex-derivation
+  ghc-options:         -threaded -rtsopts -with-rtsopts=-N -Wall
+
   hs-source-dirs:      app-regex-derivation
   main-is:             Main.hs
-  ghc-options:         -threaded -rtsopts -with-rtsopts=-N -Wall
+
   build-depends:       base
                      , containers
                      , HaTeX
@@ -99,16 +104,20 @@ executable regex-derivation
   default-language:    Haskell2010
 
 executable website
-  hs-source-dirs:      website
   default-language:    Haskell2010
   default-extensions:  OverloadedStrings
+  ghc-options:         -threaded -rtsopts -with-rtsopts=-N -Wall
+
+  hs-source-dirs:      website
   main-is:             Main.hs
   other-modules:       Actions.Derivation
                      , Actions.FiniteAutomataEquivalence
                      , Actions.RegexEquivalence
                      , Actions.RegexToDfaConversion
+
   build-depends:
                        base                      >= 4     && < 5
+                     , bimap
                      , bytestring                >= 0.9.1 && < 0.11
                      , aeson
                      , containers
@@ -126,9 +135,15 @@ executable website
     ghc-options: -threaded -Wall -fwarn-tabs -funbox-strict-fields -O2
 
 executable benchmark
+  default-language:    Haskell2010
+  ghc-options:         -threaded -rtsopts -with-rtsopts=-N -O2 -Wall
+
   hs-source-dirs:      app-benchmark
   main-is:             Main.hs
-  ghc-options:         -threaded -rtsopts -with-rtsopts=-N -O2 -Wall
+  other-modules:       AutomataOutput
+                     , Interpolator
+                     , RandomNfa
+
   build-depends:       base
                      , containers
                      , criterion
@@ -142,10 +157,6 @@ executable benchmark
                      , time
                      -- For the Control.Monad.Trans.Except module
                      , transformers >= 0.4
-  other-modules:       AutomataOutput
-                     , Interpolator
-                     , RandomNfa
-  default-language:    Haskell2010
 
 test-suite NfaExperiments-test
   type:                exitcode-stdio-1.0

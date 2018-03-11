@@ -9,10 +9,11 @@ import           Data.ByteString.Lazy         as LBS
 import           Data.ByteString.UTF8         as UTF8
 import           Data.Either.Combinators      ( mapLeft )
 import           Data.IntSet                  ( fromList, toList )
-import           Data.Map                     ( Map, lookup )
+import           Data.Bimap                   ( Bimap, lookup, lookupR )
 import           Data.Maybe                   ( fromJust )
 import           Data.Monoid                  ( (<>) )
 import qualified Data.Text.Lazy               as T
+import           Prelude                      hiding ( lookup )
 import           Snap.Core
 
 import           Algorithm.NfaEquivalence
@@ -104,11 +105,10 @@ equivalent (Just utf8Body)
                 nfa
                 (Data.IntSet.fromList stateSet1')
                 (Data.IntSet.fromList stateSet2')
-        invStateMapping = invertedStateMapping stateMapping
-        trace' = Prelude.map (translatedTrace invStateMapping) trace
+        trace' = Prelude.map (translatedTrace stateMapping) trace
     case maybeWitness of
         Nothing -> return (Equivalent trace')
-        Just witness -> return (NotEquivalent (translatedConstraint invStateMapping witness) trace')
+        Just witness -> return (NotEquivalent (translatedConstraint stateMapping witness) trace')
 
 fromUtf8 :: UTF8.ByteString -> Maybe String
 fromUtf8 bs = do
@@ -119,28 +119,28 @@ fromUtf8 bs = do
 
 -- | Translate a set of user input states to the internal states needed for computing equivalence
 -- The user could have specified nonexisting states, so we have to watch out for that
-translateState :: (Ord s, Show s) => Map s s' -> s -> Either EquivalenceError s'
+translateState :: (Ord s, Ord s', Show s) => Bimap s s' -> s -> Either EquivalenceError s'
 translateState stateMapping state =
     maybe
         (Left . CheckedStateDoesNotExist . show $ state)
         return
-        (state `Data.Map.lookup` stateMapping)
+        (state `lookup` stateMapping)
 
-translatedTrace :: Map Int String -> (Bool, Constraint Char) -> Trace
-translatedTrace invStateMapping (skipped, constraint) =
+translatedTrace :: Bimap String Int -> (Bool, Constraint Char) -> Trace
+translatedTrace stateMapping (skipped, constraint) =
     Trace
     { stateSetChecked = not skipped
-    , stateSetConstraint = translatedConstraint invStateMapping constraint
+    , stateSetConstraint = translatedConstraint stateMapping constraint
     }
 
 -- | Map back state numbers to the state names specified by the user
 -- There will be no check whether the state numbers are valid because they are supposed to come from the compiler.
-translatedConstraint :: Map Int String -> Constraint Char -> PrettyConstraint
+translatedConstraint :: Bimap String Int -> Constraint Char -> PrettyConstraint
 translatedConstraint invStateMapping (input, stateSet1, stateSet2) =
     let prettyStateSet1 =
-            Prelude.map (fromJust . (`Data.Map.lookup` invStateMapping)) . Data.IntSet.toList $
+            Prelude.map (fromJust . (`lookupR` invStateMapping)) . Data.IntSet.toList $
             stateSet1
         prettyStateSet2 =
-            Prelude.map (fromJust . (`Data.Map.lookup` invStateMapping)) . Data.IntSet.toList $
+            Prelude.map (fromJust . (`lookupR` invStateMapping)) . Data.IntSet.toList $
             stateSet2
     in PrettyConstraint input prettyStateSet1 prettyStateSet2
