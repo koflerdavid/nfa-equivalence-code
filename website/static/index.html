@@ -139,7 +139,10 @@
             <button type="button" class="dagger-input-addon" data-for="txtRegex">&#x2020;</button>
         </div>
 
-        <button type="submit">Derive!</button>
+        <div class="form-row">
+            <button type="submit">Derive!</button>
+            <button class="clear-button" data-for=".output-container" type="button">Clear Output</button>
+        </div>
 
         <div class="form-row output-container hidden" id="divDerivationOutput">
             <label for="wordDerivationOutput">Result:</label>
@@ -173,7 +176,10 @@
             <button type="button" class="dagger-input-addon" data-for="txtInputRegex2">&#x2020;</button>
         </div>
 
-        <button type="submit">Check Equivalence</button>
+        <div class="form-row">
+            <button type="submit">Check Equivalence</button>
+            <button class="clear-button" data-for=".output-container, .trace-container" type="button">Clear Output</button>
+        </div>
 
         <div class="form-row output-container hidden">
             <label>Result:</label>
@@ -220,7 +226,11 @@
             <textarea name="regex" rows="5" cols="30" id="txtInputRegex"></textarea>
             <button type="button" class="dagger-input-addon" data-for="txtInputRegex">&#x2020;</button>
         </div>
-        <button type="submit">Convert!</button>
+
+        <div class="form-row">
+            <button type="submit">Convert!</button>
+            <button class="clear-button" data-for=".output-container" type="button">Clear Output</button>
+        </div>
 
         <div class="form-row output-container hidden" id="divDfaOutput">
             <label>DFA:</label>
@@ -323,7 +333,11 @@
             <label for="txtAutomatonEquivalenceSpecification">Automaton and Equivalence Specification:</label>
             <textarea name="input" rows="10" cols="30" id="txtAutomatonEquivalenceSpecification"></textarea>
         </div>
-        <button type="submit">Check Equivalence</button>
+
+        <div class="form-row">
+            <button type="submit">Check Equivalence</button>
+            <button class="clear-button" data-for=".output-container, .trace-container" type="button">Clear Output</button>
+        </div>
 
         <div class="form-row output-container hidden">
             <label>Result:</label>
@@ -640,6 +654,27 @@
         } else {
             console.error('The input field with the id ' + inputFieldId + ' was not found');
         }
+    }
+</script>
+<script type="application/javascript">
+    'use strict';
+
+    for (let clearButton of document.getElementsByClassName('clear-button')) {
+        // console.info(clearButton);
+
+        clearButton.addEventListener('click', function () {
+            const containingForm = DomUtiltities.firstParent(clearButton, 'form');
+            if (containingForm == null) {
+                return;
+            }
+
+            const selector = clearButton.getAttribute('data-for')
+                , toHide = containingForm.querySelectorAll(selector);
+
+            for (let element of toHide) {
+                DomUtiltities.hideElement(element);
+            }
+        });
     }
 </script>
 </body>

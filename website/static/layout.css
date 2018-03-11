@@ -53,7 +53,7 @@ textarea + .dagger-input-addon {
         padding-right: 1em;
     }
 
-    .form-rows input, .form-rows textarea, .form-rows output {
+    .form-rows input, .form-rows textarea, .form-rows output, .form-rows button {
         display: table-cell;
     }
 

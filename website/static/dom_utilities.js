@@ -27,10 +27,29 @@ window.DomUtiltities = (function (undefined) {
         element.classList.add('hidden');
     }
 
+    function firstParent(element, predicate) {
+        for (let parent = element.parentNode; parent != null; parent = parent.parentNode) {
+            if (!predicate) {
+                return parent;
+            }
+
+            if (typeof predicate === 'string' && parent.matches(predicate)) {
+                return parent;
+            }
+
+            if (typeof predicate === 'function' && predicate.call(null, parent)) {
+                return parent;
+            }
+        }
+
+        return null;
+    }
+
     return {
         removeImmediateChildNodes: removeImmediateChildNodes,
         removeChildNodes: removeChildNodes,
         makeElementVisible: makeElementVisible,
-        hideElement: hideElement
+        hideElement: hideElement,
+        firstParent: firstParent
     };
 })();
