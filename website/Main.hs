@@ -15,7 +15,7 @@ main = quickHttpServe site
 
 site :: Snap ()
 site =
-    ifTop (sendFile "website/static/index.html") <|>
+    ifTop (modifyResponse (setContentType "text/html; charset=utf-8") >> sendFile "website/static/index.html") <|>
     route
         [ ("finiteAutomata/equivalence", FiniteAutomataEquivalence.action)
         , ("regex/derivation", Derivation.action)
