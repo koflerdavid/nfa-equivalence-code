@@ -1,9 +1,11 @@
 {-# LANGUAGE FlexibleInstances #-}
+{-# OPTIONS_GHC -fno-warn-orphans #-}
 
 module Actions.RegexToDfaConversion
     ( action
     ) where
 
+import           Data.Dfa.Format.Hknt ( NameGenerator, toHknt )
 import           Data.Dfa.Regex       ( RegexDfa, fromRegex, initialRegex )
 import           Data.FiniteAutomaton
 import           Data.Regex           ( Regex, matchesEmptyWord )
@@ -11,15 +13,13 @@ import           Data.Regex.Formats   ( MinimallyQuotedRegex (..) )
 import           Language.RegexParser ( parseRegex )
 
 import           Control.Monad        ( when )
-import           Data.Aeson           ( ToJSON (toJSON), ToJSONKey (..),
-                                        Value (String), object, (.=) )
+import           Data.Aeson           ( ToJSON (toJSON), Value(String), object, (.=) )
 import           Data.Aeson.Text      ( encodeToLazyText )
 import           Data.Aeson.Types     ( Pair )
 import           Data.ByteString.UTF8 as UTF8
-import           Data.Maybe           ( isJust )
 import           Data.Monoid          ( (<>) )
 import qualified Data.Set             ( toList )
-import qualified Data.Text            as TS
+import qualified Data.Text            as T
 import           Snap.Core
 
 action :: Snap ()
@@ -38,7 +38,6 @@ action =
                     Left parseError ->
                         badRequestError . UTF8.fromString $ "Regex parse error:\n" <> parseError
                     Right regex -> do
-                        withoutSkeleton <- (isJust . getHeader "X-Embeddable") <$> getRequest
                         writeLazyText . encodeToLazyText . JsonRegexDfa . fromRegex $ regex
 
 badRequestError :: ByteString -> Snap ()
@@ -48,11 +47,10 @@ badRequestError description = do
     writeBS description
     finishWith =<< getResponse
 
-data JsonRegexDfa =
-    JsonRegexDfa (RegexDfa Char)
+newtype JsonRegexDfa = JsonRegexDfa (RegexDfa Char)
 
 instance ToJSON (Regex Char) where
-    toJSON = String . TS.pack . show . MinimallyQuotedRegex
+    toJSON = String . toText . MinimallyQuotedRegex
 
 instance ToJSON JsonRegexDfa where
     toJSON (JsonRegexDfa regexDfa) =
@@ -61,12 +59,14 @@ instance ToJSON JsonRegexDfa where
             , "initialRegex" .= initialRegex regexDfa
             , "regexes" .= (map regexData . Data.Set.toList . faStates $ regexDfa)
             , "transitionTable" .= object (transitionTable regexDfa)
+            , "hkntRepresentation" .= toHknt regexDfa regexNameGenerator
             ]
       where
         transitionTable :: RegexDfa Char -> [Pair]
         transitionTable =
-            map (\r -> toText (MinimallyQuotedRegex r) .= faTransitions regexDfa r) .
-            Data.Set.toList . faStates
+            map (\r -> toText (MinimallyQuotedRegex r) .= faTransitions regexDfa r)
+            . Data.Set.toList
+            . faStates
 
         regexData :: Regex Char -> Value
         regexData regex = object [
@@ -74,5 +74,10 @@ instance ToJSON JsonRegexDfa where
               , "matchesEmptyWord" .= matchesEmptyWord regex
             ]
 
-toText :: Show a => a -> TS.Text
-toText = TS.pack . show
+regexNameGenerator :: NameGenerator Int (Regex Char) T.Text
+regexNameGenerator = (1, nextName)
+    where
+        nextName _regex state = (succ state, "r" <> toText state)
+
+toText :: Show a => a -> T.Text
+toText = T.pack . show

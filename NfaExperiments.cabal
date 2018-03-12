@@ -25,6 +25,7 @@ library
                      , Compiler.Hknt
                      , Compiler.Regex
                      , Data.Dfa
+                     , Data.Dfa.Format.Hknt
                      , Data.Dfa.Format.Html
                      , Data.Dfa.Regex
                      , Data.EpsilonNfa
@@ -48,7 +49,8 @@ library
 
   build-depends:       base >= 4.7 && < 5
                      , bimap
-                     , containers
+                     -- For Data.Map.!?
+                     , containers >= 0.5.9.1
                      , either
                      , equivalence
                      , lucid

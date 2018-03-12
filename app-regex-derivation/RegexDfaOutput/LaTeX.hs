@@ -5,7 +5,8 @@ module RegexDfaOutput.LaTeX
     ( printTransitionTable
     ) where
 
-import Data.Dfa.Regex               ( RegexDfaTransitions, fromRegex, transitions )
+import Data.Dfa.Regex               ( RegexDfaTransitions, fromRegex,
+                                      transitions )
 import Data.Regex
 
 import Data.List                    as List
@@ -25,12 +26,12 @@ printTransitionTable :: Bool -> Regex Char -> IO ()
 printTransitionTable withoutSkeleton regex = do
     let regexAlphabet = alphabet regex
         firstColumn = [LeftColumn, DVerticalLine]
-        stateColumns = take (2 * Set.size regexAlphabet) $ cycle [LeftColumn, VerticalLine]
+        stateColumns = repeatList (Set.size regexAlphabet) [LeftColumn, VerticalLine]
         table =
             tabular
                 (Just Center)
                 (firstColumn ++ stateColumns)
-                (tableHeader regexAlphabet <> lnbk <> hline <> (tableBody . transitions . fromRegex $ regex))
+                (tableHeader regexAlphabet <> lnbk <> hline <> ((tableBody . transitions) (fromRegex regex)))
         theDocument =
             if withoutSkeleton
                 then table
@@ -68,9 +69,10 @@ stateTransitions r ts = columns
     theTitle = maybeStar <> regexRepr r
     columns = List.foldl1 (&) (theTitle : (List.map regexRepr . Map.elems $ ts)) <> lnbk
 
-newtype TexyRegex c = TexyRegex
-    { innerRegex :: Regex c
-    }
+repeatList :: Int -> [a] -> [a]
+repeatList n = List.concat . List.replicate n
+
+newtype TexyRegex c = TexyRegex { innerRegex :: Regex c }
 
 instance Texy (TexyRegex Char) where
     texy r = math $ texyPrec 0 $ innerRegex r

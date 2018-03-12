@@ -7,7 +7,7 @@ import Data.Regex
 
 import Control.Monad.Trans.State.Strict
 import Data.Foldable                    ( toList )
-import Data.Sequence                    as Seq
+import Data.Sequence                    as Seq hiding ( Empty )
 
 type FaState = Int
 

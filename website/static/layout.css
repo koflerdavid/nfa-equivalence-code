@@ -43,21 +43,21 @@ textarea + .dagger-input-addon {
         padding-right: 20%;
     }
 
-    .form-rows {
-        display: table;
+    .form-rows .form-row {
+        display: table-row;
     }
 
-    .form-rows label {
+    .form-row label {
         display: table-cell;
         vertical-align: top;
         padding-right: 1em;
     }
 
-    .form-rows input, .form-rows textarea, .form-rows output, .form-rows button {
+    .form-row input, .form-row textarea, .form-row output, .form-row button {
         display: table-cell;
     }
 
-    .form-rows .form-row {
-        display: table-row;
+    .button-group button {
+        display: inline-block;
     }
 }

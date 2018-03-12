@@ -139,7 +139,7 @@
             <button type="button" class="dagger-input-addon" data-for="txtRegex">&#x2020;</button>
         </div>
 
-        <div class="form-row">
+        <div class="button-group">
             <button type="submit">Derive!</button>
             <button class="clear-button" data-for=".output-container" type="button">Clear Output</button>
         </div>
@@ -176,7 +176,7 @@
             <button type="button" class="dagger-input-addon" data-for="txtInputRegex2">&#x2020;</button>
         </div>
 
-        <div class="form-row">
+        <div class="button-group">
             <button type="submit">Check Equivalence</button>
             <button class="clear-button" data-for=".output-container, .trace-container" type="button">Clear Output</button>
         </div>
@@ -227,9 +227,10 @@
             <button type="button" class="dagger-input-addon" data-for="txtInputRegex">&#x2020;</button>
         </div>
 
-        <div class="form-row">
+        <div class="button-group">
             <button type="submit">Convert!</button>
             <button class="clear-button" data-for=".output-container" type="button">Clear Output</button>
+            <button class="to-equivalence-check" type="button">Copy to Equivalence Check</button>
         </div>
 
         <div class="form-row output-container hidden" id="divDfaOutput">
@@ -255,7 +256,9 @@
                     <tbody></tbody>
                 </table>
             </div>
+
         </div>
+        <div class="dfa-as-hknt" style="display: none;"></div>
     </div>
 </form>
 
@@ -334,7 +337,7 @@
             <textarea name="input" rows="10" cols="30" id="txtAutomatonEquivalenceSpecification"></textarea>
         </div>
 
-        <div class="form-row">
+        <div class="button-group">
             <button type="submit">Check Equivalence</button>
             <button class="clear-button" data-for=".output-container, .trace-container" type="button">Clear Output</button>
         </div>
@@ -399,6 +402,9 @@
                 try {
                     const result = JSON.parse(request.responseText);
                     renderRegexDfa(document.getElementById('divDfaOutput'), result);
+
+                    form.dataset['hkntRepresentation'] = result['hkntRepresentation'];
+
                     DomUtiltities.makeElementVisible(document.getElementById('divDfaOutput'));
                 } catch (e) {
                     if (e.name === 'SyntaxError') {
@@ -660,8 +666,6 @@
     'use strict';
 
     for (let clearButton of document.getElementsByClassName('clear-button')) {
-        // console.info(clearButton);
-
         clearButton.addEventListener('click', function () {
             const containingForm = DomUtiltities.firstParent(clearButton, 'form');
             if (containingForm == null) {
@@ -676,6 +680,27 @@
             }
         });
     }
+</script>
+<script type="application/javascript">
+    'use strict';
+
+    (function () {
+        const button = document.querySelector('#frmRegexToDfa .to-equivalence-check');
+        button.addEventListener('click', function () {
+            const hkntContainer = document.getElementById('frmRegexToDfa')
+                , hkntRepresentation = hkntContainer.dataset['hkntRepresentation'] || '';
+
+            if (hkntRepresentation.trim() !== '') {
+                const automataEquivalenceInput = document.getElementById('txtAutomatonEquivalenceSpecification')
+                    , automataEquivalenceHeading = document.getElementById('sectionFiniteAutomataEquivalence');
+
+                automataEquivalenceInput.value = hkntRepresentation;
+                automataEquivalenceHeading.scrollIntoView({
+                    behavior: 'smooth'
+                });
+            }
+        });
+    })();
 </script>
 </body>
 </html>
