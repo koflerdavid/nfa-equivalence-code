@@ -13,7 +13,7 @@ import           Data.Regex.Formats   ( MinimallyQuotedRegex (..) )
 import           Language.RegexParser ( parseRegex )
 
 import           Control.Monad        ( when )
-import           Data.Aeson           ( ToJSON (toJSON), Value(String), object, (.=) )
+import           Data.Aeson           ( ToJSON (toJSON), Value (String), object, (.=) )
 import           Data.Aeson.Text      ( encodeToLazyText )
 import           Data.Aeson.Types     ( Pair )
 import           Data.ByteString.UTF8 as UTF8
@@ -69,15 +69,16 @@ instance ToJSON JsonRegexDfa where
             . faStates
 
         regexData :: Regex Char -> Value
-        regexData regex = object [
-                "regex" .= (toText . MinimallyQuotedRegex) regex
-              , "matchesEmptyWord" .= matchesEmptyWord regex
-            ]
+        regexData regex =
+            object
+                [ "regex" .= (toText . MinimallyQuotedRegex) regex
+                , "matchesEmptyWord" .= matchesEmptyWord regex
+                ]
 
 regexNameGenerator :: NameGenerator Int (Regex Char) T.Text
 regexNameGenerator = (1, nextName)
-    where
-        nextName _regex state = (succ state, "r" <> toText state)
+  where
+    nextName _regex state = (succ state, "r" <> toText state)
 
 toText :: Show a => a -> T.Text
 toText = T.pack . show
