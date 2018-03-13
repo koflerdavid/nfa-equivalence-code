@@ -1,5 +1,5 @@
 name:                NfaExperiments
-version:             1.0.0.0
+version:             1.1.0.0
 synopsis:            A collection of more or less efficient algorithms for simplifying finite automata and proving their equivalence.
 description:         Please see README.md
 homepage:            https://github.com/koflerdavid/nfa-equivalence-code#readme
