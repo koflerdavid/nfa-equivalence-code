@@ -1,14 +1,17 @@
+{-# LANGUAGE OverloadedStrings #-}
+
 module Compiler.HkntSpec
     ( main
     , spec
     ) where
 
-import Compiler.Hknt
-import Data.Dfa
-import Language.Automata.HkntParser
+import           Compiler.Hknt
+import           Data.Dfa
+import           Language.Automata.HkntParser
 
-import Control.Monad
-import Test.Hspec
+import           Control.Monad
+import qualified Data.Text        as T
+import           Test.Hspec
 
 main :: IO ()
 main = hspec spec
@@ -24,5 +27,5 @@ spec = do
         Result transitions acceptingStates _ <- parseHknt input
         fst <$> compileHkntToDfa transitions acceptingStates
 
-cases :: [(String, Dfa Char)]
+cases :: [(T.Text, Dfa Char)]
 cases = [("accept: a b", buildDfaUnsafe [0, 1] [])]

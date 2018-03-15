@@ -1,8 +1,12 @@
+{-# LANGUAGE OverloadedStrings #-}
+
 module HkntSamples where
 
-import Data.Nfa
+import           Data.Nfa
 
-introductionInHkntFormat :: String
+import qualified Data.Text as T
+
+introductionInHkntFormat :: T.Text
 introductionInHkntFormat =
     "x -a-> y\n\
     \y -a-> z\n\

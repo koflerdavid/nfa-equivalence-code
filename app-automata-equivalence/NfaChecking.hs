@@ -2,19 +2,20 @@ module NfaChecking
     ( checkNfaEquivalence
     ) where
 
-import Control.Monad                ( forM, forM_, mapM, when )
-import Control.Monad.Trans.Class    ( lift )
-import Control.Monad.Trans.Except   ( ExceptT, runExceptT, throwE )
-import Data.Bimap                   as Bimap hiding ( fromList, toList )
-import Data.IntSet                  ( fromList, toList )
-import Data.List                    as List
-import System.IO                    ( IOMode (ReadMode), hGetContents,
-                                      hPutStrLn, stderr, stdin, withFile )
+import           Algorithm.NfaEquivalence
+import           Compiler.Hknt
+import           Data.Nfa
+import           Language.Automata.HkntParser
 
-import Algorithm.NfaEquivalence
-import Compiler.Hknt
-import Data.Nfa
-import Language.Automata.HkntParser
+import           Control.Monad                ( forM, forM_, mapM, when )
+import           Control.Monad.Trans.Class    ( lift )
+import           Control.Monad.Trans.Except   ( ExceptT, runExceptT, throwE )
+import           Data.Bimap                   as Bimap hiding ( fromList, toList )
+import           Data.IntSet                  ( fromList, toList )
+import           Data.List                    as List
+import qualified Data.Text.IO                 as TIO
+import           System.IO                    ( IOMode (ReadMode), hPutStrLn,
+                                                stderr, stdin, withFile )
 
 type IOWithError a = ExceptT String IO a
 
@@ -24,9 +25,7 @@ checkNfaEquivalence filename = do
     forM (equivalenceChecks checks) $ \(stateSet1, _, stateSet2) -> do
         let (strStateSet1, strStateSet2) = (show stateSet1, show stateSet2)
         lift $
-            hPutStrLn stderr $
-            "Checking equivalence of " ++
-            strStateSet1 ++ " and " ++ strStateSet2
+            hPutStrLn stderr ("Checking equivalence of " ++ strStateSet1 ++ " and " ++ strStateSet2)
         stateSet1' <- mapM (translateState stateMapping) stateSet1
         stateSet2' <- mapM (translateState stateMapping) stateSet2
         let (maybeWitness, trace) =
@@ -61,7 +60,7 @@ parseInput =
   where
     parseInput' stream =
         runExceptT $ do
-            fileContents <- lift $ hGetContents stream
+            fileContents <- lift (TIO.hGetContents stream)
             either throwE return $ do
                 Result transitions acceptingStates checks <- parseHknt fileContents
                 (nfa, stateMapping) <- compileHkntToNfa transitions acceptingStates

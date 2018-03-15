@@ -1,15 +1,18 @@
+{-# LANGUAGE OverloadedStrings #-}
+
 module Language.Automata.HkntParser.TokeniserSpec
     ( main
     , spec
     ) where
 
-import HkntSamples
-import Language.Automata.HkntParser.Class
-import Language.Automata.HkntParser.Tokeniser
+import           HkntSamples
+import           Language.Automata.HkntParser.Class
+import           Language.Automata.HkntParser.Tokeniser
 
-import Control.Monad                          ( forM_ )
-import Test.Hspec
-import Text.Parsec
+import           Control.Monad                          ( forM_ )
+import qualified Data.Text                              as T
+import           Test.Hspec
+import           Text.Parsec
 
 main :: IO ()
 main = hspec spec
@@ -115,5 +118,5 @@ spec = do
                     , Newline
                     ]
 
-tokensFromInput :: String -> Either ParseError [Token]
+tokensFromInput :: T.Text -> Either ParseError [Token]
 tokensFromInput = fmap (map snd) . tokenise

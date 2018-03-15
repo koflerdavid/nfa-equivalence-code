@@ -2,17 +2,20 @@ module DfaChecking
     ( checkDfaEquivalence
     ) where
 
-import Control.Monad                      ( forM, forM_, when )
-import Control.Monad.Trans.Class          ( lift )
-import Control.Monad.Trans.Except         ( ExceptT, runExceptT, throwE )
-import Data.Bimap                         as Bimap
-import Data.List                          as List
-import System.IO
+import           Algorithm.DfaEquivalence
+import           Compiler.Hknt
+import           Data.Dfa
+import           Language.Automata.HkntParser
 
-import Algorithm.DfaEquivalence
-import Compiler.Hknt
-import Data.Dfa
-import Language.Automata.HkntParser
+import           Control.Monad                ( forM, forM_, when )
+import           Control.Monad.Trans.Class    ( lift )
+import           Control.Monad.Trans.Except   ( ExceptT, runExceptT, throwE )
+import           Data.Bimap                   as Bimap
+import           Data.List                    as List
+import qualified Data.Text.IO                 as TIO
+import           System.IO                    ( Handle, IOMode (ReadMode),
+                                                hPutStrLn, stderr, stdin,
+                                                withFile )
 
 type IOWithError a = ExceptT String IO a
 
@@ -23,9 +26,7 @@ checkDfaEquivalence filename = do
         ensureSingletonStateSet stateSet1
         ensureSingletonStateSet stateSet2
         let (state1, state2) = (head stateSet1, head stateSet2)
-        lift $
-            hPutStrLn stderr $
-            "Checking equivalence of " ++ state1 ++ " and " ++ state2
+        lift $ hPutStrLn stderr ("Checking equivalence of " ++ state1 ++ " and " ++ state2)
         state1' <- translateState stateMapping state1
         state2' <- translateState stateMapping state2
         let result = dfaStatesDifferencesHk dfa (Just state1') (Just state2')
@@ -55,24 +56,18 @@ printConstraint stateMapping (skipped, (w, x, y)) = do
         putStr y'
         putChar '\n'
 
-parseInput ::
-       Maybe String
-    -> IOWithError (Dfa Char, Bimap String Int, [Check String])
+parseInput :: Maybe String -> IOWithError (Dfa Char, Bimap String Int, [Check String])
 parseInput =
     maybe (relift $ parseInput' stdin) $ \file ->
         relift $ withFile file ReadMode parseInput'
   where
-    parseInput' ::
-           Handle
-        -> IO (Either String (Dfa Char, Bimap String Int, [Check String]))
+    parseInput' :: Handle -> IO (Either String (Dfa Char, Bimap String Int, [Check String]))
     parseInput' stream =
         runExceptT $ do
-            fileContents <- lift $ hGetContents stream
+            fileContents <- lift $ TIO.hGetContents stream
             either throwE return $ do
-                Result transitions acceptingStates checks <-
-                    parseHknt fileContents
-                (dfa, stateMapping) <-
-                    compileHkntToDfa transitions acceptingStates
+                Result transitions acceptingStates checks <- parseHknt fileContents
+                (dfa, stateMapping) <- compileHkntToDfa transitions acceptingStates
                 return (dfa, stateMapping, checks)
     relift :: IO (Either String a) -> IOWithError a
     relift m = lift m >>= either throwE return
@@ -82,11 +77,11 @@ equivalenceChecks = List.filter (\(_, operation, _) -> operation == Equivalence)
 
 translateState :: (Ord s, Ord s', Show s) => Bimap s s' -> s -> IOWithError s'
 translateState stateMapping state =
-    maybe (throwE $ show state ++ " does not exist") return $
-    state `Bimap.lookup` stateMapping
+    case state `Bimap.lookup` stateMapping of
+        Nothing -> throwE (show state ++ " does not exist")
+        Just name -> return name
 
 ensureSingletonStateSet :: [s] -> IOWithError ()
 ensureSingletonStateSet stateSet =
     when (length stateSet > 1) $ do
-        throwE
-            "Use the NFA mode if the equivalence of sets of states shall be checked."
+        throwE "Use the NFA mode if the equivalence of sets of states shall be checked."

@@ -12,14 +12,15 @@ import           Data.Regex           ( Regex, matchesEmptyWord )
 import           Data.Regex.Formats   ( MinimallyQuotedRegex (..) )
 import           Language.RegexParser ( parseRegex )
 
-import           Control.Monad        ( when )
-import           Data.Aeson           ( ToJSON (toJSON), Value (String), object, (.=) )
+import           Data.Aeson           ( ToJSON (toJSON), Value (String), object,
+                                        (.=) )
 import           Data.Aeson.Text      ( encodeToLazyText )
 import           Data.Aeson.Types     ( Pair )
-import           Data.ByteString.UTF8 as UTF8
+import           Data.Bifunctor       ( first )
 import           Data.Monoid          ( (<>) )
 import qualified Data.Set             ( toList )
 import qualified Data.Text            as T
+import           Data.Text.Encoding   ( decodeUtf8' )
 import           Snap.Core
 
 action :: Snap ()
@@ -28,23 +29,19 @@ action =
         setTimeout 10
         modifyResponse $ setContentType "application/json; charset=utf-8"
         mRegexString <- getParam "regex"
-        case mRegexString of
-            Nothing -> badRequestError "No regex given"
-            Just utf8RegexString -> do
-                let regexString = UTF8.toString utf8RegexString
-                when (UTF8.replacement_char `elem` regexString) $
-                    badRequestError "UTF-8 decoding error"
-                case parseRegex "<param>" regexString of
-                    Left parseError ->
-                        badRequestError . UTF8.fromString $ "Regex parse error:\n" <> parseError
-                    Right regex -> do
-                        writeLazyText . encodeToLazyText . JsonRegexDfa . fromRegex $ regex
+        either badRequestError (writeLazyText . encodeToLazyText . JsonRegexDfa) $ do
+            utf8RegexString <- maybe (Left "No regex given") Right mRegexString
+            regexString <- first (const "UTF-8 decoding error") $ decodeUtf8' utf8RegexString
+            regex <-
+                first (\err -> "Regex parse error:\n" <> T.pack err) $
+                parseRegex "<param>" regexString
+            return $! fromRegex regex
 
-badRequestError :: ByteString -> Snap ()
+badRequestError :: T.Text -> Snap ()
 badRequestError description = do
     modifyResponse $ setResponseCode 400
     modifyResponse $ setContentType "text/plain; charset=utf-8"
-    writeBS description
+    writeText description
     finishWith =<< getResponse
 
 newtype JsonRegexDfa = JsonRegexDfa (RegexDfa Char)

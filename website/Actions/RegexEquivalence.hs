@@ -1,4 +1,5 @@
 {-# LANGUAGE FlexibleInstances #-}
+{-# OPTIONS_GHC -fno-warn-orphans #-}
 
 module Actions.RegexEquivalence
     ( action
@@ -13,17 +14,18 @@ import           Data.Aeson                  ( ToJSON (toJSON), Value (String),
                                                object, (.=) )
 import           Data.Aeson.Text             ( encodeToLazyText )
 import           Data.Bifunctor              ( first )
-import           Data.ByteString.UTF8        as UTF8
+import           Data.ByteString             ( ByteString )
 import           Data.Monoid                 ( (<>) )
-import qualified Data.Text                   as TS
-import qualified Data.Text.Lazy              as T
+import qualified Data.Text                   as T
+import           Data.Text.Encoding          ( decodeUtf8' )
+import qualified Data.Text.Lazy              as TL
 import           Snap.Core
 
 data Parameter
     = Regex1
     | Regex2
 
-asText :: Parameter -> T.Text
+asText :: Parameter -> TL.Text
 asText Regex1 = "regex 1"
 asText Regex2 = "regex 2"
 
@@ -51,7 +53,7 @@ instance ToJSON EquivalenceResult where
         object ["equivalent" .= False, "witnesses" .= witnesses, "trace" .= trace]
 
 instance ToJSON (MinimallyQuotedRegex Char) where
-    toJSON = String . TS.pack . show
+    toJSON = String . T.pack . show
 
 instance ToJSON TraceElement where
     toJSON traceElement =
@@ -60,7 +62,10 @@ instance ToJSON TraceElement where
                [ "checked" .= traceConsidered traceElement
                , "constraint" .=
                  object
-                     ["input" .= input, "regex1" .= MinimallyQuotedRegex regex1, "regex2" .= MinimallyQuotedRegex regex2]
+                     [ "input" .= input
+                     , "regex1" .= MinimallyQuotedRegex regex1
+                     , "regex2" .= MinimallyQuotedRegex regex2
+                     ]
                ]
 
 action :: Snap ()
@@ -75,11 +80,11 @@ action =
                     RegexMissing p -> writeLazyText $ "The parameter " <> asText p <> " is missing"
                     Utf8DecodeError p ->
                         writeLazyText $
-                        "The parameter " <> asText p <> " contains invalid UTF8 codepoints"
+                            "The parameter " <> asText p <> " contains invalid UTF8 codepoints"
                     RegexParseError p syntaxError ->
                         writeLazyText $
-                        "The parameter " <> asText p <> " contains a syntax error:\n" <>
-                        T.pack syntaxError
+                            "The parameter " <> asText p <> " contains a syntax error:\n" <>
+                            TL.pack syntaxError
             Right result -> do
                 modifyResponse $ setContentType "application/json"
                 writeLazyText . encodeToLazyText $ result
@@ -88,10 +93,8 @@ equivalent :: Maybe ByteString -> Maybe ByteString -> Either EquivalenceError Eq
 equivalent Nothing _ = Left (RegexMissing Regex1)
 equivalent _ Nothing = Left (RegexMissing Regex2)
 equivalent (Just utf8RegexString1) (Just utf8RegexString2) = do
-    regexString1 <-
-        maybe (Left $ Utf8DecodeError Regex1) Right (fromUtf8 utf8RegexString1)
-    regexString2 <-
-        maybe (Left $ Utf8DecodeError Regex2) Right (fromUtf8 utf8RegexString2)
+    regexString1 <- first (const (Utf8DecodeError Regex1)) $ decodeUtf8' utf8RegexString1
+    regexString2 <- first (const (Utf8DecodeError Regex2)) $ decodeUtf8' utf8RegexString2
     regex1 <- first (RegexParseError Regex1) $ parseRegex "regex1" regexString1
     regex2 <- first (RegexParseError Regex2) $ parseRegex "regex2" regexString2
     let (witnesses, trace) = getDifferences regex1 regex2
@@ -101,13 +104,6 @@ equivalent (Just utf8RegexString1) (Just utf8RegexString2) = do
              NotEquivalent
                  (map (\(witness, _, _) -> witness) witnesses)
                  (map convertTraceElement trace)
-
-fromUtf8 :: ByteString -> Maybe String
-fromUtf8 bs = do
-    let str = UTF8.toString bs
-    if UTF8.replacement_char `elem` str
-        then Nothing
-        else Just str
 
 convertTraceElement :: (Bool, (String, Regex Char, Regex Char)) -> TraceElement
 convertTraceElement (skipped, witness) =

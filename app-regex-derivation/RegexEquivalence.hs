@@ -1,17 +1,18 @@
 module RegexEquivalence where
 
-import Algorithm.Regex.Equivalence
-import Language.RegexParser
-import Data.Regex.Formats          ( MinimallyQuotedRegex(..) )
+import           Algorithm.Regex.Equivalence
+import           Data.Regex.Formats          ( MinimallyQuotedRegex (..) )
+import           Language.RegexParser
 
-import Control.Monad               ( forM_ )
-import Control.Monad.Trans.Class   ( lift )
-import Control.Monad.Trans.Except  ( ExceptT, throwE )
+import           Control.Monad               ( forM_ )
+import           Control.Monad.Trans.Class   ( lift )
+import           Control.Monad.Trans.Except  ( ExceptT(..), throwE )
+import qualified Data.Text.IO                as TIO
 
 checkRegexEquivalence :: ExceptT String IO Bool
 checkRegexEquivalence = do
-    regex1 <- lift getLine >>= (exceptM . parseRegex "first regex")
-    regex2 <- lift getLine >>= (exceptM . parseRegex "second regex")
+    regex1 <- lift TIO.getLine >>= ExceptT . return . parseRegex "first regex"
+    regex2 <- lift TIO.getLine >>= ExceptT . return . parseRegex "second regex"
     let (witnesses, _trace) = getDifferences regex1 regex2
     lift $
         forM_ witnesses $ \(w, r1, r2) -> do

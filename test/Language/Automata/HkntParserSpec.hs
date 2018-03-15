@@ -1,3 +1,5 @@
+{-# LANGUAGE OverloadedStrings #-}
+
 module Language.Automata.HkntParserSpec
     ( main
     , spec

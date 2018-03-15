@@ -9,10 +9,11 @@ import           Language.RegexParser
 
 import           Control.Monad.Trans.Class  ( lift )
 import           Control.Monad.Trans.Except ( ExceptT, throwE )
+import qualified Data.Text.IO               as TIO
 
 parseAndDeriveRegexToDfa :: OutputFormat -> Bool -> ExceptT String IO ()
 parseAndDeriveRegexToDfa outputFormat withoutSkeleton = do
-    input <- lift getContents
+    input <- lift TIO.getContents
     case parseRegex "<stdin>" input of
         Left parseError -> throwE parseError
         Right regex -> do

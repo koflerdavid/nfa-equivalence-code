@@ -1,15 +1,18 @@
+{-# LANGUAGE OverloadedStrings #-}
+
 module Language.Automata.HkntParser.InternalSpec
     ( main
     , spec
     ) where
 
-import Language.Automata.HkntParser.Class
-import Language.Automata.HkntParser.Internal
-import Language.Automata.HkntParser.Tokeniser
+import           Language.Automata.HkntParser.Class
+import           Language.Automata.HkntParser.Internal
+import           Language.Automata.HkntParser.Tokeniser
 
-import Control.Monad                          ( forM_ )
-import Test.Hspec
-import Text.Parsec
+import           Control.Monad                          ( forM_ )
+import qualified Data.Text                              as T
+import           Test.Hspec
+import           Text.Parsec
 
 main :: IO ()
 main = hspec spec
@@ -98,7 +101,7 @@ spec = do
 shouldAccept ::
        (Eq a, Show a)
     => Parsec [(SourcePos, Token)] () a
-    -> String
+    -> T.Text
     -> a
     -> Expectation
 shouldAccept parser input expectedResult =

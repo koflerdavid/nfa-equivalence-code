@@ -3,12 +3,12 @@ module Data.DfaSpec
     , spec
     ) where
 
-import Data.Dfa
+import           Data.Dfa
 
-import Control.Monad ( forM_ )
-import Data.IntSet   ( isSubsetOf )
-import Data.Set      as Set hiding ( isSubsetOf )
-import Test.Hspec
+import           Control.Monad ( forM_ )
+import           Data.IntSet   ( isSubsetOf )
+import           Data.Set      as Set hiding ( isSubsetOf )
+import           Test.Hspec
 
 main :: IO ()
 main = hspec spec

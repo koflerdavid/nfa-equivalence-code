@@ -2,20 +2,21 @@
 
 module Language.RegexParser.Internal where
 
-import Data.Regex
-import Language.RegexParser.Class
-import Language.RegexParser.Tokeniser
+import           Data.Regex
+import           Language.RegexParser.Class
+import           Language.RegexParser.Tokeniser
 
-import Data.Either.Combinators        ( mapLeft )
-import Data.Functor                   ( ($>) )
-import Data.Functor.Identity
-import Text.Parsec                    hiding ( Empty )
-import Text.Parsec.Expr
+import           Data.Bifunctor                 ( first )
+import           Data.Functor                   ( ($>) )
+import           Data.Functor.Identity
+import qualified Data.Text                      as T
+import           Text.Parsec                    hiding ( Empty )
+import           Text.Parsec.Expr
 
 tokeniseAndParse ::
-       RegexTokenParser () a -> SourceName -> String -> Either String a
+       RegexTokenParser () a -> SourceName -> T.Text -> Either String a
 tokeniseAndParse parser name input =
-    mapLeft show $ tokenise name input >>= parse parser name
+    first show $ tokenise name input >>= parse parser name
 
 regexOperatorTable :: OperatorTable [(SourcePos, Token)] u Identity (Regex Char)
 regexOperatorTable =

@@ -2,14 +2,16 @@ module Actions.Derivation
     ( action
     ) where
 
-import Algorithm.Regex.Derivation ( wordDerive )
-import Data.Regex                 ( Regex )
-import Data.Regex.Formats         ( MinimallyQuotedRegex (..) )
-import Language.RegexParser       ( parseRegex )
+import           Algorithm.Regex.Derivation ( wordDerive )
+import           Data.Regex                 ( Regex )
+import           Data.Regex.Formats         ( MinimallyQuotedRegex (..) )
+import           Language.RegexParser       ( parseRegex )
 
-import Control.Monad              ( when )
-import Data.ByteString.UTF8       as UTF8
-import Snap.Core
+import           Data.Bifunctor             ( first )
+import           Data.ByteString
+import qualified Data.Text                  as T
+import           Data.Text.Encoding         ( decodeUtf8' )
+import           Snap.Core
 
 data DerivationParameter
     = Regex
@@ -29,28 +31,28 @@ action =
         modifyResponse $ setContentType "text/plain; charset=utf-8"
         case result of
             Right derivedRegex ->
-                writeBS . UTF8.fromString . show . MinimallyQuotedRegex $ derivedRegex
+                writeText . T.pack . show . MinimallyQuotedRegex $ derivedRegex
             Left e -> do
                 modifyResponse $ setResponseCode 400
                 case e of
                     ParameterNotFound parameter -> do
-                        writeBS . UTF8.fromString . show $ parameter
+                        writeText . T.pack . show $ parameter
                         writeBS " was not specified"
                     Utf8DecodingError parameter -> do
-                        writeBS . UTF8.fromString . show $ parameter
+                        writeText . T.pack . show $ parameter
                         writeBS " was not specified as a valid UTF-8 string"
                     RegularExpressionParseError parseError -> do
                         writeBS "Parse error in regular expression:\n"
-                        writeBS . UTF8.fromString $ parseError
+                        writeText . T.pack . show $ parseError
 
 derive :: Maybe ByteString -> Maybe ByteString -> Either DerivationError (Regex Char)
 derive Nothing _ = Left (ParameterNotFound Regex)
 derive _ Nothing = Left (ParameterNotFound Word)
 derive (Just utf8InputRegexString) (Just utf8Word) = do
-    let inputRegexString = UTF8.toString utf8InputRegexString
-        word = UTF8.toString utf8Word
-    when (UTF8.replacement_char `elem` inputRegexString) $ Left (Utf8DecodingError Regex)
-    when (UTF8.replacement_char `elem` word) $ Left (Utf8DecodingError Word)
+    inputRegexString <- first (const (Utf8DecodingError Regex)) $
+        decodeUtf8' utf8InputRegexString
+    word <- first (const (Utf8DecodingError Word)) $
+        decodeUtf8' utf8Word
     case parseRegex "<regex>" inputRegexString of
         Left parseError -> Left (RegularExpressionParseError parseError)
-        Right regex     -> return $ wordDerive word regex
+        Right regex     -> return $ wordDerive (T.unpack word) regex

@@ -1,3 +1,5 @@
+{-# LANGUAGE OverloadedStrings #-}
+
 module Language.RegexParser.TokeniserSpec
     ( main
     , spec

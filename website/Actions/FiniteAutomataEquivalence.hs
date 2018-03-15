@@ -5,14 +5,14 @@ module Actions.FiniteAutomataEquivalence
 import           Control.Monad                ( when )
 import           Data.Aeson                   ( ToJSON (toJSON), object, (.=) )
 import           Data.Aeson.Text              ( encodeToLazyText )
-import           Data.ByteString.Lazy         as LBS
-import           Data.ByteString.UTF8         as UTF8
-import           Data.Either.Combinators      ( mapLeft )
-import           Data.IntSet                  ( fromList, toList )
+import           Data.Bifunctor               ( first )
 import           Data.Bimap                   ( Bimap, lookup, lookupR )
+import           Data.ByteString.Lazy         as LBS
+import           Data.IntSet                  ( fromList, toList )
 import           Data.Maybe                   ( fromJust )
 import           Data.Monoid                  ( (<>) )
-import qualified Data.Text.Lazy               as T
+import qualified Data.Text.Lazy               as TL
+import           Data.Text.Encoding          ( decodeUtf8' )
 import           Prelude                      hiding ( lookup )
 import           Snap.Core
 
@@ -73,11 +73,11 @@ action =
                     Utf8DecodeError -> writeLazyText "The request contains invalid UTF8 codepoints"
                     ParseError syntaxError ->
                         writeLazyText $
-                        "The request contains a syntax error:\n" <> T.pack syntaxError
+                        "The request contains a syntax error:\n" <> TL.pack syntaxError
                     NoCheckSpecified ->
                         writeLazyText "The input does not contain a constraint to check for"
                     CheckedStateDoesNotExist state ->
-                        writeLazyText $ "The following state does not exist: " <> T.pack state
+                        writeLazyText $ "The following state does not exist: " <> TL.pack state
             Right result -> do
                 modifyResponse $ setContentType "application/json"
                 writeLazyText . encodeToLazyText $ result
@@ -87,11 +87,11 @@ equivalent Nothing = Left ParameterIsMissing
 equivalent (Just utf8Body)
     -- Try to parse UTF8 string
  = do
-    body <- maybe (Left Utf8DecodeError) Right (fromUtf8 . LBS.toStrict $ utf8Body)
+    body <- first (const Utf8DecodeError) (decodeUtf8' . LBS.toStrict $ utf8Body)
     -- Parse body
-    Result transitions acceptingStates checks <- mapLeft ParseError $ parseHknt body
+    Result transitions acceptingStates checks <- first ParseError $ parseHknt body
     -- Wrap errors into ParseError
-    (nfa, stateMapping) <- mapLeft ParseError $ compileHkntToNfa transitions acceptingStates
+    (nfa, stateMapping) <- first ParseError $ compileHkntToNfa transitions acceptingStates
     -- Ensure there is at least one check
     when (Prelude.null checks) $ Left NoCheckSpecified
     -- Only consider the last constraint. Assume it is an equivalence constraint
@@ -109,13 +109,6 @@ equivalent (Just utf8Body)
     case maybeWitness of
         Nothing -> return (Equivalent trace')
         Just witness -> return (NotEquivalent (translatedConstraint stateMapping witness) trace')
-
-fromUtf8 :: UTF8.ByteString -> Maybe String
-fromUtf8 bs = do
-    let str = UTF8.toString bs
-    if UTF8.replacement_char `Prelude.elem` str
-        then Nothing
-        else Just str
 
 -- | Translate a set of user input states to the internal states needed for computing equivalence
 -- The user could have specified nonexisting states, so we have to watch out for that
