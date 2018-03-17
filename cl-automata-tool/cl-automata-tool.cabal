@@ -19,13 +19,15 @@ executable automata-equivalence
 
   hs-source-dirs:      app
   main-is:             Main.hs
-  other-modules:       DfaChecking
+  other-modules:       Common
+                     , DfaChecking
                      , NfaChecking
 
   build-depends:       base
                      , bimap
-                     , containers
                      , cl-automata
+                     , containers
+                     , exceptions
                      , optparse-generic
                      , text
                      -- For the Control.Monad.Trans.Except module

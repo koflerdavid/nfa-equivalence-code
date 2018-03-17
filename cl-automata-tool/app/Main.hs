@@ -1,9 +1,10 @@
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE ScopedTypeVariables #-}
 
 module Main where
 
-import Control.Monad.Trans.Except ( runExceptT )
+import Control.Exception ( Exception(displayException), try )
 import Options.Generic
 import System.Exit
 import System.IO
@@ -23,21 +24,21 @@ main = do
     command <- getRecord "automata equivalence"
     case command of
         NfaEquivalence filename -> do
-            result <- runExceptT (checkNfaEquivalence filename)
+            result :: Either NfaCheckingException [Bool] <- try (checkNfaEquivalence filename)
             case result of
-                Left message -> printErrorAndExit message
+                Left exception -> printErrorAndExit exception
                 Right results ->
                     if and results
                         then exitSuccess
                         else exitWith (ExitFailure 1)
         DfaEquivalence filename -> do
-            result <- runExceptT (checkDfaEquivalence filename)
+            result :: Either DfaCheckingException [Bool] <- try (checkDfaEquivalence filename)
             case result of
-                Left message -> printErrorAndExit message
-                Right results ->
+                Left exception -> printErrorAndExit exception
+                Right results -> do
                     if and results
                         then exitSuccess
                         else exitWith (ExitFailure 1)
 
-printErrorAndExit :: String -> IO ()
-printErrorAndExit msg = hPutStrLn stderr msg >> exitWith (ExitFailure 2)
+printErrorAndExit :: Exception e => e -> IO ()
+printErrorAndExit exception = hPutStrLn stderr (displayException exception) >> exitWith (ExitFailure 2)
