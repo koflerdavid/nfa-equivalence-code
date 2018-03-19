@@ -12,7 +12,7 @@ import           Compiler.Hknt
 import           Data.Dfa
 import           Language.Automata.HkntParser
 
-import           Control.Monad.Catch          ( Exception, MonadThrow (..), throwM )
+import           Control.Monad.Catch          ( Exception, MonadThrow, handle, throwM )
 import           Control.Monad                ( forM, forM_, when )
 import           Data.Bimap                   as Bimap
 import           Data.List                    as List
@@ -25,9 +25,9 @@ data DfaCheckingException
     = NotADfaState String
     | NotASingletonStateSet [String]
     | StateDoesNotExist String
-    | CouldNotTranslateStateBack Int
+    | CouldNotTranslateStateBack DfaState
     | HkntSyntaxError String
-    | HkntToDfaTranslationError String
+    | HkntToDfaTranslationError HkntCompileError
     deriving (Show)
 
 instance Exception DfaCheckingException
@@ -42,23 +42,19 @@ checkDfaEquivalence filename = do
         hPutStrLn stderr ("Checking equivalence of " ++ state1 ++ " and " ++ state2)
         state1' <- translateState stateMapping state1
         state2' <- translateState stateMapping state2
-        let result = dfaStatesDifferencesHk dfa (Just state1') (Just state2')
-        case result of
-            Left (NotDfaState s) ->
-                throwM $ NotADfaState (fromMaybe (show s) $ translateBack stateMapping s)
-            Right (maybeWitness, trace) -> do
-                forM_ trace (printConstraint stateMapping)
-                case maybeWitness of
-                    Nothing -> return True
-                    Just witness -> do
-                        putStrLn "\nFailed on:"
-                        printConstraint stateMapping (False, witness)
-                        return False
+        let (maybeWitness, trace) = dfaStatesDifferencesHk dfa state1' state2'
+        forM_ trace (printConstraint stateMapping)
+        case maybeWitness of
+            Nothing -> return True
+            Just witness -> do
+                putStrLn "\nFailed on:"
+                printConstraint stateMapping (False, witness)
+                return False
 
-printConstraint :: Bimap String Int -> (Bool, Constraint Char) -> IO ()
+printConstraint :: Bimap String DfaState -> (Bool, Constraint Char) -> IO ()
 printConstraint stateMapping (skipped, (w, x, y)) = do
-    x' <- maybe (return "_|_") (translateBack stateMapping) x
-    y' <- maybe (return "_|_") (translateBack stateMapping) y
+    x' <- if x == dfaErrorState then return "_|_" else translateBack stateMapping x
+    y' <- if x == dfaErrorState then return "_|_" else translateBack stateMapping y
 
     when skipped $ putStr "skipped"
     putChar '\t'
@@ -69,7 +65,7 @@ printConstraint stateMapping (skipped, (w, x, y)) = do
     putStr y'
     putChar '\n'
 
-parseInput :: Maybe String -> IO (Dfa Char, Bimap String Int, [Check String])
+parseInput :: Maybe String -> IO (Dfa Char, Bimap String DfaState, [Check String])
 parseInput maybeFilePath =
     case maybeFilePath of
         Just filePath -> withFile filePath ReadMode parseInput'
@@ -90,10 +86,10 @@ ensureSingletonStateSet :: [String] -> IO ()
 ensureSingletonStateSet stateSet =
     when (length stateSet > 1) $ throwM (NotASingletonStateSet stateSet)
 
-translateState :: MonadThrow m => Bimap String Int -> String -> m Int
+translateState :: MonadThrow m => Bimap String DfaState -> String -> m DfaState
 translateState stateMapping state =
     onNothingThrow (StateDoesNotExist state) $ state `Bimap.lookup` stateMapping
 
-translateBack :: MonadThrow m => Bimap String Int -> Int -> m String
+translateBack :: MonadThrow m => Bimap String DfaState -> DfaState -> m String
 translateBack stateMapping state =
     onNothingThrow (CouldNotTranslateStateBack state) $ state `Bimap.lookupR` stateMapping

@@ -24,6 +24,7 @@ data EquivalenceError
     = ParameterIsMissing
     | Utf8DecodeError
     | ParseError String
+    | TranslationError HkntCompileError
     | NoCheckSpecified
     | CheckedStateDoesNotExist String
 
@@ -91,7 +92,7 @@ equivalent (Just utf8Body)
     -- Parse body
     Result transitions acceptingStates checks <- first ParseError $ parseHknt body
     -- Wrap errors into ParseError
-    (nfa, stateMapping) <- first ParseError $ compileHkntToNfa transitions acceptingStates
+    (nfa, stateMapping) <- first TranslationError $ compileHkntToNfa transitions acceptingStates
     -- Ensure there is at least one check
     when (Prelude.null checks) $ Left NoCheckSpecified
     -- Only consider the last constraint. Assume it is an equivalence constraint

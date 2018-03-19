@@ -12,8 +12,8 @@ import           Compiler.Hknt
 import           Data.Nfa
 import           Language.Automata.HkntParser
 
-import           Control.Exception            ( Exception )
 import           Control.Monad                ( forM, forM_, mapM, when )
+import           Control.Monad.Catch          ( Exception, MonadThrow, handle, throwM )
 import           Data.Bimap                   as Bimap hiding ( fromList,
                                                          toList )
 import           Data.IntSet                  ( fromList, toList )
@@ -26,7 +26,7 @@ data NfaCheckingException
     = StateDoesNotExist String
     | CouldNotTranslateStateBack Int
     | HkntSyntaxError String
-    | HkntToDfaTranslationError String
+    | HkntToDfaTranslationError HkntCompileError
     deriving (Show)
 
 instance Exception NfaCheckingException
@@ -81,10 +81,10 @@ parseInput maybeFilePath =
 equivalenceChecks :: [Check String] -> [Check String]
 equivalenceChecks = List.filter (\(_, operation, _) -> operation == Equivalence)
 
-translateState :: Bimap String Int -> String -> IO Int
+translateState :: MonadThrow m => Bimap String Int -> String -> m Int
 translateState stateMapping state =
     onNothingThrow (StateDoesNotExist state) $ state `Bimap.lookup` stateMapping
 
-translateBack :: Bimap String Int -> Int -> IO String
+translateBack :: MonadThrow m => Bimap String Int -> Int -> m String
 translateBack stateMapping state =
     onNothingThrow (CouldNotTranslateStateBack state) $ state `Bimap.lookupR` stateMapping

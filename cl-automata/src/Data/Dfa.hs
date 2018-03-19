@@ -3,7 +3,8 @@
 
 module Data.Dfa
     ( Dfa
-    , DfaState
+    , DfaState()
+    , toStateNumber
     , dfaAlphabet
     , dfaStates
     , dfaAcceptingStates
@@ -15,6 +16,7 @@ module Data.Dfa
     , translateDfaStates
     , dfaStep
     , runDfa
+    , toDfaState
     ) where
 
 import           Data.FiniteAutomaton
@@ -24,7 +26,16 @@ import qualified Data.IntSet          as ISet
 import qualified Data.Map             as Map
 import qualified Data.Set             as Set
 
-type DfaState = Maybe Int
+newtype DfaState = DfaState { toStateNumber :: Maybe Int }
+    deriving (Eq, Ord, Show)
+
+dfaErrorState :: DfaState
+dfaErrorState = DfaState Nothing
+
+toDfaState :: Dfa c -> Int -> Maybe DfaState
+toDfaState dfa q
+    | q `ISet.member` dfaStates dfa = Just (DfaState (Just q))
+    | otherwise = Nothing
 
 data Dfa c =
     Dfa ISet.IntSet
@@ -48,24 +59,21 @@ dfaStates (Dfa acceptingStates transitions) =
 dfaAcceptingStates :: Dfa c -> ISet.IntSet
 dfaAcceptingStates (Dfa acceptingStates _) = acceptingStates
 
-dfaErrorState :: Maybe Int
-dfaErrorState = Nothing
-
 dfaTransitions :: Dfa c -> Map.Map (Int, c) Int
 dfaTransitions (Dfa _ transitions) = transitions
 
 dfaAccepts :: Dfa c -> DfaState -> Bool
-dfaAccepts (Dfa acceptingStates _) (Just q) = q `ISet.member` acceptingStates
-dfaAccepts _ Nothing                        = False
+dfaAccepts (Dfa acceptingStates _) (DfaState (Just q)) = q `ISet.member` acceptingStates
+dfaAccepts _ (DfaState Nothing)                        = False
 
 instance Ord c => FiniteAutomaton (Dfa c) DfaState c Bool where
     faStates =
-        Set.union (Set.singleton Nothing) .
-        Set.map Just . Set.fromAscList . ISet.toAscList . dfaStates
+        Set.union (Set.singleton dfaErrorState) .
+        Set.map (DfaState . Just) . Set.fromAscList . ISet.toAscList . dfaStates
     faOutput = dfaAccepts
     faInputs = dfaAlphabet
-    faTransitions dfa (Just q) =
-        Map.map (Set.singleton . Just) -- Wrap each state into a singleton set
+    faTransitions dfa (DfaState (Just q)) =
+        Map.map (Set.singleton . DfaState . Just) -- Wrap each state into a singleton set
          .
         Map.mapKeys snd -- Remove the state
          .
@@ -73,15 +81,15 @@ instance Ord c => FiniteAutomaton (Dfa c) DfaState c Bool where
          .
         dfaTransitions $
         dfa
-    faTransitions dfa Nothing =
-        Map.fromSet (const (Set.singleton Nothing)) -- Each input leads to `Nothing`
+    faTransitions dfa (DfaState Nothing) =
+        -- Each input leads to `Nothing`
+        Map.fromSet (const (Set.singleton dfaErrorState))
          .
         faInputs $
         dfa
 
--- | This function builds a DFA and returns the initial state. This is a convenience to explicitly
--- start the DFA from the initial state, allowing it to be treated uniformly with other states.
--- The function will return Nothing if there are overlapping transitions.
+-- | This function builds a DFA.
+-- The function will return `Nothing` if there are overlapping transitions.
 buildDfa :: Ord c => [Int] -> [((Int, c), Int)] -> Maybe (Dfa c)
 buildDfa finalStates transitions =
     if Map.size transitionMap < length transitions
@@ -109,6 +117,6 @@ runDfa :: (Ord c, Foldable t) => Dfa c -> DfaState -> t c -> DfaState
 runDfa dfa = Foldable.foldl (dfaStep dfa)
 
 dfaStep :: (Ord c) => Dfa c -> DfaState -> c -> DfaState
-dfaStep _ Nothing _ = dfaErrorState
-dfaStep (Dfa _ transitions) (Just state) input =
-    Map.lookup (state, input) transitions
+dfaStep _ (DfaState Nothing) _ = dfaErrorState
+dfaStep (Dfa _ transitions) (DfaState (Just state)) input =
+    DfaState $ Map.lookup (state, input) transitions

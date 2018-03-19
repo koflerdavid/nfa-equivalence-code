@@ -1,21 +1,28 @@
 module Compiler.Hknt (
-    compileHkntToDfa
+    HkntCompileError
+    , compileHkntToDfa
     , compileHkntToNfa
 ) where
-
-import Data.Bimap as Bimap
-import Data.List  as List
 
 import Data.Dfa
 import Data.Nfa
 
-type Transition s c = (s, c, s)
+import Data.Bimap          as Bimap
+import Data.List           as List
+import Data.Maybe          ( fromJust )
+
+type Transition q c = (q, c, q)
+
+data HkntCompileError = CouldNotTranslateTransitions
+    | CouldNotTranslateAcceptingStates
+    | FoundOverlappingTransitions
+    deriving (Show)
 
 compileHkntToDfa ::
-       (Ord s, Ord c)
-    => [Transition s c]
-    -> [s]
-    -> Either String (Dfa c, Bimap.Bimap s Int)
+       (Ord q, Ord c)
+    => [Transition q c]
+    -> [q]
+    -> Either HkntCompileError (Dfa c, Bimap.Bimap q DfaState)
 compileHkntToDfa transitions acceptingStates = do
     let transitionStates = nub $ concatMap (\(s, _, d) -> [s, d]) transitions
         transitionStatesMapping = Bimap.fromList $ zip transitionStates [0 ..]
@@ -23,21 +30,21 @@ compileHkntToDfa transitions acceptingStates = do
             List.filter
                 (`Bimap.notMember` transitionStatesMapping)
                 (nub acceptingStates)
-        acceptingStatesMapping =
+        unmappedAcceptingStatesMapping =
             Bimap.fromList $
             zip unmappedAcceptingStates [Bimap.size transitionStatesMapping ..]
         stateNumberMapping =
-            transitionStatesMapping `bimapUnion` acceptingStatesMapping
-    transitions' <-
-        eitherFromMaybe "Error translating transitions" $ do
-            mapM (translate stateNumberMapping) transitions
-    acceptingStates' <-
-        eitherFromMaybe "Error translating accepting states" $ do
-            mapM (`Bimap.lookup` stateNumberMapping) (nub acceptingStates)
-    dfa <-
-        eitherFromMaybe "Overlapping transitions found" $ do
-            buildDfa acceptingStates' transitions'
-    return (dfa, stateNumberMapping)
+            transitionStatesMapping `bimapUnion` unmappedAcceptingStatesMapping
+    transitions' <- eitherFromMaybe CouldNotTranslateTransitions $
+        mapM (translate stateNumberMapping) transitions
+    acceptingStates' <- eitherFromMaybe CouldNotTranslateAcceptingStates $
+        mapM (`Bimap.lookup` stateNumberMapping) (nub acceptingStates)
+    dfa <- eitherFromMaybe FoundOverlappingTransitions $
+        buildDfa acceptingStates' transitions'
+    -- Should be safe since both `statesMapping` and `dfa`
+    -- have been created by this function
+    let statesMapping' = Bimap.mapMonotonicR (fromJust . toDfaState dfa) stateNumberMapping
+    return (dfa, statesMapping')
 
 -- | This function looks up the origin and destination states and makes the transition suitable for the DFA builder.
 translate :: Ord s => Bimap s Int -> Transition s c -> Maybe ((Int, c), Int)
@@ -50,10 +57,10 @@ eitherFromMaybe :: l -> Maybe r -> Either l r
 eitherFromMaybe l = maybe (Left l) Right
 
 compileHkntToNfa ::
-       (Ord s, Ord c)
-    => [Transition s c]
-    -> [s]
-    -> Either String (Nfa c, Bimap s Int)
+       (Ord q, Ord c)
+    => [Transition q c]
+    -> [q]
+    -> Either HkntCompileError (Nfa c, Bimap q Int)
 compileHkntToNfa transitions acceptingStates = do
     let transitionStates = nub $ concatMap (\(s, _, d) -> [s, d]) transitions
         transitionStatesMapping = Bimap.fromList $ zip transitionStates [0 ..]
@@ -67,10 +74,10 @@ compileHkntToNfa transitions acceptingStates = do
         stateNumberMapping =
             transitionStatesMapping `bimapUnion` acceptingStatesMapping
     transitions' <-
-        eitherFromMaybe "Error translating transitions" $ do
+        eitherFromMaybe CouldNotTranslateTransitions $
             mapM (translateNfaStates stateNumberMapping) transitions
     acceptingStates' <-
-        eitherFromMaybe "Error translating accepting states" $ do
+        eitherFromMaybe CouldNotTranslateAcceptingStates $
             mapM (`Bimap.lookup` stateNumberMapping) (nub acceptingStates)
     let nfa = buildNfa acceptingStates' transitions'
     return (nfa, stateNumberMapping)
