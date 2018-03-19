@@ -29,24 +29,23 @@ data Nfa c = Nfa
 -- The main advantage over the constructor is that the input can be made using lists.
 buildNfa :: (Ord c) => [Int] -> [((Int, c), [Int])] -> Nfa c
 buildNfa acceptingStates =
-    Nfa (ISet.fromList acceptingStates) .
-    Map.fromListWith ISet.union .
-    List.map (second ISet.fromList) -- Use sets to represent target states
+    Nfa (ISet.fromList acceptingStates)
+    . Map.fromListWith ISet.union
+    . List.map (second ISet.fromList) -- Use sets to represent target states
 
 nfaAlphabet :: (Ord c) => Nfa c -> Set.Set c
 nfaAlphabet =
     Set.map snd -- Only extract the characters.
-     .
-    Map.keysSet . nfaTransitions
+    . Map.keysSet . nfaTransitions
 
 nfaStates :: Nfa c -> ISet.IntSet
 nfaStates nfa = nfaAcceptingStates nfa `ISet.union` transitionStates nfa
   where
     transitionStates =
-        ISet.unions .
-        List.map (\((q, _), qs) -> q `ISet.insert` qs) -- Collect the states
-         .
-        Map.toAscList . nfaTransitions
+        ISet.unions
+        . List.map (\((q, _), qs) -> q `ISet.insert` qs) -- Collect the states
+        . Map.toAscList
+        . nfaTransitions
 
 runNfa :: (Ord c, Foldable t) => Nfa c -> [Int] -> t c -> [Int]
 runNfa nfa initialStates =
@@ -63,7 +62,7 @@ nfaStep nfa qs input =
 accepts :: Nfa c -> [Int] -> Bool
 accepts nfa possibleStates =
     not . ISet.null $
-    nfaAcceptingStates nfa `ISet.intersection` ISet.fromList possibleStates
+        nfaAcceptingStates nfa `ISet.intersection` ISet.fromList possibleStates
 
 instance Ord c => FiniteAutomaton (Nfa c) Int c Bool where
     faStates = Set.fromDistinctAscList . ISet.toAscList . nfaStates
@@ -71,10 +70,7 @@ instance Ord c => FiniteAutomaton (Nfa c) Int c Bool where
     faOutput nfa = (`ISet.member` nfaAcceptingStates nfa)
     faTransitions nfa q =
         Map.map (Set.fromDistinctAscList . ISet.toAscList) -- Convert IntSets to Sets
-         .
-        Map.mapKeys snd -- Remove the state
-         .
-        Map.filterWithKey (const . (== q) . fst) -- Select only the relevant transitions
-         .
-        nfaTransitions $
-        nfa
+        . Map.mapKeys snd -- Remove the state
+        . Map.filterWithKey (const . (== q) . fst) -- Select only the relevant transitions
+        . nfaTransitions
+        $ nfa

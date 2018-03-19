@@ -74,19 +74,13 @@ instance Ord c => FiniteAutomaton (Dfa c) DfaState c Bool where
     faInputs = dfaAlphabet
     faTransitions dfa (DfaState (Just q)) =
         Map.map (Set.singleton . DfaState . Just) -- Wrap each state into a singleton set
-         .
-        Map.mapKeys snd -- Remove the state
-         .
-        Map.filterWithKey (const . (== q) . fst) -- Pick the transitions from state p
-         .
-        dfaTransitions $
-        dfa
+        . Map.mapKeys snd -- Remove the state
+        . Map.filterWithKey (const . (== q) . fst) -- Pick the transitions from state p
+        . dfaTransitions
+        $ dfa
     faTransitions dfa (DfaState Nothing) =
         -- Each input leads to `Nothing`
-        Map.fromSet (const (Set.singleton dfaErrorState))
-         .
-        faInputs $
-        dfa
+        Map.fromSet (const (Set.singleton dfaErrorState)) $ faInputs dfa
 
 -- | This function builds a DFA.
 -- The function will return `Nothing` if there are overlapping transitions.
@@ -110,8 +104,9 @@ translateDfaStates (Dfa acceptingStates transitions) offset =
   where
     acceptingStates' = ISet.map (+ offset) acceptingStates
     transitions' =
-        Map.map (+ offset) . Map.mapKeys (\(q, c) -> (q + offset, c)) $
-        transitions
+        Map.map (+ offset)
+        . Map.mapKeys (\(q, c) -> (q + offset, c))
+        $ transitions
 
 runDfa :: (Ord c, Foldable t) => Dfa c -> DfaState -> t c -> DfaState
 runDfa dfa = Foldable.foldl (dfaStep dfa)
