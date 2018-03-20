@@ -28,15 +28,15 @@ executable regex-derivation
                      , Types
 
   build-depends:       base
-                     , cl-automata
-                     , cl-regexes
+                     , cl-automata      >= 2.0
+                     , cl-regexes       >= 2.0
                      , containers
                      , HaTeX
                      , lucid
                      , optparse-generic
                      , text
                      -- For the Control.Monad.Trans.Except module
-                     , transformers >= 0.4
+                     , transformers     >= 0.4
 
 source-repository head
   type:     git

@@ -20,13 +20,13 @@ executable website
   hs-source-dirs:      app
   main-is:             Main.hs
 
-  build-depends:       base                      >= 4     && < 5
+  build-depends:       base          >= 4     && < 5
                      , aeson
-                     , bytestring                >= 0.9.1 && < 0.11
-                     , cl-webservice
+                     , bytestring    >= 0.9.1 && < 0.11
+                     , cl-webservice >= 2.0
                      , containers
-                     , snap-core                 >= 1.0   && < 1.1
-                     , snap-server               >= 1.0   && < 1.1
+                     , snap-core     >= 1.0   && < 1.1
+                     , snap-server   >= 1.0   && < 1.1
                      , text
 
   if impl(ghc >= 6.12.0)

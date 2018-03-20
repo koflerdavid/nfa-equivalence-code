@@ -21,7 +21,7 @@ library
                      , Data.CongruenceClosure.Internal
                      , Data.Queue
 
-  build-depends:       base >= 4.7 && < 5
+  build-depends:       base         >= 4.7 && < 5
                      , containers
                      , either
                      , transformers
@@ -32,7 +32,7 @@ test-suite cl-data-structures-test
   type:                exitcode-stdio-1.0
   hs-source-dirs:      test
   main-is:             Spec.hs
-  build-depends:       base >= 4.7 && < 5
+  build-depends:       base               >= 4.7 && < 5
                      , hspec
                      , hspec-discover
                      , QuickCheck

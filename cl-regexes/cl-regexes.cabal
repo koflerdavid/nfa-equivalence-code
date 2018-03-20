@@ -31,14 +31,14 @@ library
                      , Language.RegexParser.Internal
                      , Language.RegexParser.Tokeniser
 
-  build-depends:       base >= 4.7 && < 5
-                     , cl-automata
-                     , cl-data-structures
+  build-depends:       base               >= 4.7 && < 5
+                     , cl-automata        >= 2.0
+                     , cl-data-structures >= 2.0
                      , containers
                      , either
                      , equivalence
                      , lucid
-                     , parsec >= 3 && < 4
+                     , parsec             >= 3 && < 4
                      , text
                      , transformers
 
@@ -52,15 +52,15 @@ test-suite cl-regexes-test
   hs-source-dirs:      test
   main-is:             Spec.hs
 
-  build-depends:       base >= 4.7 && < 5
+  build-depends:       base           >= 4.7 && < 5
                      , hspec
                      , hspec-discover
                      , QuickCheck
-                     , cl-automata
-                     , cl-regexes
+                     , cl-automata    >= 2.0
+                     , cl-regexes     >= 2.0
                      , containers
                      , equivalence
-                     , parsec >= 3 && < 4
+                     , parsec         >= 3 && < 4
                      , text
                      , transformers
 

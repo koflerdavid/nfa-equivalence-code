@@ -32,14 +32,14 @@ library
                      , Language.Automata.HkntParser.Internal
                      , Language.Automata.HkntParser.Tokeniser
 
-  build-depends:       base >= 4.7 && < 5
+  build-depends:       base               >= 4.7 && < 5
                      , bimap
-                     , cl-data-structures
+                     , cl-data-structures >= 2.0
                      -- For Data.Map.!?
-                     , containers >= 0.5.9.1
+                     , containers         >= 0.5.9.1
                      , equivalence
                      , lucid
-                     , parsec >= 3 && < 4
+                     , parsec             >= 3 && < 4
                      , text
                      , transformers
 
@@ -51,14 +51,14 @@ test-suite cl-automata-test
   hs-source-dirs:      test
   main-is:             Spec.hs
 
-  build-depends:       base >= 4.7 && < 5
+  build-depends:       base           >= 4.7 && < 5
                      , hspec
                      , hspec-discover
                      , QuickCheck
-                     , cl-automata
+                     , cl-automata    >= 2.0
                      , containers
                      , equivalence
-                     , parsec >= 3 && < 4
+                     , parsec         >= 3 && < 4
                      , text
                      , transformers
 

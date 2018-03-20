@@ -25,7 +25,7 @@ executable benchmark
 
   build-depends:       base
                      , containers
-                     , cl-automata
+                     , cl-automata      >= 2.0
                      , criterion
                      , deepseq
                      , graphviz
@@ -35,7 +35,7 @@ executable benchmark
                      , text
                      , time
                      -- For the Control.Monad.Trans.Except module
-                     , transformers >= 0.4
+                     , transformers     >= 0.4
 
 source-repository head
   type:     git

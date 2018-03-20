@@ -25,13 +25,13 @@ executable automata-equivalence
 
   build-depends:       base
                      , bimap
-                     , cl-automata
+                     , cl-automata      >= 2.0
                      , containers
                      , exceptions
                      , optparse-generic
                      , text
                      -- For the Control.Monad.Trans.Except module
-                     , transformers >= 0.4
+                     , transformers     >= 0.4
 
 
 source-repository head
