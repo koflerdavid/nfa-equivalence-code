@@ -7,19 +7,18 @@ import           Types
 
 import           Language.RegexParser
 
-import           Control.Monad.Trans.Class  ( lift )
-import           Control.Monad.Trans.Except ( ExceptT, throwE )
+import           Control.Exception.Safe     ( throw )
 import qualified Data.Text.IO               as TIO
 
-parseAndDeriveRegexToDfa :: OutputFormat -> Bool -> ExceptT String IO ()
+parseAndDeriveRegexToDfa :: OutputFormat -> Bool -> IO ()
 parseAndDeriveRegexToDfa outputFormat withoutSkeleton = do
-    input <- lift TIO.getContents
+    input <- TIO.getContents
     case parseRegex "<stdin>" input of
-        Left parseError -> throwE parseError
+        Left parseError -> throw (RegexParseException parseError)
         Right regex -> do
             let printer =
                     case outputFormat of
                         Html  -> HtmlOutput.printTransitionTable
                         Latex -> LaTeXOutput.printTransitionTable
                         Tsv   -> TsvOutput.printTransitionTable
-            lift $ printer withoutSkeleton regex
+            printer withoutSkeleton regex

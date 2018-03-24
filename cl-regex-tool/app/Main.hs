@@ -8,7 +8,7 @@ import RegexEquivalence
 import RegexFullDerivation
 import Types
 
-import Control.Monad.Trans.Except ( runExceptT )
+import Control.Exception.Safe (Exception(displayException), try)
 import Options.Generic
 import System.Exit
 import System.IO
@@ -27,21 +27,21 @@ main = do
     command <- getRecord "regex derivation"
     case command of
         RegexFullDerivation format noSkeleton -> do
-            result <- runExceptT (parseAndDeriveRegexToDfa format noSkeleton)
-            case result of
+            result <- try (parseAndDeriveRegexToDfa format noSkeleton)
+            case result :: Either RegexParseException () of
                 Left message -> printErrorAndExit message
                 Right _      -> exitSuccess
         RegexDerivation word -> do
-            result <- runExceptT (parseAndDeriveRegexByWord word)
-            case result of
+            result <- try (parseAndDeriveRegexByWord word)
+            case result :: Either RegexParseException () of
                 Left message -> printErrorAndExit message
                 Right _      -> exitSuccess
         RegexEquivalence -> do
-            result <- runExceptT checkRegexEquivalence
-            case result of
+            result <- try checkRegexEquivalence
+            case result :: Either RegexParseException Bool of
                 Left message -> printErrorAndExit message
                 Right True   -> exitSuccess
                 Right False  -> exitWith (ExitFailure 1)
 
-printErrorAndExit :: String -> IO a
-printErrorAndExit msg = hPutStrLn stderr msg >> exitWith (ExitFailure 2)
+printErrorAndExit :: Exception e => e -> IO ()
+printErrorAndExit exception = hPutStrLn stderr (displayException exception) >> exitWith (ExitFailure 2)

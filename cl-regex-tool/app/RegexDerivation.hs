@@ -3,17 +3,17 @@ module RegexDerivation where
 import           Algorithm.Regex.Derivation
 import           Data.Regex.Formats         ( MinimallyQuotedRegex(..) )
 import           Language.RegexParser
+import           Types
 
-import           Control.Monad.Trans.Class  ( lift )
-import           Control.Monad.Trans.Except ( ExceptT, throwE )
+import           Control.Exception.Safe     ( throw )
 import qualified Data.Text.IO               as TIO
 
-parseAndDeriveRegexByWord :: String -> ExceptT String IO ()
+parseAndDeriveRegexByWord :: String -> IO ()
 parseAndDeriveRegexByWord word = do
-    input <- lift TIO.getContents
+    input <- TIO.getContents
     case parseRegex "<stdin>" input of
-        Left parseError -> throwE parseError
+        Left parseError -> throw (RegexParseException parseError)
         Right regex -> do
-            lift . print . MinimallyQuotedRegex $ regex
+            print (MinimallyQuotedRegex regex)
             let regex' = wordDerive word regex
-            lift . print . MinimallyQuotedRegex $ regex'
+            print (MinimallyQuotedRegex regex')

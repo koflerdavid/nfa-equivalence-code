@@ -3,29 +3,29 @@ module RegexEquivalence where
 import           Algorithm.Regex.Equivalence
 import           Data.Regex.Formats          ( MinimallyQuotedRegex (..) )
 import           Language.RegexParser
+import           Types
 
 import           Control.Monad               ( forM_ )
-import           Control.Monad.Trans.Class   ( lift )
-import           Control.Monad.Trans.Except  ( ExceptT(..), throwE )
+import           Control.Exception.Safe      ( Exception, MonadThrow, handle, throw )
 import qualified Data.Text.IO                as TIO
 
-checkRegexEquivalence :: ExceptT String IO Bool
+checkRegexEquivalence :: IO Bool
 checkRegexEquivalence = do
-    regex1 <- lift TIO.getLine >>= ExceptT . return . parseRegex "first regex"
-    regex2 <- lift TIO.getLine >>= ExceptT . return . parseRegex "second regex"
+    regex1 <- onLeftThrow RegexParseException . parseRegex "first regex"  =<< TIO.getLine
+    regex2 <- onLeftThrow RegexParseException . parseRegex "second regex" =<< TIO.getLine
     let (witnesses, _trace) = getDifferences regex1 regex2
-    lift $
-        forM_ witnesses $ \(w, r1, r2) -> do
-            printSameLine w
-            putChar '\t'
-            printSameLine . MinimallyQuotedRegex $ r1
-            putChar '\t'
-            print . MinimallyQuotedRegex $ r2
+
+    forM_ witnesses $ \(w, r1, r2) -> do
+        printSameLine w
+        putChar '\t'
+        printSameLine . MinimallyQuotedRegex $ r1
+        putChar '\t'
+        print . MinimallyQuotedRegex $ r2
+
     return (null witnesses)
 
-exceptM :: Monad m => Either e a -> ExceptT e m a
-exceptM (Left e)  = throwE e
-exceptM (Right a) = return a
+onLeftThrow :: (Exception e, MonadThrow m) => (a -> e) -> Either a b -> m b
+onLeftThrow toException = either (throw . toException) return
 
 printSameLine :: Show a => a -> IO ()
 printSameLine = putStr . show

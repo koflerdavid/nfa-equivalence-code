@@ -32,9 +32,8 @@ executable regex-derivation
                      , containers
                      , HaTeX
                      , optparse-generic
+                     , safe-exceptions
                      , text
-                     -- For the Control.Monad.Trans.Except module
-                     , transformers     >= 0.4
 
 source-repository this
   type:              git
