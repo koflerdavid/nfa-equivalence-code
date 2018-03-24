@@ -116,21 +116,15 @@ dfaStatesDifferencesHk dfa s1 s2 = do
     skip :: Constraint c -> HkEquivM c s () -- Necessary to help the type checker
     skip = lift . tell . Seq.singleton . (True, )
 
--- assertIsStateOf :: DfaState -> Dfa c -> Either Error ()
--- assertIsStateOf q dfa = when (not (isStateOf q dfa)) $ Left (NotDfaState q)
---
--- isStateOf :: DfaState -> Dfa c -> Bool
--- isStateOf q dfa = maybe True (`ISet.member` dfaStates dfa) $ toStateNumber q
-
 dfaEquivalentHkNaive ::
        Ord c => (DfaState, Dfa c) -> (DfaState, Dfa c) -> Bool
 dfaEquivalentHkNaive (p, dfa1) (q, dfa2) =
-    dfaStatesEquivalentHkNaive mergedAutomata (toMergedState p) (toMergedState q)
+    dfaStatesEquivalentHkNaive mergedAutomata p (toMergedState q)
   where
     (toMergedState, mergedAutomata) = mergeDfa dfa1 dfa2
 
 dfaEquivalentHk :: Ord c => (DfaState, Dfa c) -> (DfaState, Dfa c) -> Bool
 dfaEquivalentHk (p, dfa1) (q, dfa2) =
-    dfaStatesEquivalentHk mergedAutomata (toMergedState p) (toMergedState q)
+    dfaStatesEquivalentHk mergedAutomata p (toMergedState q)
   where
     (toMergedState, mergedAutomata) = mergeDfa dfa1 dfa2
