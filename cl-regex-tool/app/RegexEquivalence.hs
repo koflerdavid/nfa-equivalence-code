@@ -1,4 +1,6 @@
-module RegexEquivalence where
+module RegexEquivalence
+    ( checkRegexEquivalence
+    ) where
 
 import           Algorithm.Regex.Equivalence
 import           Data.Regex.Formats          ( MinimallyQuotedRegex (..) )

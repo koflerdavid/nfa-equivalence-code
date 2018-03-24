@@ -1,4 +1,7 @@
-module Data.EquivalenceSpec where
+module Data.EquivalenceSpec
+    ( main
+    , spec
+    ) where
 
 import Control.Monad.Trans.Class
 import Data.Equivalence.Monad
