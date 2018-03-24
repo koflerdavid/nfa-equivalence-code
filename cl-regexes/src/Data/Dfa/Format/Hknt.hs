@@ -3,19 +3,18 @@
 {-# LANGUAGE ViewPatterns #-}
 
 module Data.Dfa.Format.Hknt
-    (
-      NameGenerator
+    ( NameGenerator
     , toHknt
     ) where
 
 import           Data.FiniteAutomaton
 
-import           Control.Arrow           ( second )
 import           Control.Monad           ( forM_, when )
 import           Control.Monad.Trans.RWS
-import qualified Data.Set             as Set
+import           Data.Bifunctor          ( second )
 import qualified Data.Map                as Map
 import           Data.Monoid             ( (<>) )
+import qualified Data.Set                as Set
 import qualified Data.Text               as T
 import           Data.Text.Lazy          ( toStrict )
 import qualified Data.Text.Lazy.Builder  as TB
@@ -50,5 +49,6 @@ toHknt fa (initialGeneratorState, nextName) =
         case names Map.!? automataState of
             Just name -> (name, oldState)
             Nothing ->
-                let (nextState, newName) = second TB.fromText (nextName automataState generatorState)
+                let (nextState, newName) =
+                        second TB.fromText (nextName automataState generatorState)
                 in (newName, (Map.insert automataState newName names, nextState))

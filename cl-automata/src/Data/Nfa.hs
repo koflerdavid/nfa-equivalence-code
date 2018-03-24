@@ -13,7 +13,7 @@ module Data.Nfa
 
 import Data.FiniteAutomaton
 
-import Control.Arrow        ( second )
+import Data.Bifunctor       ( second )
 import Data.Foldable        as Foldable
 import Data.IntSet          as ISet
 import Data.List            as List

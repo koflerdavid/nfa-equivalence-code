@@ -10,7 +10,7 @@ module Data.EpsilonNfa
     , accepts
     ) where
 
-import           Control.Arrow                  ( second )
+import           Data.Bifunctor                 ( second )
 import           Control.Monad                  ( forM_ )
 import           Control.Monad.Trans.RWS.Strict ( execRWS )
 import           Data.IntSet                    as ISet
