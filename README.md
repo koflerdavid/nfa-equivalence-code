@@ -30,8 +30,6 @@ Execute
 to get the right compiler version for the project and to build it.
 Stack will download all the necessary packages and build them inside the sandbox.
 
-All of this can also done by using the provided Makefile by just running `make` or `make build`.
-
 
 Running the tool
 ----------------
@@ -128,7 +126,7 @@ expression by that word.
 
 ### Webservice ###
 
-The subdirectory `webservice` contains a webservice implemented using the
+The subdirectory `cl-website-tool` contains a webservice implemented using the
 Snap framework. 
 It makes it possible to use the above tools via a REST-style interface.
 By default it opens a HTTP server on `0.0.0.0:8000`.
@@ -195,23 +193,3 @@ endpoints:
    containing an array of strings, will be present.
    Each of these strings belongs to the language of one of the states, 
    but not of the other.
-   
-
-Technical Report
-----------------
-
-The technical report is contained in the `doc` subirectory. Type `make` there
-or `make doc` in the project directory to build it.
-
-The build process uses the program `lhs2tex` on all Literate Haskell
-source files in the `src` directory and below.
-Then they are combined by the main file `doc/report.tex`.
-
-`latex2hs` is installed into the sandbox if not in $PATH on your machine.
-In any case the `lhs2tex` tool requires the CTAN packages `polytable` and `lazylist`.
-If they are not present, or not recent enough, the installer of lhs2TeX will
-try to install its own version of them into the system's TeX distribution,
-which will most likely fail unless `make` is called with `sudo` rights.
-
-The places where `lhs2TeX` will look for these files (`polytable.sty` and
-`lazylist.sty`) can be looked up in the `lhs2TeX` documentation.
