@@ -15,14 +15,16 @@ main = hspec spec
 
 spec :: Spec
 spec = do
+    let Just startState' = toDfaState dfa startState
+        Just acceptingState' = toDfaState dfa acceptingState
     describe "runDfa" $ do
         it "accepts \"ab\" and \"abab\"" $ do
             forM_ ["ab", "abab"] $ \input -> do
-                (dfa `dfaAccepts` runDfa dfa (Just startState) input) `shouldBe`
+                (dfa `dfaAccepts` runDfa dfa startState' input) `shouldBe`
                     True
         it "does not accept the empty string, \"aba\", \"abb\" and \"aabbaa\"" $ do
             forM_ ["", "aba", "abb", "aabbaa"] $ \input -> do
-                (dfa `dfaAccepts` runDfa dfa (Just startState) input) `shouldBe`
+                (dfa `dfaAccepts` runDfa dfa startState' input) `shouldBe`
                     False
     describe "buildDfa" $ do
         it "dfaStates should contain the accepting state(s) of the DFA" $ do

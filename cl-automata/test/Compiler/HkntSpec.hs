@@ -10,11 +10,15 @@ import           Data.Dfa
 import           Language.Automata.HkntParser
 
 import           Control.Monad
-import qualified Data.Text        as T
+import           Data.Bifunctor               ( first )
+import qualified Data.Text                    as T
 import           Test.Hspec
 
 main :: IO ()
 main = hspec spec
+
+data Error = E1 String | E2 HkntCompileError
+    deriving (Show)
 
 spec :: Spec
 spec = do
@@ -25,7 +29,7 @@ spec = do
   where
     compiledDfa input = do
         Result transitions acceptingStates _ <- parseHknt input
-        fst <$> compileHkntToDfa transitions acceptingStates
+        fst <$> first show (compileHkntToDfa transitions acceptingStates)
 
 cases :: [(T.Text, Dfa Char)]
 cases = [("accept: a b", buildDfaUnsafe [0, 1] [])]
