@@ -16,7 +16,6 @@ main = hspec spec
 spec :: Spec
 spec = do
     let Just startState' = toDfaState dfa startState
-        Just acceptingState' = toDfaState dfa acceptingState
     describe "runDfa" $ do
         it "accepts \"ab\" and \"abab\"" $ do
             forM_ ["ab", "abab"] $ \input -> do

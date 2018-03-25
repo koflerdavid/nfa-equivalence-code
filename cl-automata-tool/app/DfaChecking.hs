@@ -12,11 +12,10 @@ import           Compiler.Hknt
 import           Data.Dfa
 import           Language.Automata.HkntParser
 
-import           Control.Monad.Catch          ( Exception, MonadThrow, handle, throwM )
+import           Control.Monad.Catch          ( Exception, MonadThrow, throwM )
 import           Control.Monad                ( forM, forM_, when )
 import           Data.Bimap                   as Bimap
 import           Data.List                    as List
-import           Data.Maybe                   ( fromMaybe )
 import qualified Data.Text.IO                 as TIO
 import           System.IO                    ( IOMode (ReadMode), hPutStrLn,
                                                 stderr, stdin, withFile )

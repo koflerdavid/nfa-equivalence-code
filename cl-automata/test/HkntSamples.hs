@@ -33,6 +33,7 @@ introductionNfa2 =
 
 type Int6 = (Int, Int, Int, Int, Int, Int)
 
+introductionNfaMerged :: Nfa Char
 introductionNfaMerged =
     let (u, v, w, x, y, z) = (0, 1, 2, 3, 4, 5) :: Int6
     in buildNfa
@@ -47,6 +48,7 @@ introductionNfaMerged =
            , ((z, 'a'), [y])
            ]
 
+figure3NfaMerged :: Nfa Char
 figure3NfaMerged =
     let (u, x, y, z) = (0, 1, 2, 3) :: (Int, Int, Int, Int)
     in buildNfa

@@ -13,7 +13,7 @@ import           Data.Nfa
 import           Language.Automata.HkntParser
 
 import           Control.Monad                ( forM, forM_, mapM, when )
-import           Control.Monad.Catch          ( Exception, MonadThrow, handle, throwM )
+import           Control.Monad.Catch          ( Exception, MonadThrow )
 import           Data.Bimap                   as Bimap hiding ( fromList,
                                                          toList )
 import           Data.IntSet                  ( fromList, toList )

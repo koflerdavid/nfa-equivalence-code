@@ -9,12 +9,10 @@ import           Data.Dfa
 import           Data.Equivalence.Monad
 import           Data.Queue                      as Q
 
-import           Control.Monad                   ( when )
 import           Control.Monad.Trans.Class       ( lift )
 import           Control.Monad.Trans.Writer.Lazy
 import           Data.Bifunctor                  ( second )
 import           Data.Foldable
-import qualified Data.IntSet                     as ISet
 import           Data.Maybe                      ( isNothing )
 import           Data.Sequence                   as Seq
 import qualified Data.Set                        as Set

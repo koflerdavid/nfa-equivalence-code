@@ -17,12 +17,16 @@ import Test.Hspec
 main :: IO ()
 main = hspec spec
 
+a :: Regex Char
 a = Atom 'a'
 
+b :: Regex Char
 b = Atom 'b'
 
+c :: Regex Char
 c = Atom 'c'
 
+ab :: Regex Char
 ab = Sequence a b
 
 spec :: Spec
