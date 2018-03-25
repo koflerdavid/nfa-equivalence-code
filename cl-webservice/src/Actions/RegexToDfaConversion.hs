@@ -9,7 +9,7 @@ import           Data.Dfa.Format.Hknt ( NameGenerator, toHknt )
 import           Data.Dfa.Regex       ( RegexDfa, fromRegex, initialRegex )
 import           Data.FiniteAutomaton
 import           Data.Regex           ( Regex, matchesEmptyWord )
-import           Data.Regex.Formats   ( MinimallyQuotedRegex (..) )
+import           Data.Regex.Formats   ( toMinimallyQuotedText )
 import           Language.RegexParser ( parseRegex )
 
 import           Data.Aeson           ( ToJSON (toJSON), Value (String), object,
@@ -47,7 +47,7 @@ badRequestError description = do
 newtype JsonRegexDfa = JsonRegexDfa (RegexDfa Char)
 
 instance ToJSON (Regex Char) where
-    toJSON = String . toText . MinimallyQuotedRegex
+    toJSON = String . toMinimallyQuotedText
 
 instance ToJSON JsonRegexDfa where
     toJSON (JsonRegexDfa regexDfa) =
@@ -61,14 +61,14 @@ instance ToJSON JsonRegexDfa where
       where
         transitionTable :: RegexDfa Char -> [Pair]
         transitionTable =
-            map (\r -> toText (MinimallyQuotedRegex r) .= faTransitions regexDfa r)
+            map (\r -> toMinimallyQuotedText r .= faTransitions regexDfa r)
             . Data.Set.toList
             . faStates
 
         regexData :: Regex Char -> Value
         regexData regex =
             object
-                [ "regex" .= (toText . MinimallyQuotedRegex) regex
+                [ "regex" .= toMinimallyQuotedText regex
                 , "matchesEmptyWord" .= matchesEmptyWord regex
                 ]
 

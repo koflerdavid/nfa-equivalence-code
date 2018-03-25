@@ -1,14 +1,29 @@
 {-# LANGUAGE FlexibleInstances #-}
 
 module Data.Regex.Formats
-    ( FullyQuotedRegex(..)
-    , MinimallyQuotedRegex(..)
+    ( toFullyQuotedString
+    , toFullyQuotedText
+    , toMinimallyQuotedString
+    , toMinimallyQuotedText
     ) where
 
-import Data.Regex
+import           Data.Regex
 
-import Data.Char   ( isSpace, ord )
-import Data.IntSet ( fromList, member )
+import           Data.Char   ( isSpace, ord )
+import           Data.IntSet ( fromList, member )
+import qualified Data.Text   as T
+
+toFullyQuotedString :: Regex Char -> String
+toFullyQuotedString = show . FullyQuotedRegex
+
+toFullyQuotedText :: Regex Char -> T.Text
+toFullyQuotedText = T.pack . toFullyQuotedString
+
+toMinimallyQuotedString :: Regex Char -> String
+toMinimallyQuotedString = show . MinimallyQuotedRegex
+
+toMinimallyQuotedText :: Regex Char -> T.Text
+toMinimallyQuotedText = T.pack . toMinimallyQuotedString
 
 newtype FullyQuotedRegex c =
     FullyQuotedRegex (Regex c)

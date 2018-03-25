@@ -1,4 +1,6 @@
+{-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# OPTIONS_GHC -fno-warn-orphans #-}
 
 module Language.RegexParserSpec
     ( main
@@ -6,7 +8,7 @@ module Language.RegexParserSpec
     ) where
 
 import Data.Regex
-import Data.Regex.Formats   ( MinimallyQuotedRegex(..) )
+import Data.Regex.Formats   ( toMinimallyQuotedString )
 import Language.RegexParser
 
 import Control.Monad        ( forM_ )
@@ -27,8 +29,8 @@ spec :: Spec
 spec = do
     describe "regexParser" $ do
         forM_ regexCases $ \(input, expected) -> do
-            it ("should parse " ++ show input ++ " to " ++ show (MinimallyQuotedRegex expected)) $ do
-                fmap MinimallyQuotedRegex (parseRegex "testcase" input) `shouldBe` Right (MinimallyQuotedRegex expected)
+            it ("should parse " ++ show input ++ " to " ++ toMinimallyQuotedString expected) $ do
+                parseRegex "testcase" input `shouldBe` Right expected
   where
     regexCases =
         [ ("a", a)
@@ -45,3 +47,6 @@ spec = do
         , ("ab* +c", Alternative (Sequence a (Asterisk b)) c)
         , ("1ε0∅", foldr1 Sequence [Epsilon, Epsilon, Empty, Empty])
         ]
+
+instance Show (Regex Char) where
+    show = toMinimallyQuotedString

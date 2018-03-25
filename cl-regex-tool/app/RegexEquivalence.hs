@@ -3,12 +3,12 @@ module RegexEquivalence
     ) where
 
 import           Algorithm.Regex.Equivalence
-import           Data.Regex.Formats          ( MinimallyQuotedRegex (..) )
+import           Data.Regex.Formats          ( toMinimallyQuotedString )
 import           Language.RegexParser
 import           Types
 
 import           Control.Monad               ( forM_ )
-import           Control.Exception.Safe      ( Exception, MonadThrow, handle, throw )
+import           Control.Exception.Safe      ( Exception, MonadThrow, throw )
 import qualified Data.Text.IO                as TIO
 
 checkRegexEquivalence :: IO Bool
@@ -20,9 +20,9 @@ checkRegexEquivalence = do
     forM_ witnesses $ \(w, r1, r2) -> do
         printSameLine w
         putChar '\t'
-        printSameLine . MinimallyQuotedRegex $ r1
+        putStr (toMinimallyQuotedString r1)
         putChar '\t'
-        print . MinimallyQuotedRegex $ r2
+        putStrLn (toMinimallyQuotedString r2)
 
     return (null witnesses)
 

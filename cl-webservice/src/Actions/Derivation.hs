@@ -4,7 +4,7 @@ module Actions.Derivation
 
 import           Algorithm.Regex.Derivation ( wordDerive )
 import           Data.Regex                 ( Regex )
-import           Data.Regex.Formats         ( MinimallyQuotedRegex (..) )
+import           Data.Regex.Formats         ( toMinimallyQuotedText )
 import           Language.RegexParser       ( parseRegex )
 
 import           Data.Bifunctor             ( first )
@@ -31,7 +31,7 @@ action =
         modifyResponse $ setContentType "text/plain; charset=utf-8"
         case result of
             Right derivedRegex ->
-                writeText . T.pack . show . MinimallyQuotedRegex $ derivedRegex
+                writeText (toMinimallyQuotedText derivedRegex)
             Left e -> do
                 modifyResponse $ setResponseCode 400
                 case e of

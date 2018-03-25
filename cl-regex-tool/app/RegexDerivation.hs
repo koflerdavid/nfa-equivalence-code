@@ -1,7 +1,7 @@
 module RegexDerivation where
 
 import           Algorithm.Regex.Derivation
-import           Data.Regex.Formats         ( MinimallyQuotedRegex(..) )
+import           Data.Regex.Formats         ( toMinimallyQuotedString )
 import           Language.RegexParser
 import           Types
 
@@ -14,6 +14,6 @@ parseAndDeriveRegexByWord word = do
     case parseRegex "<stdin>" input of
         Left parseError -> throw (RegexParseException parseError)
         Right regex -> do
-            print (MinimallyQuotedRegex regex)
+            putStrLn (toMinimallyQuotedString regex)
             let regex' = wordDerive word regex
-            print (MinimallyQuotedRegex regex')
+            putStrLn (toMinimallyQuotedString regex')

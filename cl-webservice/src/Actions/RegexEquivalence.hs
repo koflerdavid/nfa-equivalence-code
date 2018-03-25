@@ -1,5 +1,4 @@
 {-# LANGUAGE FlexibleInstances #-}
-{-# OPTIONS_GHC -fno-warn-orphans #-}
 
 module Actions.RegexEquivalence
     ( action
@@ -7,7 +6,7 @@ module Actions.RegexEquivalence
 
 import           Algorithm.Regex.Equivalence ( Witness, getDifferences )
 import           Data.Regex                  ( Regex )
-import           Data.Regex.Formats          ( MinimallyQuotedRegex (..) )
+import           Data.Regex.Formats          ( toMinimallyQuotedText )
 import           Language.RegexParser        ( parseRegex )
 
 import           Data.Aeson                  ( ToJSON (toJSON), Value (String),
@@ -52,9 +51,6 @@ instance ToJSON EquivalenceResult where
     toJSON (NotEquivalent witnesses trace) =
         object ["equivalent" .= False, "witnesses" .= witnesses, "trace" .= trace]
 
-instance ToJSON (MinimallyQuotedRegex Char) where
-    toJSON = String . T.pack . show
-
 instance ToJSON TraceElement where
     toJSON traceElement =
         let (input, regex1, regex2) = traceConstraint traceElement
@@ -63,8 +59,8 @@ instance ToJSON TraceElement where
                , "constraint" .=
                  object
                      [ "input" .= input
-                     , "regex1" .= MinimallyQuotedRegex regex1
-                     , "regex2" .= MinimallyQuotedRegex regex2
+                     , "regex1" .= toMinimallyQuotedText regex1
+                     , "regex2" .= toMinimallyQuotedText regex2
                      ]
                ]
 
