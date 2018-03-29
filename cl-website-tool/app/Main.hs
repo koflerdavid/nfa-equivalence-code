@@ -1,6 +1,9 @@
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE InstanceSigs #-}
+{-# LANGUAGE UndecidableInstances #-}
 module Main where
 
-import Paths_cl_website_tool             ( getDataFileName )
+import DataFiles                         ( getDataFileName )
 
 import Actions.Derivation                as Derivation
 import Actions.FiniteAutomataEquivalence as FiniteAutomataEquivalence
@@ -9,6 +12,7 @@ import Actions.RegexToDfaConversion      as RegexToDfaConversion
 
 import Control.Applicative               ( (<|>) )
 import Control.Monad.IO.Class            ( liftIO )
+import Data.ByteString
 import Snap.Core
 import Snap.Http.Server
 import Snap.Util.FileServe
@@ -17,20 +21,27 @@ main :: IO ()
 main = quickHttpServe site
 
 site :: Snap ()
-site = ifTop index
-   <|> route
-       [ ("finiteAutomata/equivalence", FiniteAutomataEquivalence.action)
-       , ("regex/derivation", Derivation.action)
-       , ("regex/dfa_conversion", RegexToDfaConversion.action)
-       , ("regex/equivalence", RegexEquivalence.action)
-       ]
-   <|> dir "static" (serveDirectory =<< liftIO (getDataFileName "static"))
-   <|> notFoundError
+site =
+    ifTop serveIndex
+    <|> route
+        [ ("finiteAutomata/equivalence", FiniteAutomataEquivalence.action)
+        , ("regex/derivation", Derivation.action)
+        , ("regex/dfa_conversion", RegexToDfaConversion.action)
+        , ("regex/equivalence", RegexEquivalence.action)
+        ]
+    <|> serveStatic "static" "static"
+    <|> notFoundError
 
-index :: Snap ()
-index = do
+serveIndex :: Snap ()
+serveIndex = do
     modifyResponse $ setContentType "text/html; charset=utf-8"
     sendFile =<< liftIO (getDataFileName "static/index.html")
+
+serveStatic :: ByteString -> FilePath -> Snap ()
+serveStatic pathComponent baseDirectory = do
+    dir pathComponent $ do
+        dataFileBaseDir <- liftIO (getDataFileName baseDirectory)
+        serveDirectory dataFileBaseDir
 
 notFoundError :: Snap ()
 notFoundError = do
