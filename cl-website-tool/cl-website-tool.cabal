@@ -1,5 +1,5 @@
 name:                 cl-website-tool
-version:              2.0.0.0
+version:              2.1.0.0
 synopsis:             A collection of more or less efficient algorithms for simplifying finite automata and proving their equivalence.
 description:          Please see README.md
 homepage:             https://github.com/koflerdavid/nfa-equivalence-code#readme
@@ -20,21 +20,25 @@ data-files:           static/index.html
 executable website
   default-language:     Haskell2010
   default-extensions:   OverloadedStrings
+  ghc-options:          -O2 -Wall -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wredundant-constraints
 
   hs-source-dirs:       app
   main-is:              Main.hs
-  other-modules:        Paths_cl_website_tool
+  other-modules:        DataFiles
+                      , Paths_cl_website_tool
   autogen-modules:      Paths_cl_website_tool
 
   build-depends:        base          >= 4.7   && < 5
+                      , bytestring
                       , cl-webservice >= 2.0
+                      , path
                       , snap-core     >= 1.0   && < 1.1
                       , snap-server   >= 1.0   && < 1.1
 
 source-repository this
   type:               git
   location:           https://github.com/koflerdavid/nfa-equivalence-code
-  tag:                v2.0
+  tag:                v2.1
   subdir:             cl-website-tool
 
 source-repository head
