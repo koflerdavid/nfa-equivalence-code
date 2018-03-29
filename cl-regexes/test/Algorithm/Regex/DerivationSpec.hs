@@ -25,7 +25,7 @@ spec = do
                 , (Atom 'a', "b", Empty)
                 , (Sequence (Atom 'a') (Atom 'b'), "a", Atom 'b')
                 , (Sequence (Atom 'a') (Atom 'b'), "c", Empty)
-                , (Asterisk (Atom 'c'), "c", Asterisk (Atom 'c'))
+                , (KleeneStar (Atom 'c'), "c", KleeneStar (Atom 'c'))
                 ]
         forM_ cases $ \(from, by, to) -> do
             let shouldConvertFromTo =

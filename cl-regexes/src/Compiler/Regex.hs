@@ -45,10 +45,13 @@ compileRegex' (Sequence first second) startFaState finalFaState =
         endFaState <- freshFaState
         compileRegex' r currentStartFaState endFaState
         compileSequence r' rs' endFaState
-compileRegex' (Asterisk inner) startFaState endFaState = do
+compileRegex' (KleeneStar inner) startFaState endFaState = do
     compileRegex' inner startFaState endFaState
-    startFaState `epsilonTransitionsTo` [endFaState]
-    endFaState `epsilonTransitionsTo` [startFaState]
+    startFaState `epsilonTransitionsTo` [endFaState] -- Forwards jump
+    endFaState `epsilonTransitionsTo` [startFaState] -- Backwards jump
+compileRegex' (KleenePlus inner) startFaState endFaState = do
+    compileRegex' inner startFaState endFaState
+    endFaState `epsilonTransitionsTo` [startFaState] -- Only backwards jump
 
 freshFaState :: CompilerState c FaState
 freshFaState = do

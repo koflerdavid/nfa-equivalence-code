@@ -84,7 +84,8 @@ texyPrec _ (Atom c) = fromString (show c)
 texyPrec prec (Alternative r s) =
     autoParensWhen (prec > 0) $ texyPrec 0 r <> raw "+" <> texyPrec 0 s
 texyPrec prec (Sequence r s) = autoParensWhen (prec > 1) $ texyPrec 1 r <> quad <> texyPrec 1 s
-texyPrec _ (Asterisk r) = texyPrec 2 r ^: raw "\\ast"
+texyPrec _ (KleeneStar r) = texyPrec 2 r ^: raw "\\ast"
+texyPrec _ (KleenePlus r) = texyPrec 2 r ^: raw "\\dagger"
 
 autoParensWhen :: LaTeXC l => Bool -> l -> l
 autoParensWhen True  = autoParens

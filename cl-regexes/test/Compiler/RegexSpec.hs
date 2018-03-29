@@ -26,14 +26,14 @@ spec = do
             forM_ ["", "b", "aa", "ab"] $ \input -> do
                 (enfa `accepts` runEnfa enfa [0] input) `shouldBe` False
     describe "run (a|b)*" $ do
-        let enfa = compileRegex (Asterisk (Alternative (Atom 'a') (Atom 'b')))
+        let enfa = compileRegex (KleeneStar (Alternative (Atom 'a') (Atom 'b')))
         it "accepts the empty string, \"a\", \"b\" and \"ab\"" $ do
             forM_ ["", "a", "b", "ab"] $ \input -> do
                 (enfa `accepts` runEnfa enfa [0] input) `shouldBe` True
         it "does not accept \"d\"" $ do
             (enfa `accepts` runEnfa enfa [0] "d") `shouldBe` False
     describe "run a*" $ do
-        let enfa = compileRegex (Asterisk (Atom 'a'))
+        let enfa = compileRegex (KleeneStar (Atom 'a'))
         it "accepts \"\", \"a\", \"aa\", \"aaa\"" $ do
             forM_ ["", "a", "aa", "aaa"] $ \input ->
                 enfa `accepts` runEnfa enfa [0] input `shouldBe` True

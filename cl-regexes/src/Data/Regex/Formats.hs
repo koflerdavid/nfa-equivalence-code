@@ -43,8 +43,10 @@ instance (Show c) => Show (FullyQuotedRegex c) where
             showsPrec 7 (FullyQuotedRegex r) .
             showChar ' ' .
             showsPrec 7 (FullyQuotedRegex s)
-    showsPrec _ (FullyQuotedRegex (Asterisk r)) =
+    showsPrec _ (FullyQuotedRegex (KleeneStar r)) =
         showsPrec 8 (FullyQuotedRegex r) . showChar '*'
+    showsPrec _ (FullyQuotedRegex (KleenePlus r)) =
+        showsPrec 8 (FullyQuotedRegex r) . showChar '†'
 
 newtype MinimallyQuotedRegex c =
     MinimallyQuotedRegex (Regex c)
@@ -67,8 +69,10 @@ instance Show (MinimallyQuotedRegex Char) where
             showsPrec 7 (MinimallyQuotedRegex r) .
             showChar ' ' .
             showsPrec 7 (MinimallyQuotedRegex s)
-    showsPrec _ (MinimallyQuotedRegex (Asterisk r)) =
+    showsPrec _ (MinimallyQuotedRegex (KleeneStar r)) =
         showsPrec 8 (MinimallyQuotedRegex r) . showChar '*'
+    showsPrec _ (MinimallyQuotedRegex (KleenePlus r)) =
+        showsPrec 8 (MinimallyQuotedRegex r) . showChar '†'
 
 hasToBeEscaped :: Char -> Bool
 hasToBeEscaped c = isSpace c || ord c `Data.IntSet.member` charsToBeEscaped

@@ -19,7 +19,8 @@ derive c (Atom c')
     | c == c' = Epsilon
     | otherwise = Empty
 derive c (Alternative r s) = normalised $ Alternative (derive c r) (derive c s)
-derive c r@(Asterisk inner) = normalised $ Sequence (derive c inner) r
+derive c r@(KleeneStar inner) = normalised $ Sequence (derive c inner) r
+derive c (KleenePlus inner) = normalised $ Sequence (derive c inner) (KleeneStar inner)
 derive c (Sequence r s) =
     if (not . matchesEmptyWord) r
         then normalised $ Sequence (derive c r) s

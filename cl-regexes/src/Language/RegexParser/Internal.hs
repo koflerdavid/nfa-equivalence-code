@@ -20,8 +20,8 @@ tokeniseAndParse parser name input =
 
 regexOperatorTable :: OperatorTable [(SourcePos, Token)] u Identity (Regex Char)
 regexOperatorTable =
-    [ [ Postfix $ justToken ZeroOrMoreTimesToken $> Asterisk -- ZeroOrMore
-      , Postfix $ justToken OneOrMoreTimesToken $> oneOrMore -- OneOrMore
+    [ [ Postfix $ justToken ZeroOrMoreTimesToken $> KleeneStar -- ZeroOrMore
+      , Postfix $ justToken OneOrMoreTimesToken $> KleenePlus -- OneOrMore
       , Postfix $ justToken ZeroOrOneTimesToken $> zeroOrMore -- ZeroOrOne
       ]
     , [Infix (pure Sequence) AssocRight] -- Sequence
@@ -30,9 +30,6 @@ regexOperatorTable =
 
 zeroOrMore :: Regex c -> Regex c
 zeroOrMore r = Alternative r Epsilon
-
-oneOrMore :: Regex c -> Regex c
-oneOrMore r = Sequence r (Asterisk r)
 
 regex :: RegexTokenParser () (Regex Char)
 regex = buildExpressionParser regexOperatorTable primitiveRegex

@@ -19,7 +19,8 @@ data Regex c
                   (Regex c)
     | Sequence (Regex c)
                (Regex c)
-    | Asterisk (Regex c)
+    | KleeneStar (Regex c)
+    | KleenePlus (Regex c)
     deriving (Eq, Ord)
 
 alphabet :: Ord c => Regex c -> Set.Set c
@@ -30,7 +31,8 @@ alphabet regex = execWriter (computeAlphabet regex)
             Epsilon         -> return ()
             Empty           -> return ()
             Atom c          -> tell (Set.singleton c)
-            Asterisk inner  -> computeAlphabet inner
+            KleeneStar inner  -> computeAlphabet inner
+            KleenePlus inner  -> computeAlphabet inner
             Alternative s t -> computeAlphabet s >> computeAlphabet t
             Sequence s t    -> computeAlphabet s >> computeAlphabet t
 
@@ -39,7 +41,8 @@ empty :: Regex c -> Bool
 empty Epsilon           = False
 empty Empty             = True
 empty (Atom _)          = False
-empty (Asterisk _)      = False -- The empty string is always a match
+empty (KleeneStar _)      = False -- The empty string is always a match
+empty (KleenePlus r)      = empty r -- Depends on the inner string.
 empty (Alternative r s) = empty r && empty s
 empty (Sequence r s)    = empty r || empty s
 
@@ -49,7 +52,8 @@ matchesEmptyWord regex =
         Atom _          -> False
         Epsilon         -> True
         Empty           -> False
-        Asterisk _      -> True
+        KleeneStar _      -> True
+        KleenePlus r      -> matchesEmptyWord r
         Alternative r s -> matchesEmptyWord r || matchesEmptyWord s
         Sequence r s    -> matchesEmptyWord r && matchesEmptyWord s
 
@@ -57,7 +61,8 @@ matchesOnlyEmptyWord :: Regex c -> Bool
 matchesOnlyEmptyWord Epsilon = True
 matchesOnlyEmptyWord Empty = False
 matchesOnlyEmptyWord (Atom _) = False
-matchesOnlyEmptyWord (Asterisk r) = empty r
+matchesOnlyEmptyWord (KleeneStar r) = empty r
+matchesOnlyEmptyWord (KleenePlus r) = matchesOnlyEmptyWord r
 matchesOnlyEmptyWord (Sequence r s) =
     matchesOnlyEmptyWord r && matchesOnlyEmptyWord s
 matchesOnlyEmptyWord (Alternative r s) =
@@ -74,6 +79,7 @@ normalised regex
     | matchesOnlyEmptyWord regex =
         Epsilon -- Captures Epsilon -!> Epsilon, among others
 normalised regex@(Atom _) = regex
+
 normalised (Alternative first second) =
     normalised' (normalised first `plus` normalised second)
   where
@@ -88,6 +94,7 @@ normalised (Alternative first second) =
         | r == s = r
         | r <= s = Alternative r s
         | otherwise = Alternative s r
+
 normalised (Sequence first second) =
     normalised' (normalised first `concat` normalised second)
   where
@@ -97,14 +104,22 @@ normalised (Sequence first second) =
     r `concat` Epsilon = r
     Sequence r s `concat` t = Sequence r (s `concat` t)
     r `concat` s = Sequence r s
-normalised (Asterisk inner@(Asterisk _)) = normalised inner
-normalised (Asterisk inner) = Asterisk (normalised inner)
+
+normalised (KleeneStar inner@(KleeneStar _)) = normalised inner
+normalised (KleeneStar (KleenePlus inner)) = KleeneStar (normalised inner)
+normalised (KleeneStar inner) = KleeneStar (normalised inner)
+
+normalised (KleenePlus inner@(KleenePlus _)) = normalised inner
+normalised (KleenePlus inner)
+    | matchesEmptyWord inner = normalised $ KleeneStar (normalised inner)
+normalised (KleenePlus inner) = KleenePlus (normalised inner)
 
 -- | Matches some patterns more. This is most effectively used after another normalisation pass.
 normalised' :: (Eq c) => Regex c -> Regex c
 normalised' r =
     case r of
-        Alternative Epsilon (Sequence a inner@(Asterisk a'))
+        Alternative Epsilon (Sequence a inner@(KleeneStar a'))
             | a == a' -> inner -- 1 + a a* = a*
-        Alternative Epsilon inner@(Asterisk _) -> inner
+        Alternative Epsilon inner@(KleeneStar _) -> inner -- 1 + a* -> a*
+        Alternative Epsilon (KleenePlus inner) -> KleeneStar inner -- 1 + a+ -> a*
         _ -> r
