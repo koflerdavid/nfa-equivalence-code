@@ -1,17 +1,13 @@
 module Data.EquivalenceSpec
-    ( main
-    , spec
+    ( spec_equivalenceMonadTransformer
     ) where
 
 import Control.Monad.Trans.Class
 import Data.Equivalence.Monad
 import Test.Hspec
 
-main :: IO ()
-main = hspec spec
-
-spec :: Spec
-spec = do
+spec_equivalenceMonadTransformer :: Spec
+spec_equivalenceMonadTransformer = do
     describe "union find" $ do
         it "should be possible to merge two equivalence classes" $ do
             runEquivT' $ do

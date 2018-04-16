@@ -2,8 +2,7 @@
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 
 module Algorithm.Regex.DerivationSpec
-    ( main
-    , spec
+    ( spec_regexDerivation
     ) where
 
 import Control.Monad              ( forM_ )
@@ -14,11 +13,8 @@ import Algorithm.Regex.Derivation
 import Data.Regex
 import Data.Regex.Formats         ( toMinimallyQuotedString )
 
-main :: IO ()
-main = hspec spec
-
-spec :: Spec
-spec = do
+spec_regexDerivation :: Spec
+spec_regexDerivation = do
     describe "derivation of regular expressions" $ do
         let cases =
                 [ (Atom 'a', "a", Epsilon)

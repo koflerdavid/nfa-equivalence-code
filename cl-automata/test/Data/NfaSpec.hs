@@ -1,6 +1,5 @@
 module Data.NfaSpec
-    ( main
-    , spec
+    ( spec_nfa
     ) where
 
 import Control.Monad ( forM_ )
@@ -8,11 +7,8 @@ import Test.Hspec
 
 import Data.Nfa
 
-main :: IO ()
-main = hspec spec
-
-spec :: Spec
-spec = do
+spec_nfa :: Spec
+spec_nfa = do
     describe "nfa for \"\"" $ do
         let nfa = buildNfa [0] []
         it "should accept \"\"" $ ([0], nfa) `shouldAccept` ""

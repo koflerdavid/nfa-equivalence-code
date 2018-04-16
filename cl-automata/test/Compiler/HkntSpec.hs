@@ -1,8 +1,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 
 module Compiler.HkntSpec
-    ( main
-    , spec
+    ( spec_hkntCompiler
     ) where
 
 import           Compiler.Hknt
@@ -14,14 +13,11 @@ import           Data.Bifunctor               ( first )
 import qualified Data.Text                    as T
 import           Test.Hspec
 
-main :: IO ()
-main = hspec spec
-
 data Error = E1 String | E2 HkntCompileError
     deriving (Show)
 
-spec :: Spec
-spec = do
+spec_hkntCompiler :: Spec
+spec_hkntCompiler = do
     describe "the DFA compiler" $ do
         forM_ cases $ \(input, expected) -> do
             it ("should compile " ++ show input) $ do

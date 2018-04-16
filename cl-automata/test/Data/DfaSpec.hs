@@ -1,6 +1,5 @@
 module Data.DfaSpec
-    ( main
-    , spec
+    ( spec_dfa
     ) where
 
 import           Data.Dfa
@@ -10,11 +9,8 @@ import           Data.IntSet   ( isSubsetOf )
 import           Data.Set      as Set hiding ( isSubsetOf )
 import           Test.Hspec
 
-main :: IO ()
-main = hspec spec
-
-spec :: Spec
-spec = do
+spec_dfa :: Spec
+spec_dfa = do
     let Just startState' = toDfaState dfa startState
     describe "runDfa" $ do
         it "accepts \"ab\" and \"abab\"" $ do

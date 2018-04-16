@@ -3,8 +3,7 @@
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 
 module Language.RegexParserSpec
-    ( main
-    , spec
+    ( spec_regexParser
     ) where
 
 import Data.Regex
@@ -13,9 +12,6 @@ import Language.RegexParser
 
 import Control.Monad        ( forM_ )
 import Test.Hspec
-
-main :: IO ()
-main = hspec spec
 
 a :: Regex Char
 a = Atom 'a'
@@ -29,8 +25,8 @@ c = Atom 'c'
 ab :: Regex Char
 ab = Sequence a b
 
-spec :: Spec
-spec = do
+spec_regexParser :: Spec
+spec_regexParser = do
     describe "regexParser" $ do
         forM_ regexCases $ \(input, expected) -> do
             it ("should parse " ++ show input ++ " to " ++ toMinimallyQuotedString expected) $ do

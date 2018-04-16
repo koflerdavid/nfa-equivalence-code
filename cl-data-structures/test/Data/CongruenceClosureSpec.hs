@@ -1,6 +1,5 @@
 module Data.CongruenceClosureSpec
-    ( main
-    , spec
+    ( spec_congruenceClosure
     ) where
 
 import qualified Data.CongruenceClosure as CC
@@ -8,11 +7,8 @@ import qualified Data.CongruenceClosure as CC
 import           Data.IntSet            ( fromList )
 import           Test.Hspec
 
-main :: IO ()
-main = hspec spec
-
-spec :: Spec
-spec = do
+spec_congruenceClosure :: Spec
+spec_congruenceClosure = do
     describe "empty family of sets" $ do
         it "should consider equal sets as equal" $ do
             let emptySetOfSets = CC.empty

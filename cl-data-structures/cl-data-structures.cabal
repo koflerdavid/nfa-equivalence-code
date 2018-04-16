@@ -29,12 +29,15 @@ library
 test-suite cl-data-structures-test
   type:                exitcode-stdio-1.0
   hs-source-dirs:      test
-  main-is:             Spec.hs
+  main-is:             Driver.hs
   build-depends:       base               >= 4.7 && < 5
                      , hspec
                      , cl-data-structures
                      , containers
                      , equivalence
+                     , tasty
+                     , tasty-discover
+                     , tasty-hspec
                      , transformers
 
   other-modules:       Data.EquivalenceSpec

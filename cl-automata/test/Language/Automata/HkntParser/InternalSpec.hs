@@ -1,8 +1,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 
 module Language.Automata.HkntParser.InternalSpec
-    ( main
-    , spec
+    ( spec_hkntParserInternal
     ) where
 
 import           Language.Automata.HkntParser.Class
@@ -14,11 +13,8 @@ import qualified Data.Text                              as T
 import           Test.Hspec
 import           Text.Parsec
 
-main :: IO ()
-main = hspec spec
-
-spec :: Spec
-spec = do
+spec_hkntParserInternal :: Spec
+spec_hkntParserInternal = do
     describe "transition parser" $ do
         let cases =
                 [ ("a -a-> b", [("a", 'a', "b")])

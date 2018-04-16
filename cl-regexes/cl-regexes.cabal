@@ -53,13 +53,16 @@ test-suite cl-regexes-test
                       -Wincomplete-record-updates -Wincomplete-uni-patterns -Wredundant-constraints
 
   hs-source-dirs:     test
-  main-is:            Spec.hs
+  main-is:            Driver.hs
 
   build-depends:      base           >= 4.8 && < 5
                     , hspec
                     , cl-automata    >= 2.0
                     , cl-regexes     >= 2.0
                     , parsec         >= 3 && < 4
+                    , tasty
+                    , tasty-discover
+                    , tasty-hspec
 
   other-modules:      Algorithm.Regex.DerivationSpec
                     , Compiler.RegexSpec

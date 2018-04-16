@@ -49,13 +49,16 @@ test-suite cl-automata-test
   ghc-options:        -threaded -rtsopts -with-rtsopts=-N -Wall
 
   hs-source-dirs:     test
-  main-is:            Spec.hs
+  main-is:            Driver.hs
 
   build-depends:      base           >= 4.8 && < 5
                     , hspec
                     , cl-automata    >= 2.0
                     , containers
                     , parsec         >= 3 && < 4
+                    , tasty
+                    , tasty-discover
+                    , tasty-hspec
                     , text
                     , transformers
 

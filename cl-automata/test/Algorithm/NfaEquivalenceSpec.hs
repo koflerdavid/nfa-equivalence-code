@@ -1,6 +1,5 @@
 module Algorithm.NfaEquivalenceSpec
-    ( main
-    , spec
+    ( spec_nfaEquivalence
     ) where
 
 import Algorithm.NfaEquivalence
@@ -10,11 +9,8 @@ import Control.Monad            ( forM_ )
 import Data.IntSet              ( singleton )
 import Test.Hspec
 
-main :: IO ()
-main = hspec spec
-
-spec :: Spec
-spec =
+spec_nfaEquivalence :: Spec
+spec_nfaEquivalence =
     forM_
         [ ("HK naive", nfaStatesEquivalentHk)
         , ("HK with congruence", nfaStatesEquivalentHkC)

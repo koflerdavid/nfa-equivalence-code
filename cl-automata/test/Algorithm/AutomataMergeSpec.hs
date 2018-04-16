@@ -1,6 +1,5 @@
 module Algorithm.AutomataMergeSpec
-    ( main
-    , spec
+    ( spec_automataMerge
     ) where
 
 import Algorithm.AutomataMerge
@@ -10,11 +9,8 @@ import Control.Monad           ( forM_ )
 import Data.Maybe              ( fromJust )
 import Test.Hspec
 
-main :: IO ()
-main = hspec spec
-
-spec :: Spec
-spec = do
+spec_automataMerge :: Spec
+spec_automataMerge = do
     describe "union" $ do
         forM_ samples $ \(i, (dfa1, dfa2, merged)) -> do
             it ("should work for sample #" ++ show i) $ do

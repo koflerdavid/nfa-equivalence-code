@@ -1,6 +1,5 @@
 module Data.EpsilonNfa.InternalSpec
-    ( main
-    , spec
+    ( spec_epsilonNfaInternal
     ) where
 
 import Data.EpsilonNfa.Internal
@@ -10,14 +9,11 @@ import Data.IntSet                    ( IntSet, empty, fromList, singleton )
 import Data.Map                       as Map hiding ( empty, singleton )
 import Test.Hspec
 
-main :: IO ()
-main = hspec spec
-
 emptySet :: IntSet
 emptySet = empty
 
-spec :: Spec
-spec = do
+spec_epsilonNfaInternal :: Spec
+spec_epsilonNfaInternal = do
     describe "enfaStep'ping" $ do
         let (firstState, secondState, thirdState, fourthState) = (1, 2, 3, 4)
             transitions =

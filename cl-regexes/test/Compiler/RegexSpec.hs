@@ -1,6 +1,5 @@
 module Compiler.RegexSpec
-    ( main
-    , spec
+    ( spec_regexCompiler
     ) where
 
 import Control.Monad   ( forM_ )
@@ -10,14 +9,8 @@ import Compiler.Regex
 import Data.EpsilonNfa
 import Data.Regex
 
-main :: IO ()
-main = do
-    let regexENfa = compileRegex (Atom 'a')
-    print regexENfa
-    hspec spec
-
-spec :: Spec
-spec = do
+spec_regexCompiler :: Spec
+spec_regexCompiler = do
     describe "run a" $ do
         let enfa = compileRegex (Atom 'a')
         it "accepts \"a\"" $ do

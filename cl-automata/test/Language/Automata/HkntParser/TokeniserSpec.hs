@@ -1,8 +1,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 
 module Language.Automata.HkntParser.TokeniserSpec
-    ( main
-    , spec
+    ( spec_hkntTokeniser
     ) where
 
 import           HkntSamples
@@ -14,11 +13,8 @@ import qualified Data.Text                              as T
 import           Test.Hspec
 import           Text.Parsec
 
-main :: IO ()
-main = hspec spec
-
-spec :: Spec
-spec = do
+spec_hkntTokeniser :: Spec
+spec_hkntTokeniser = do
     describe "hkntTokenizer" $ do
         let cases =
                 [ ( "a -a-> b c"

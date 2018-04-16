@@ -1,6 +1,5 @@
 module Algorithm.DfaEquivalenceSpec
-    ( main
-    , spec
+    ( spec_dfaEquivalence
     ) where
 
 import Algorithm.DfaEquivalence
@@ -9,11 +8,8 @@ import Data.Dfa
 import Control.Monad            ( forM_ )
 import Test.Hspec
 
-main :: IO ()
-main = hspec spec
-
-spec :: Spec
-spec = do
+spec_dfaEquivalence :: Spec
+spec_dfaEquivalence = do
     forM_ [("dfaEquivalentHkNaive", dfaEquivalentHkNaive), ("dfaEquivalentHk", dfaEquivalentHk)] $ \(name, dfaEquivalent) ->
         describe name $ do
             it "should tell apart the automata for {a, b} and {a}" $ do

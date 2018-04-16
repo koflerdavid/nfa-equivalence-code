@@ -3,8 +3,7 @@
 {-# OPTIONS_GHC -fno-warn-orphans #-}
 
 module Language.RegexParser.InternalSpec
-    ( main
-    , spec
+    ( spec_regexParserInternal
     ) where
 
 import Data.Regex
@@ -14,17 +13,14 @@ import Language.RegexParser.Internal
 import Control.Monad                 ( forM_ )
 import Test.Hspec
 
-main :: IO ()
-main = hspec spec
-
 a :: Regex Char
 a = Atom 'a'
 
 b :: Regex Char
 b = Atom 'b'
 
-spec :: Spec
-spec = do
+spec_regexParserInternal :: Spec
+spec_regexParserInternal = do
     describe "primitiveRegexParser" $ do
         forM_ primitiveRegexCases $ \(input, expected) -> do
             it ("should parse " ++ show input ++ " to " ++ toMinimallyQuotedString expected) $ do

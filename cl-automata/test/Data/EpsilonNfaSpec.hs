@@ -1,6 +1,5 @@
 module Data.EpsilonNfaSpec
-    ( main
-    , spec
+    ( spec_epsilonNfa
     ) where
 
 import Control.Monad   ( forM_ )
@@ -8,11 +7,8 @@ import Test.Hspec
 
 import Data.EpsilonNfa
 
-main :: IO ()
-main = hspec spec
-
-spec :: Spec
-spec = do
+spec_epsilonNfa :: Spec
+spec_epsilonNfa = do
     describe "enfa for \"\"" $ do
         let enfa = buildEnfa [0] []
         it "should accept \"\"" $ ([0], enfa) `shouldAccept` ""

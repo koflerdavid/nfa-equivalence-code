@@ -1,8 +1,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 
 module Language.Automata.HkntParserSpec
-    ( main
-    , spec
+    ( spec_hkntParser
     ) where
 
 import HkntSamples
@@ -10,11 +9,8 @@ import Language.Automata.HkntParser
 
 import Test.Hspec
 
-main :: IO ()
-main = hspec spec
-
-spec :: Spec
-spec = do
+spec_hkntParser :: Spec
+spec_hkntParser = do
     describe "automataParser" $ do
         it
             "should parse an automata with only accepting states and no transitions" $ do
