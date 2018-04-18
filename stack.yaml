@@ -15,7 +15,9 @@ packages:
 - './cl-webservice'
 - './cl-website-tool'
 # Packages to be pulled from upstream that are not in the resolver (e.g., acme-missiles-0.3)
-extra-deps: []
+extra-deps:
+- base-4.11.0.0
+- haddock-api-2.19.0.1
 
 # Override default flag values for local packages and extra-deps
 flags: {}

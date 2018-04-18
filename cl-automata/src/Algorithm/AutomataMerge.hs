@@ -1,3 +1,19 @@
+{- |
+Module:      Algorithm.AutomataMerge
+
+Description: This module provides an algorithm to merge two DFAs.
+Copyright:   (C) David Kofler
+License:     Please see LICENCE file of project
+
+Maintainer:  kofler.david@gmail.com
+Stability:   provisional
+Portability: portable (Haskell 2010)
+
+Provides an algorithm to merge two DFAs.
+It is crucial to avoid overlaps between state names because the goal is
+to transform the two passed DFAs into subautomata of the resulting DFA.
+-}
+
 module Algorithm.AutomataMerge
     ( mergeDfa
     ) where

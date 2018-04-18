@@ -1,3 +1,16 @@
+{- |
+Module:      Actions.FiniteAutomataEquivalence
+Description: Endpoint for checking the equivalence of two finite automata
+Copyright:   (C) David Kofler
+License:     BSD3 (see the LICENSE file in the distribution)
+
+Maintainer:  kofler.david@gmail.com
+Stability:   provisional
+Portability: portable (OverloadedStrings)
+
+This module provides an endpoint for checking the equivalence of two finite automata.
+
+-}
 module Actions.FiniteAutomataEquivalence
     ( action
     ) where
@@ -11,8 +24,8 @@ import           Data.ByteString.Lazy         as LBS
 import           Data.IntSet                  ( fromList, toList )
 import           Data.Maybe                   ( fromJust )
 import           Data.Monoid                  ( (<>) )
+import           Data.Text.Encoding           ( decodeUtf8' )
 import qualified Data.Text.Lazy               as TL
-import           Data.Text.Encoding          ( decodeUtf8' )
 import           Prelude                      hiding ( lookup )
 import           Snap.Core
 
@@ -28,10 +41,14 @@ data EquivalenceError
     | NoCheckSpecified
     | CheckedStateDoesNotExist String
 
-data PrettyConstraint =
-    PrettyConstraint String -- | The input that lead to this constraint
-                     [String] -- | The first set of states
-                     [String] -- | The second set of states
+data PrettyConstraint = PrettyConstraint {
+        -- | The input that lead to this constraint
+      input     :: String
+        -- | The first set of states
+    , stateSet1 :: [String]
+        -- | The second set of states
+    , stateSet2 :: [String]
+    }
 
 -- | A trace is the execution sequence of the algorithm
 -- Constraints are either ignored or are significant.
@@ -60,6 +77,27 @@ instance ToJSON PrettyConstraint where
     toJSON (PrettyConstraint input stateSet1 stateSet2) =
         object ["input" .= input, "stateSet1" .= stateSet1, "stateSet2" .= stateSet2]
 
+{-| This action expects a POST request with content type
+`application/x-www-form-urlencoded` and a parameter `input`.
+The value of this parameter has to be a UTF-8 string matching the syntax
+specified by Bonchi and Pous at the
+[web-appendix of their paper](https://perso.ens-lyon.fr/damien.pous/hknt/).
+If there is a syntax error, a UTF-8 text message describing the error is
+returned.
+
+Only the last `check:` clause in the input will be considered.
+Currently, it is always going to be interpreted as an equality check.
+
+After performing the check, a JSON document containing the result
+will be encoded and sent to the client.
+It will represent an object that always has at least the field `equivalent`.
+It is always a boolean stating whether the two states are equivalent.
+In case they are not equivalent, an additional field `witnesses`,
+containing an array of strings, will be present.
+Each of these strings belongs to the language of one of the states,
+but not of the other.
+
+-}
 action :: Snap ()
 action =
     method POST $ do
