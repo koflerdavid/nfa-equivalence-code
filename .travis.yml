@@ -1,0 +1,19 @@
+sudo: false
+
+cache:
+  directories:
+    - $HOME/.stack
+
+before_install:
+  - mkdir p ~/.local/bin
+  - export PATH=$HOME/.local/bin:$PATH
+  - travis_retry curl -L https://www.stackage.org/stack/linux-x86_64 | tar xz --wildcards --strip-components=1 -C ~/.local/bin '*/stack'
+
+install:
+  # Install GHC
+  - travis_wait stack --no-terminal --skip-ghc-check setup
+  # Build the dependencies of the project this way to not require `travis_wait` on the next command.
+  - travis_wait stack --no-terminal --skip-ghc-check test --no-run-tests
+
+script:
+  - stack --no-terminal --skip-ghc-check test cl-automata cl-data-structures cl-regexes
