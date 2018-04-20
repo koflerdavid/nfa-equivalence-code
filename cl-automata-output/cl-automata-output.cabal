@@ -1,0 +1,44 @@
+name:               cl-automata-output
+version:            1.0.0.0
+synopsis:           A collection of more or less efficient algorithms for simplifying finite automata and proving their equivalence.
+description:        Please see README.md
+homepage:           https://github.com/koflerdavid/nfa-equivalence-code#readme
+bug-reports:        https://github.com/koflerdavid/nfa-equivalence-code/issues
+license:            BSD3
+license-file:       LICENSE
+author:             David Kofler
+maintainer:         D.Kofler@student.uibk.ac.at
+copyright:          2016-2018 David Kofler
+category:           Algorithms
+build-type:         Simple
+cabal-version:      >= 2
+
+library
+  default-language:   Haskell2010
+  ghc-options:        -Wall -Wcompat -Werror
+                      -Wincomplete-record-updates -Wincomplete-uni-patterns -Wredundant-constraints
+
+  hs-source-dirs:     src
+  exposed-modules:    Data.Dfa.Format.Hknt
+                    , Data.Dfa.Format.Html
+
+  -- base-4.8 is required for Bifunctors
+  build-depends:      base               >= 4.8 && < 5
+                    , cl-automata        >= 2.0
+                    , cl-regexes         >= 3.0
+                    -- For Data.Map.!?
+                    , containers         >= 0.5.9.1
+                    , lucid
+                    , text
+                    , transformers
+
+source-repository this
+  type:             git
+  location:         https://github.com/koflerdavid/nfa-equivalence-code
+  tag:              v2.0
+  subdir:           cl-automata
+
+source-repository head
+  type:             git
+  location:         https://github.com/koflerdavid/nfa-equivalence-code
+  subdir:           cl-automata

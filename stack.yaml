@@ -7,6 +7,7 @@ resolver: lts-10.9
 packages:
 #- '.'
 - './cl-automata'
+- './cl-automata-output'
 - './cl-automata-tool'
 - './cl-benchmark'
 - './cl-data-structures'

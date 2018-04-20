@@ -1,5 +1,5 @@
 name:                cl-regex-tool
-version:             2.0.0.0
+version:             2.1.0.0
 synopsis:            A collection of more or less efficient algorithms for simplifying finite automata and proving their equivalence.
 description:         Please see README.md
 homepage:            https://github.com/koflerdavid/nfa-equivalence-code#readme
@@ -30,7 +30,8 @@ executable regex-derivation
                      , Types
 
   build-depends:       base
-                     , cl-regexes       >= 2.0
+                     , cl-automata-output >= 1.0
+                     , cl-regexes         >= 3.0
                      , containers
                      , HaTeX
                      , optparse-generic

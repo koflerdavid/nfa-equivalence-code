@@ -5,17 +5,17 @@ module RegexDfaOutput.LaTeX
     ( printTransitionTable
     ) where
 
-import Data.Dfa.Regex               ( RegexDfaTransitions, fromRegex,
-                                      transitions )
+import Algorithm.Regex.DfaConversion ( RegexDfaTransitions, fromRegex,
+                                       regexDfaTransitions )
 import Data.Regex
 
-import Data.List                    as List
-import Data.Map                     as Map
-import Data.Set                     as Set
-import Text.LaTeX                   ( LaTeX, Pos (..), TableSpec (..),
-                                      Texy (..), article, document,
-                                      documentclass, fromString, hline, lnbk,
-                                      raw, tabular, usepackage, (&), (<>) )
+import Data.List                     as List
+import Data.Map                      as Map
+import Data.Set                      as Set
+import Text.LaTeX                    ( LaTeX, Pos (..), TableSpec (..),
+                                       Texy (..), article, document,
+                                       documentclass, fromString, hline, lnbk,
+                                       raw, tabular, usepackage, (&), (<>) )
 import Text.LaTeX.Base.Class
 import Text.LaTeX.Base.Pretty
 import Text.LaTeX.Packages.AMSMath
@@ -31,7 +31,7 @@ printTransitionTable withoutSkeleton regex = do
             tabular
                 (Just Center)
                 (firstColumn ++ stateColumns)
-                (tableHeader regexAlphabet <> lnbk <> hline <> ((tableBody . transitions) (fromRegex regex)))
+                (tableHeader regexAlphabet <> lnbk <> hline <> ((tableBody . regexDfaTransitions) (fromRegex regex)))
         theDocument =
             if withoutSkeleton
                 then table

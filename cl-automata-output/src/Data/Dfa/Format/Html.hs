@@ -4,15 +4,15 @@ module Data.Dfa.Format.Html
     ( asHtml
     ) where
 
-import           Data.Dfa.Regex
-import           Data.FiniteAutomaton ( faInputs )
+import           Algorithm.Regex.DfaConversion
+import           Data.FiniteAutomaton          ( faInputs )
 import           Data.Regex
-import           Data.Regex.Formats   ( toMinimallyQuotedString )
+import           Data.Regex.Formats            ( toMinimallyQuotedString )
 
-import           Control.Monad        ( forM_ )
-import           Data.Map             as Map
-import           Data.Set             as Set
-import qualified Data.Text.Lazy       as T
+import           Control.Monad                 ( forM_ )
+import           Data.Map                      as Map
+import           Data.Set                      as Set
+import qualified Data.Text.Lazy                as T
 import           Lucid
 
 asHtml :: Bool -> Regex Char -> T.Text
@@ -47,10 +47,10 @@ asHtml withoutSkeleton regex =
                     forM_ (Set.toAscList . faInputs $ regexDfa) $ -- Ascending order
                      \c -> th_ (toHtml . show $ c)
             tbody_ $ do
-                transitionTableRow (regex, transitions regexDfa ! regex)
+                transitionTableRow (regex, regexDfaTransitions regexDfa ! regex)
                 -- Leave out the initial regex, as it has been printed before
                 forM_
-                    (Map.toList . Map.delete regex . transitions $ regexDfa)
+                    (Map.toList . Map.delete regex . regexDfaTransitions $ regexDfa)
                     transitionTableRow
     transitionTableRow :: (Regex Char, Map Char (Regex Char)) -> Html ()
     transitionTableRow (r, ts) =

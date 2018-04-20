@@ -5,22 +5,22 @@ module Actions.RegexToDfaConversion
     ( action
     ) where
 
-import           Data.Dfa.Format.Hknt ( NameGenerator, toHknt )
-import           Data.Dfa.Regex       ( RegexDfa, fromRegex, initialRegex )
+import           Data.Dfa.Format.Hknt          ( NameGenerator, toHknt )
+import           Algorithm.Regex.DfaConversion ( RegexDfa, fromRegex, regexDfaInitialState )
 import           Data.FiniteAutomaton
-import           Data.Regex           ( Regex, matchesEmptyWord )
-import           Data.Regex.Formats   ( toMinimallyQuotedText )
-import           Language.RegexParser ( parseRegex )
+import           Data.Regex                    ( Regex, matchesEmptyWord )
+import           Data.Regex.Formats            ( toMinimallyQuotedText )
+import           Language.RegexParser          ( parseRegex )
 
-import           Data.Aeson           ( ToJSON (toJSON), Value (String), object,
-                                        (.=) )
-import           Data.Aeson.Text      ( encodeToLazyText )
-import           Data.Aeson.Types     ( Pair )
-import           Data.Bifunctor       ( first )
-import           Data.Monoid          ( (<>) )
-import qualified Data.Set             ( toList )
-import qualified Data.Text            as T
-import           Data.Text.Encoding   ( decodeUtf8' )
+import           Data.Aeson                    ( ToJSON (toJSON), Value (String), object,
+                                                 (.=) )
+import           Data.Aeson.Text               ( encodeToLazyText )
+import           Data.Aeson.Types              ( Pair )
+import           Data.Bifunctor                ( first )
+import           Data.Monoid                   ( (<>) )
+import qualified Data.Set                      ( toList )
+import qualified Data.Text                     as T
+import           Data.Text.Encoding            ( decodeUtf8' )
 import           Snap.Core
 
 action :: Snap ()
@@ -53,7 +53,7 @@ instance ToJSON JsonRegexDfa where
     toJSON (JsonRegexDfa regexDfa) =
         object
             [ "alphabet" .= faInputs regexDfa
-            , "initialRegex" .= initialRegex regexDfa
+            , "initialRegex" .= regexDfaInitialState regexDfa
             , "regexes" .= (map regexData . Data.Set.toList . faStates $ regexDfa)
             , "transitionTable" .= object (transitionTable regexDfa)
             , "hkntRepresentation" .= toHknt regexDfa regexNameGenerator

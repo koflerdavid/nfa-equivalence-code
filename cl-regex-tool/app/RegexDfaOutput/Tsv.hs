@@ -2,13 +2,13 @@ module RegexDfaOutput.Tsv
     ( printTransitionTable
     ) where
 
-import Data.Dfa.Regex     ( fromRegex, transitions )
-import Data.Regex         ( Regex, alphabet, matchesEmptyWord )
-import Data.Regex.Formats ( toMinimallyQuotedString )
+import Algorithm.Regex.DfaConversion ( fromRegex, regexDfaTransitions )
+import Data.Regex                    ( Regex, alphabet, matchesEmptyWord )
+import Data.Regex.Formats            ( toMinimallyQuotedString )
 
-import Control.Monad      ( forM_ )
-import Data.Map           as Map
-import Data.Set           as Set
+import Control.Monad                 ( forM_ )
+import Data.Map                      as Map
+import Data.Set                      as Set
 
 printTransitionTable :: Bool -> Regex Char -> IO ()
 printTransitionTable _ regex = do
@@ -16,7 +16,7 @@ printTransitionTable _ regex = do
         putChar '\t'
         putStr (show character)
     putChar '\n'
-    forM_ (Map.toList . transitions . fromRegex $ regex) $ \(r, ts) -> do
+    forM_ (Map.toList . regexDfaTransitions . fromRegex $ regex) $ \(r, ts) -> do
         putStr $
             if regex == r
                 then "-> "

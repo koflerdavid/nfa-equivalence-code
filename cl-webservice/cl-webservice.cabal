@@ -1,5 +1,5 @@
 name:                 cl-webservice
-version:              2.0.0.0
+version:              2.1.0.0
 synopsis:             A collection of more or less efficient algorithms for simplifying finite automata and proving their equivalence.
 description:          Please see README.md
 homepage:             https://github.com/koflerdavid/nfa-equivalence-code#readme
@@ -23,14 +23,15 @@ library
                       , Actions.RegexEquivalence
                       , Actions.RegexToDfaConversion
 
-  build-depends:        base        >= 4     && < 5
+  build-depends:        base               >= 4     && < 5
                       , aeson
                       , bimap
-                      , bytestring  >= 0.9.1 && < 0.11
-                      , cl-automata >= 2.0
-                      , cl-regexes  >= 2.0
+                      , bytestring         >= 0.9.1 && < 0.11
+                      , cl-automata        >= 2.0
+                      , cl-automata-output >= 1.0
+                      , cl-regexes         >= 3.0
                       , containers
-                      , snap-core   >= 1.0   && < 1.1
+                      , snap-core          >= 1.0   && < 1.1
                       , text
 
 source-repository this

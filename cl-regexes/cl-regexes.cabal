@@ -1,5 +1,5 @@
 name:               cl-regexes
-version:            2.0.0.0
+version:            3.0.0.0
 synopsis:           A collection of more or less efficient algorithms for simplifying finite automata and proving their equivalence.
 description:        Please see README.md
 homepage:           https://github.com/koflerdavid/nfa-equivalence-code#readme
@@ -14,17 +14,15 @@ build-type:         Simple
 cabal-version:      >= 2
 
 library
-  hs-source-dirs:     src
-  ghc-options:        -O2 -Wall -Wcompat -Werror
+  default-language:   Haskell2010
+  ghc-options:        -Wall -Wcompat -Werror
                       -Wincomplete-record-updates -Wincomplete-uni-patterns -Wredundant-constraints
 
+  hs-source-dirs:     src
   exposed-modules:    Algorithm.Regex.Derivation
                     , Algorithm.Regex.DfaConversion
                     , Algorithm.Regex.Equivalence
                     , Compiler.Regex
-                    , Data.Dfa.Format.Hknt
-                    , Data.Dfa.Format.Html
-                    , Data.Dfa.Regex
                     , Data.Regex
                     , Data.Regex.Formats
                     , Language.RegexParser
@@ -38,12 +36,9 @@ library
                     , cl-data-structures >= 2.0
                     , containers
                     , equivalence
-                    , lucid
                     , parsec             >= 3 && < 4
                     , text
                     , transformers
-
-  default-language:   Haskell2010
 
 test-suite cl-regexes-test
   type:               exitcode-stdio-1.0
@@ -58,7 +53,7 @@ test-suite cl-regexes-test
   build-depends:      base           >= 4.8 && < 5
                     , hspec
                     , cl-automata    >= 2.0
-                    , cl-regexes     >= 2.0
+                    , cl-regexes
                     , parsec         >= 3 && < 4
                     , tasty
                     , tasty-discover
