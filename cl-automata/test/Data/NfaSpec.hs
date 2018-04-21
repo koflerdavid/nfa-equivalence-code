@@ -29,10 +29,10 @@ spec_nfa = do
             it ("should not accept " ++ show input) $
                 ([0], nfa) `shouldNotAccept` input
 
-shouldAccept :: (Ord c, Show c) => ([Int], Nfa c) -> [c] -> Expectation
+shouldAccept :: Ord c => ([Int], Nfa c) -> [c] -> Expectation
 shouldAccept (initialStates, nfa) input =
     runNfa nfa initialStates input `shouldSatisfy` (nfa `accepts`)
 
-shouldNotAccept :: (Ord c, Show c) => ([Int], Nfa c) -> [c] -> Expectation
+shouldNotAccept :: Ord c => ([Int], Nfa c) -> [c] -> Expectation
 shouldNotAccept (initialStates, nfa) input =
     runNfa nfa initialStates input `shouldNotSatisfy` (nfa `accepts`)

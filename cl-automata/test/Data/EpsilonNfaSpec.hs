@@ -35,10 +35,10 @@ spec_epsilonNfa = do
             it ("should not accept " ++ show input) $
                 ([0], enfa) `shouldNotAccept` input
 
-shouldAccept :: (Ord c, Show c) => ([Int], ENfa c) -> [c] -> Expectation
+shouldAccept :: Ord c => ([Int], ENfa c) -> [c] -> Expectation
 shouldAccept (initialStates, enfa) input =
     runEnfa enfa initialStates input `shouldSatisfy` (enfa `accepts`)
 
-shouldNotAccept :: (Ord c, Show c) => ([Int], ENfa c) -> [c] -> Expectation
+shouldNotAccept :: Ord c => ([Int], ENfa c) -> [c] -> Expectation
 shouldNotAccept (initialStates, enfa) input =
     runEnfa enfa initialStates input `shouldNotSatisfy` (enfa `accepts`)

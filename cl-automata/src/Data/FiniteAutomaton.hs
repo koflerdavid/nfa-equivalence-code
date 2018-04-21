@@ -20,7 +20,7 @@ class FiniteAutomaton m q a o | m -> q, m -> a, m -> o where
     faOutput :: m -> q -> o
     faTransitions :: m -> q -> Map a (Set q)
 
-faAcceptingStates :: (Ord q, IsBoolean o, FiniteAutomaton m q a o) => m -> Set q
+faAcceptingStates :: (IsBoolean o, FiniteAutomaton m q a o) => m -> Set q
 faAcceptingStates fa = Data.Set.filter (isTruthy . faOutput fa) (faStates fa)
 
 class IsBoolean b where
