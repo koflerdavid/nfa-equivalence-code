@@ -1,5 +1,5 @@
 name:               cl-regexes
-version:            3.0.0.0
+version:            3.1.0.0
 synopsis:           A collection of more or less efficient algorithms for simplifying finite automata and proving their equivalence.
 description:        Please see README.md
 homepage:           https://github.com/koflerdavid/nfa-equivalence-code#readme
@@ -32,10 +32,10 @@ library
 
   -- base-4.8 is required for Bifunctors
   build-depends:      base               >= 4.8 && < 5
+                    , bimap
                     , cl-automata        >= 2.0
                     , cl-data-structures >= 2.0
                     , containers
-                    , equivalence
                     , parsec             >= 3 && < 4
                     , text
                     , transformers
