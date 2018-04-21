@@ -1,14 +1,15 @@
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE OverloadedStrings #-}
-{-# OPTIONS_GHC -fno-warn-orphans #-}
 
 module Language.RegexParser.InternalSpec
     ( spec_regexParserInternal
     ) where
 
-import Data.Regex
+import CommonInstances               ()
+
+import Data.Regex                    ( Regex(..) )
 import Data.Regex.Formats            ( toMinimallyQuotedString )
-import Language.RegexParser.Internal
+import Language.RegexParser.Internal ( primitiveRegex, tokeniseAndParse )
 
 import Control.Monad                 ( forM_ )
 import Test.Hspec
@@ -28,6 +29,3 @@ spec_regexParserInternal = do
                 parsedInput `shouldBe` Right expected
   where
     primitiveRegexCases = [("a", a), ("'b'", b), ("(a + b)", Alternative a b)]
-
-instance Show (Regex Char) where
-    show = toMinimallyQuotedString

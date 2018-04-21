@@ -55,11 +55,16 @@ test-suite cl-regexes-test
                     , cl-automata    >= 2.0
                     , cl-regexes
                     , parsec         >= 3 && < 4
+                    , QuickCheck
                     , tasty
                     , tasty-discover
                     , tasty-hspec
+                    , tasty-quickcheck
+                    , text
 
   other-modules:      Algorithm.Regex.DerivationSpec
+                    , Algorithm.Regex.EquivalenceSpec
+                    , CommonInstances
                     , Compiler.RegexSpec
                     , Language.RegexParserSpec
                     , Language.RegexParser.InternalSpec

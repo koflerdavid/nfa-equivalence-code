@@ -2,12 +2,14 @@ module Compiler.RegexSpec
     ( spec_regexCompiler
     ) where
 
-import Control.Monad   ( forM_ )
-import Test.Hspec
+import CommonInstances ()
 
 import Compiler.Regex
 import Data.EpsilonNfa
 import Data.Regex
+
+import Control.Monad   ( forM_ )
+import Test.Hspec
 
 spec_regexCompiler :: Spec
 spec_regexCompiler = do

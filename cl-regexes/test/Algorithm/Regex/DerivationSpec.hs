@@ -1,17 +1,18 @@
 {-# LANGUAGE FlexibleInstances #-}
-{-# OPTIONS_GHC -fno-warn-orphans #-}
 
 module Algorithm.Regex.DerivationSpec
     ( spec_regexDerivation
     ) where
 
+import CommonInstances            ()
+
+import Algorithm.Regex.Derivation ( wordDerive )
+import Data.Regex                 ( Regex(..) )
+import Data.Regex.Formats         ( toMinimallyQuotedString )
+
 import Control.Monad              ( forM_ )
 import Data.Monoid                ( mconcat )
 import Test.Hspec
-
-import Algorithm.Regex.Derivation
-import Data.Regex
-import Data.Regex.Formats         ( toMinimallyQuotedString )
 
 spec_regexDerivation :: Spec
 spec_regexDerivation = do
@@ -34,6 +35,3 @@ spec_regexDerivation = do
                         , toMinimallyQuotedString to
                         ]
             it shouldConvertFromTo $ do wordDerive by from `shouldBe` to
-
-instance Show (Regex Char) where
-    show = toMinimallyQuotedString

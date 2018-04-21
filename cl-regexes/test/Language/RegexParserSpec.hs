@@ -1,10 +1,11 @@
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE OverloadedStrings #-}
-{-# OPTIONS_GHC -fno-warn-orphans #-}
 
 module Language.RegexParserSpec
     ( spec_regexParser
     ) where
+
+import CommonInstances      ()
 
 import Data.Regex
 import Data.Regex.Formats   ( toMinimallyQuotedString )
@@ -49,6 +50,3 @@ spec_regexParser = do
         , ("ab* +c", Alternative (a `Sequence` KleeneStar b) c)
         , ("1ε0∅", foldr1 Sequence [Epsilon, Epsilon, Empty, Empty])
         ]
-
-instance Show (Regex Char) where
-    show = toMinimallyQuotedString
