@@ -1,3 +1,4 @@
+{-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE ViewPatterns #-}
 {-# OPTIONS_GHC -fno-warn-orphans #-}
@@ -34,20 +35,20 @@ import           Test.QuickCheck
 instance Arbitrary DfaState where
     arbitrary = DfaState <$> (Just <$> arbitrary)
 
-instance (Arbitrary c, Ord c) => Arbitrary (Dfa c) where
+instance Arbitrary (Dfa Char) where
     arbitrary = do
         states <- listOf (arbitrary :: Gen Int)
-        alphabet <- listOf (arbitrary :: Gen c)
+        alphabet <- listOf $ elements (['a'..'z'] ++ ['A' .. 'Z'])
         generateDfa states alphabet
 
 newtype NonEmptyDfa c = MkNonEmptyDfa
     { toDfa :: Dfa c
     } deriving (Eq, Show)
 
-instance (Arbitrary c, Ord c) => Arbitrary (NonEmptyDfa c) where
+instance Arbitrary (NonEmptyDfa Char) where
     arbitrary = do
         states <- listOf1 (arbitrary :: Gen Int)
-        alphabet <- listOf1 (arbitrary :: Gen c)
+        alphabet <- listOf1 $ elements (['a'..'z'] ++ ['A' .. 'Z'])
         MkNonEmptyDfa <$> generateDfa states alphabet
 
 generateDfa :: Ord c => [Int] -> [c] -> Gen (Dfa c)
