@@ -19,6 +19,7 @@ packages:
 extra-deps:
 - base-4.11.0.0
 - haddock-api-2.19.0.1
+- test-invariant-0.4.5.0
 
 # Override default flag values for local packages and extra-deps
 flags: {}

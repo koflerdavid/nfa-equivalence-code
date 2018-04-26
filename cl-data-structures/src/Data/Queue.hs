@@ -16,6 +16,7 @@ class Queue q where
 
 newtype FifoQueue a =
     FifoQueue [a]
+    deriving (Eq, Show)
 
 instance Queue FifoQueue where
     empty = FifoQueue []
@@ -36,6 +37,7 @@ instance Monoid (FifoQueue a) where
 
 newtype LifoQueue a =
     LifoQueue (Seq.Seq a)
+    deriving (Eq, Show)
 
 instance Queue LifoQueue where
     empty = LifoQueue Seq.empty
