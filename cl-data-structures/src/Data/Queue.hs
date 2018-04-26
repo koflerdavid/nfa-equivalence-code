@@ -1,8 +1,9 @@
 module Data.Queue where
 
-import qualified Data.List     as List
-import           Data.Monoid
-import qualified Data.Sequence as Seq
+import qualified Data.List          as List
+import qualified Data.List.NonEmpty as NonEmpty
+import           Data.Semigroup
+import qualified Data.Sequence      as Seq
 
 class Queue q where
     empty :: q a
@@ -25,9 +26,13 @@ instance Queue FifoQueue where
     pushAll (FifoQueue es) fs = FifoQueue (reverse fs ++ es)
     singleton = FifoQueue . (: [])
 
+instance Semigroup (FifoQueue a) where
+    FifoQueue es <> FifoQueue fs = FifoQueue (fs <> es)
+    sconcat queues = FifoQueue $ sconcat (NonEmpty.map (\(FifoQueue es) -> es) queues)
+
 instance Monoid (FifoQueue a) where
     mempty = empty
-    mappend (FifoQueue es) (FifoQueue fs) = FifoQueue (fs ++ es)
+    mappend = (<>)
 
 newtype LifoQueue a =
     LifoQueue (Seq.Seq a)
@@ -43,6 +48,10 @@ instance Queue LifoQueue where
     pushAll (LifoQueue es) fs = LifoQueue (es <> Seq.fromList fs)
     singleton = LifoQueue . Seq.singleton
 
+instance Semigroup (LifoQueue a) where
+    LifoQueue es <> LifoQueue fs = LifoQueue (es <> fs)
+    sconcat queues = LifoQueue $ sconcat (NonEmpty.map (\(LifoQueue es) -> es) queues)
+
 instance Monoid (LifoQueue a) where
     mempty = empty
-    mappend (LifoQueue es) (LifoQueue fs) = LifoQueue (es <> fs)
+    mappend = (<>)

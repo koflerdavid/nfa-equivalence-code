@@ -30,7 +30,9 @@ test-suite cl-data-structures-test
   type:                exitcode-stdio-1.0
   hs-source-dirs:      test
   main-is:             Driver.hs
-  build-depends:       base               >= 4.7 && < 5
+
+  -- base-4.9 is required for semigroups
+  build-depends:       base               >= 4.9 && < 5
                      , hspec
                      , cl-data-structures
                      , containers
