@@ -28,11 +28,12 @@ import Data.Maybe  ( fromJust )
 -- A mapping from the old states of the second automata to the new states is returned as well.
 -- The mapping is defined only over the old states of the second automata.
 mergeDfa :: (Ord c) => Dfa c -> Dfa c -> (DfaState -> DfaState, Dfa c)
-mergeDfa dfa1 dfa2 =
-    if minimumStateDfa2 > maximumStateDfa1
-        then (id, mergeDfaUnsafe dfa1 dfa2)
-        else
-            let mergedDfa = mergeDfaUnsafe dfa1 dfa2' in
+mergeDfa dfa1 dfa2
+    | isEmpty dfa1 = (id, dfa2)
+    | isEmpty dfa2 = (id, dfa1)
+    | minimumStateDfa2 > maximumStateDfa1 =  (id, mergeDfaUnsafe dfa1 dfa2)
+    | otherwise =
+        let mergedDfa = mergeDfaUnsafe dfa1 dfa2' in
                (shiftStateBy stateOffset dfa2', mergedDfa)
   where
     maximumStateDfa1 = ISet.findMax (dfaStates dfa1)
@@ -53,3 +54,12 @@ mergeDfaUnsafe dfa1 dfa2 =
     allAcceptingStates =
         dfaAcceptingStates dfa1 `ISet.union` dfaAcceptingStates dfa2
     allTransitions = dfaTransitions dfa1 `Map.union` dfaTransitions dfa2
+
+-- | Checks for the simplest case when a DFA is empty.
+-- This is the case when there are no transitions and no accepting states.
+-- In that case, the automaton can be considered to be a neutral element redarding automata merging.
+-- Neither of these conditions is sufficient by themselves since an empty automaton can
+-- still have some meaning thanks to some accepting states.
+-- Also, an automaton with no accepting states is still a valid transition system.
+isEmpty :: Dfa c -> Bool
+isEmpty dfa = ISet.null (dfaAcceptingStates dfa) && Map.null (dfaTransitions dfa)

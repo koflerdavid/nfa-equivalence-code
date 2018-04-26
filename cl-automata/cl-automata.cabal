@@ -66,6 +66,7 @@ test-suite cl-automata-test
                     , tasty-discover
                     , tasty-hspec
                     , tasty-quickcheck
+                    , test-invariant
                     , text
                     , transformers
 
