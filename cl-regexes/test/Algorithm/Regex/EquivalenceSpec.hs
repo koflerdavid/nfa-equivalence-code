@@ -12,17 +12,19 @@ Stability:   provisional
 Portability: portable (Haskell 2010)
 -}
 module Algorithm.Regex.EquivalenceSpec
-    ( prop_sameRegexesShallHaveNoDifferences
+    ( prop_distinguishAtoms
+    , prop_sameRegexesShallHaveNoDifferences
     , spec_differentRegexesShallBeDifferent
     ) where
 
 import CommonInstances             ()
 
 import Algorithm.Regex.Equivalence ( getDifferences )
-import Data.Regex                  ( Regex )
+import Data.Regex                  ( Regex(..) )
 
 import Control.Monad               ( forM_ )
 import Test.Hspec
+import Test.QuickCheck
 
 spec_differentRegexesShallBeDifferent :: Spec
 spec_differentRegexesShallBeDifferent = do
@@ -33,5 +35,13 @@ spec_differentRegexesShallBeDifferent = do
             it ("should distinguish " ++ show r1 ++ " from " ++ show r2) $ do
                 fst (getDifferences r1 r2) `shouldNotBe` []
 
-prop_sameRegexesShallHaveNoDifferences :: Regex Char -> Bool
-prop_sameRegexesShallHaveNoDifferences r = fst (getDifferences r r) == []
+prop_distinguishAtoms :: Char -> Char -> Property
+prop_distinguishAtoms c1 c2 =
+    (c1 /= c2) ==>
+        let (r1, r2) = (Atom c1, Atom c2)
+        -- No assumption is placed on which input symbol is processed first
+        in fst (getDifferences r1 r2) === [([c1], Epsilon, Empty)]
+            .||. fst (getDifferences r1 r2) === [([c2], Empty, Epsilon)]
+
+prop_sameRegexesShallHaveNoDifferences :: Regex Char -> Property
+prop_sameRegexesShallHaveNoDifferences r = fst (getDifferences r r) === []

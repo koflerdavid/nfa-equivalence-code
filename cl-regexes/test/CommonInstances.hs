@@ -14,15 +14,11 @@ Portability: portable (Haskell 2010)
 module CommonInstances where
 
 import Data.Regex           ( Regex(..) )
-import Data.Regex.Formats   ( toMinimallyQuotedString )
 import Language.RegexParser ( parseRegex )
 
 import Data.String          ( IsString (..) )
 import Data.Text            as T ( pack )
 import Test.QuickCheck
-
-instance Show (Regex Char) where
-    show = toMinimallyQuotedString
 
 instance IsString (Regex Char) where
     fromString regexString =
@@ -33,8 +29,9 @@ instance IsString (Regex Char) where
 instance Arbitrary (Regex Char) where
     arbitrary = sized regex
       where
+        alphabeticCharacters = ['A'..'Z'] ++ ['a'..'z']
         regex n
-            | 0 == n = oneof [Atom <$> arbitrary, pure Epsilon, pure Empty]
+            | 0 == n = oneof [Atom <$> elements alphabeticCharacters, pure Epsilon, pure Empty]
             | otherwise =
                 oneof
                     [ KleeneStar <$> smallerThan n

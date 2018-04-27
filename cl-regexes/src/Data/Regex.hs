@@ -21,7 +21,7 @@ data Regex c
                (Regex c)
     | KleeneStar (Regex c)
     | KleenePlus (Regex c)
-    deriving (Eq, Ord)
+    deriving (Eq, Ord, Show)
 
 alphabet :: Ord c => Regex c -> Set.Set c
 alphabet regex = execWriter (computeAlphabet regex)

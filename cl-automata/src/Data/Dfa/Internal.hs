@@ -32,7 +32,7 @@ import qualified Data.Set             as Set
 
 data Dfa c = Dfa
     { acceptingStatesSet :: IntSet
-    , transitionMap      :: (Map (Int, c) Int)
+    , transitionMap      :: Map (Int, c) Int
     } deriving (Eq, Show)
 
 newtype DfaState = DfaState

@@ -1,6 +1,7 @@
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE ViewPatterns #-}
 
 module Algorithm.Regex.DfaConversion
     ( deriveRegexToDfa
@@ -12,21 +13,27 @@ module Algorithm.Regex.DfaConversion
     , toDfa
     ) where
 
-import Algorithm.Regex.Derivation ( derive )
-import Data.Dfa
-import Data.FiniteAutomaton
-import Data.Queue                 as Queue
-import Data.Regex                 ( Regex, alphabet, matchesEmptyWord  )
+import           Algorithm.Regex.Derivation             ( derive )
+import           Algorithm.Regex.DfaConversion.Internal
+import           Data.Dfa                               ( Dfa, DfaState,
+                                                          dfaErrorState )
+import           Data.Dfa.Builder                       ( emptyDfa )
+import           Data.FiniteAutomaton
+import           Data.Queue                             as Queue
+import           Data.Regex                             ( Regex (Empty),
+                                                          alphabet,
+                                                          matchesEmptyWord )
 
-import Control.Monad.Trans.State  ( State, evalState, gets, modify )
-import Data.Bifunctor             ( second )
-import Data.Bimap                 as Bimap
-import Data.List                  as List
-import Data.Map                   as Map
-import Data.Maybe                 ( fromJust )
-import Data.Set                   as Set
-
-type RegexDfaTransitions c = Map (Regex c) (Map c (Regex c))
+import           Control.Monad.Trans.State              ( State, evalState,
+                                                          execState, gets,
+                                                          modify )
+import           Data.Bifunctor                         ( second )
+import           Data.Bimap                             ( Bimap )
+import qualified Data.Bimap                             as Bimap
+import           Data.List                              as List
+import qualified Data.Map                               as Map
+import           Data.Set                               ( Set )
+import qualified Data.Set                               as Set
 
 deriveRegexToDfa :: Ord c => Regex c -> RegexDfaTransitions c
 deriveRegexToDfa regex =
@@ -43,13 +50,18 @@ deriveRegexToDfa regex =
                 deriveRegexForAlphabet regexAlphabet r
                 processQueue
 
+-- toTransitionTable :: Ord c => Dfa c -> Bimap DfaState (Regex c ) -> Either DfaState (RegexDfaTransitions c)
+-- toTransitionTable dfa mapping = Map.foldrWithKey insertTransition (Right Map.empty) (dfaTransitions dfa)
+--     where
+--         insertTransition (from, c) to previous = do
+--             rFrom <- maybe (Left from) Right (Bimap.lookup mapping from)
+--             rTo <- maybe (Left to) Right (Bimap.lookup mapping to)
+--             Map.insertWith (Map.union) from (Map.singleton c to) <$> previous
+
 -- | For this to work, the alphabet must be ascending!
 -- Also, all elements in the queue are assumed to not be already contained in the transition map
 deriveRegexForAlphabet ::
-       (Ord c, Queue q)
-    => [c]
-    -> Regex c
-    -> State (RegexDfaTransitions c, q (Regex c)) ()
+       (Ord c, Queue q) => [c] -> Regex c -> State (RegexDfaTransitions c, q (Regex c)) ()
 deriveRegexForAlphabet regexAlphabet regex =
     modify $ \(transitions, queue) ->
         let derivations = List.map (\c -> (c, derive c regex)) regexAlphabet
@@ -60,61 +72,55 @@ deriveRegexForAlphabet regexAlphabet regex =
                 Map.insert regex (Map.fromAscList derivations) transitions
         in (transitions', Queue.pushAll queue regexesToQueue)
 
-
 data RegexDfa c = RegexDfa
-    { _transitions  :: RegexDfaTransitions c
-    , _inputSymbols :: Set c
-    , _initialRegex :: Regex c
-    }
+    { rdTransitions  :: RegexDfaTransitions c
+    , rdInputSymbols :: Set c
+    , rdInitialRegex :: Regex c
+    } deriving (Show)
 
 regexDfaInitialState :: RegexDfa c -> Regex c
-regexDfaInitialState = _initialRegex
+regexDfaInitialState = rdInitialRegex
 
 -- Hack to keep the record from being modified
 regexDfaTransitions :: RegexDfa c -> RegexDfaTransitions c
-regexDfaTransitions = _transitions
+regexDfaTransitions = rdTransitions
 
 instance Ord c => FiniteAutomaton (RegexDfa c) (Regex c) c Bool where
-    faStates regexDfa =
-        Map.keysSet (_transitions regexDfa) `Set.union` destinationRegexes
+    faStates regexDfa = Map.keysSet (rdTransitions regexDfa) `Set.union` destinationRegexes
       where
         destinationRegexes =
             Set.unions . -- Unify all sets of destination regexes
             List.map (Set.fromList . Map.elems) . -- Get destination regexes
             Map.elems . -- Get transition mapping for each regex
-            _transitions $ -- Convert regex to transition system using derivatives
+            rdTransitions $ -- Convert regex to transition system using derivatives
             regexDfa
-    faInputs = _inputSymbols
+    faInputs = rdInputSymbols
     faOutput _ = matchesEmptyWord
     faTransitions regexDfa r =
-        case r `Map.lookup` _transitions regexDfa of
+        case r `Map.lookup` rdTransitions regexDfa of
             Just ts -> Map.map Set.singleton ts
-            Nothing -> Map.fromSet (\c -> Set.singleton $ derive c r) (_inputSymbols regexDfa)
+            Nothing -> Map.fromSet (\c -> Set.singleton $ derive c r) (rdInputSymbols regexDfa)
 
 fromRegex :: Ord c => Regex c -> RegexDfa c
-fromRegex regex = RegexDfa {
-            _transitions = deriveRegexToDfa regex
-         , _inputSymbols = alphabet regex
-         , _initialRegex = regex
-         }
+fromRegex regex =
+    RegexDfa
+    { rdTransitions = deriveRegexToDfa regex
+    , rdInputSymbols = alphabet regex
+    , rdInitialRegex = regex
+    }
 
-toDfa :: Ord c => Regex c -> (Dfa c, Bimap (Regex c) DfaState)
-toDfa regex =
-        (dfa, regexesToDfaStates)
-    where
-        dfa = buildDfaUnsafe (Set.toList convertedAcceptingStates) convertedTransitions
-        regexesToDfaStates = Bimap.mapR (fromJust . toDfaState dfa) regexesToIntegers
-
-        regexDfa = fromRegex regex
-        regexes = faStates regexDfa
-        regexesToIntegers = Bimap.fromList $ [(s, i) | s <- Set.toList regexes, i <- [0..]]
-        acceptingStates = Set.filter ((== True ) . faOutput regexDfa) regexes
-        convertedAcceptingStates = Set.map ((Bimap.!) regexesToIntegers) $ acceptingStates
-        transitionMap = regexDfaTransitions regexDfa
-        convertedTransitions =
-            (`concatMap` Map.toList transitionMap) $ \(originRegex, inputToDestination) ->
-                let origin = regexesToIntegers Bimap.! originRegex
-                in (`List.map` Map.toList inputToDestination) $
-                    \ (c, destinationRegex) ->
-                        let destination = regexesToIntegers Bimap.! destinationRegex
-                        in ((origin, c), destination)
+toDfa ::
+       forall c. Ord c
+    => Regex c
+    -> (Dfa c, Bimap (Regex c) DfaState)
+toDfa (fromRegex -> regexDfa) =
+    let (_n, dfa, mapping) = execState doIt (1, emptyDfa, Map.empty)
+        mapping' =
+            Bimap.insert Empty dfaErrorState . Bimap.fromList . Map.toAscList . Map.map snd $
+            mapping
+    in (dfa, mapping')
+  where
+    doIt = do
+        convertStateTransitions (rdTransitions regexDfa)
+        markAsAcceptingStates (faAcceptingStates regexDfa)
+        ensureInitialStateIsPresent (regexDfaInitialState regexDfa)

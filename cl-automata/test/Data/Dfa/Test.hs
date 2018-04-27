@@ -57,12 +57,11 @@ generateDfa states alphabet = do
     transitionList <-
         forM [(from, c) | from <- states, c <- alphabet] $ \key -> do
             state <- elements states
-            return $! (key, state)
-    return $
-        Dfa
-        { acceptingStatesSet = ISet.fromList acceptingStates
-        , transitionMap = Map.fromList transitionList
-        }
+            return (key, state)
+    return Dfa
+           { acceptingStatesSet = ISet.fromList acceptingStates
+           , transitionMap = Map.fromList transitionList
+           }
 
 prop_nonEmptyDfaIsNotEmpty :: NonEmptyDfa Char -> Property
 prop_nonEmptyDfaIsNotEmpty (toDfa -> dfa) =
