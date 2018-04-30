@@ -1,5 +1,5 @@
 name:                cl-automata-tool
-version:             2.0.0.0
+version:             2.1.0.0
 synopsis:            A collection of more or less efficient algorithms for simplifying finite automata and proving their equivalence.
 description:         Please see README.md
 homepage:            https://github.com/koflerdavid/nfa-equivalence-code#readme
@@ -13,23 +13,55 @@ category:            Algorithms
 build-type:          Simple
 cabal-version:       >= 2
 
+library
+  default-language:    Haskell2010
+  ghc-options:         -Wall -Wcompat -Werror
+                       -Wincomplete-record-updates -Wincomplete-uni-patterns -Wredundant-constraints
+
+  hs-source-dirs:      src
+  exposed-modules:     Common
+
+  build-depends:       base             >= 4.7 && < 5
+                     , exceptions
+
 executable automata-equivalence
   default-language:    Haskell2010
-  ghc-options:         -threaded -rtsopts -with-rtsopts=-N -Wall
+  ghc-options:         -threaded -rtsopts -with-rtsopts=-N
+                       -Wall -Wcompat
+                       -Wincomplete-record-updates -Wincomplete-uni-patterns -Wredundant-constraints
 
-  hs-source-dirs:      app
+  hs-source-dirs:      app-automata-equivalence
   main-is:             Main.hs
-  other-modules:       Common
-                     , DfaChecking
+  other-modules:       DfaChecking
                      , NfaChecking
 
-  build-depends:       base             < 5
+  build-depends:       base             >= 4.7 && < 5
                      , bimap
                      , cl-automata      >= 2.0
+                     , cl-automata-tool
                      , containers
                      , exceptions
                      , optparse-generic
                      , text
+
+executable automata-output
+  default-language:   Haskell2010
+  ghc-options:        -threaded -rtsopts -with-rtsopts=-N
+                      -Wall -Wcompat
+                      -Wincomplete-record-updates -Wincomplete-uni-patterns -Wredundant-constraints
+
+  hs-source-dirs:     app-automata-output
+  main-is:            Main.hs
+
+  build-depends:      base               >= 4.7 && < 5
+                    , bimap
+                    , cl-automata        >= 2.0
+                    , cl-automata-output >= 1.1
+                    , cl-automata-tool
+                    , graphviz
+                    , optparse-generic
+                    , exceptions
+                    , text
 
 source-repository this
   type:              git

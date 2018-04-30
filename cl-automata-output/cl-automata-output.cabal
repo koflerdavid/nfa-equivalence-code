@@ -1,5 +1,5 @@
 name:               cl-automata-output
-version:            1.0.0.0
+version:            1.1.0.0
 synopsis:           A collection of more or less efficient algorithms for simplifying finite automata and proving their equivalence.
 description:        Please see README.md
 homepage:           https://github.com/koflerdavid/nfa-equivalence-code#readme
@@ -21,6 +21,7 @@ library
   hs-source-dirs:     src
   exposed-modules:    Data.Dfa.Format.Hknt
                     , Data.Dfa.Format.Html
+                    , Data.FiniteAutomaton.Format.DotGraph
 
   -- base-4.8 is required for Bifunctors
   build-depends:      base               >= 4.8 && < 5
@@ -28,6 +29,7 @@ library
                     , cl-regexes         >= 3.0
                     -- For Data.Map.!?
                     , containers         >= 0.5.9.1
+                    , graphviz
                     , lucid
                     , text
                     , transformers

@@ -1,5 +1,3 @@
-{-# LANGUAGE ExistentialQuantification #-}
-
 module NfaChecking
     ( NfaCheckingException
     , checkNfaEquivalence
@@ -26,7 +24,7 @@ data NfaCheckingException
     = StateDoesNotExist String
     | CouldNotTranslateStateBack Int
     | HkntSyntaxError String
-    | HkntToDfaTranslationError HkntCompileError
+    | HkntToNfaTranslationError HkntCompileError
     deriving (Show)
 
 instance Exception NfaCheckingException
@@ -75,7 +73,7 @@ parseInput maybeFilePath =
         Result transitions acceptingStates checks <-
             onLeftThrow HkntSyntaxError $ parseHknt fileContents
         (nfa, stateMapping) <-
-            onLeftThrow HkntToDfaTranslationError $ compileHkntToNfa transitions acceptingStates
+            onLeftThrow HkntToNfaTranslationError $ compileHkntToNfa transitions acceptingStates
         return (nfa, stateMapping, checks)
 
 equivalenceChecks :: [Check String] -> [Check String]
