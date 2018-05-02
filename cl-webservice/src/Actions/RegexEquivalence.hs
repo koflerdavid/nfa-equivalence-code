@@ -9,13 +9,11 @@ import           Data.Regex                  ( Regex )
 import           Data.Regex.Formats          ( toMinimallyQuotedText )
 import           Language.RegexParser        ( parseRegex )
 
-import           Data.Aeson                  ( ToJSON (toJSON), Value (String),
-                                               object, (.=) )
+import           Data.Aeson                  ( ToJSON (toJSON), object, (.=) )
 import           Data.Aeson.Text             ( encodeToLazyText )
 import           Data.Bifunctor              ( first )
 import           Data.ByteString             ( ByteString )
 import           Data.Monoid                 ( (<>) )
-import qualified Data.Text                   as T
 import           Data.Text.Encoding          ( decodeUtf8' )
 import qualified Data.Text.Lazy              as TL
 import           Snap.Core

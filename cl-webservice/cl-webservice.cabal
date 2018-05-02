@@ -16,6 +16,8 @@ cabal-version:        >= 2
 library
   default-language:     Haskell2010
   default-extensions:   OverloadedStrings
+  ghc-options:          -Wall -Wcompat -Werror
+                        -Wincomplete-record-updates -Wincomplete-uni-patterns -Wredundant-constraints
 
   hs-source-dirs:       src
   exposed-modules:      Actions.Derivation

@@ -43,11 +43,11 @@ data EquivalenceError
 
 data PrettyConstraint = PrettyConstraint {
         -- | The input that lead to this constraint
-      input     :: String
+      pcInput     :: String
         -- | The first set of states
-    , stateSet1 :: [String]
+    , pcStateSet1 :: [String]
         -- | The second set of states
-    , stateSet2 :: [String]
+    , pcStateSet2 :: [String]
     }
 
 -- | A trace is the execution sequence of the algorithm
@@ -112,20 +112,22 @@ action =
                     Utf8DecodeError -> writeLazyText "The request contains invalid UTF8 codepoints"
                     ParseError syntaxError ->
                         writeLazyText $
-                        "The request contains a syntax error:\n" <> TL.pack syntaxError
+                            "The request contains a syntax error:\n" <> TL.pack syntaxError
                     NoCheckSpecified ->
                         writeLazyText "The input does not contain a constraint to check for"
                     CheckedStateDoesNotExist state ->
                         writeLazyText $ "The following state does not exist: " <> TL.pack state
+                    TranslationError translationError ->
+                        writeLazyText $
+                            "Could not complete translation:\n" <> TL.pack (show translationError)
             Right result -> do
                 modifyResponse $ setContentType "application/json"
                 writeLazyText . encodeToLazyText $ result
 
 equivalent :: Maybe LBS.ByteString -> Either EquivalenceError EquivalenceResult
 equivalent Nothing = Left ParameterIsMissing
-equivalent (Just utf8Body)
+equivalent (Just utf8Body) = do
     -- Try to parse UTF8 string
- = do
     body <- first (const Utf8DecodeError) (decodeUtf8' . LBS.toStrict $ utf8Body)
     -- Parse body
     Result transitions acceptingStates checks <- first ParseError $ parseHknt body
@@ -153,10 +155,9 @@ equivalent (Just utf8Body)
 -- The user could have specified nonexisting states, so we have to watch out for that
 translateState :: (Ord s, Ord s', Show s) => Bimap s s' -> s -> Either EquivalenceError s'
 translateState stateMapping state =
-    maybe
-        (Left . CheckedStateDoesNotExist . show $ state)
-        return
-        (state `lookup` stateMapping)
+    case state `lookup` stateMapping of
+        Just translatedState -> return translatedState
+        Nothing              -> Left $! CheckedStateDoesNotExist (show state)
 
 translatedTrace :: Bimap String Int -> (Bool, Constraint Char) -> Trace
 translatedTrace stateMapping (skipped, constraint) =
@@ -169,10 +170,10 @@ translatedTrace stateMapping (skipped, constraint) =
 -- There will be no check whether the state numbers are valid because they are supposed to come from the compiler.
 translatedConstraint :: Bimap String Int -> Constraint Char -> PrettyConstraint
 translatedConstraint invStateMapping (input, stateSet1, stateSet2) =
-    let prettyStateSet1 =
-            Prelude.map (fromJust . (`lookupR` invStateMapping)) . Data.IntSet.toList $
-            stateSet1
-        prettyStateSet2 =
-            Prelude.map (fromJust . (`lookupR` invStateMapping)) . Data.IntSet.toList $
-            stateSet2
-    in PrettyConstraint input prettyStateSet1 prettyStateSet2
+    PrettyConstraint
+    { pcInput = input
+    , pcStateSet1 =
+          Prelude.map (fromJust . (`lookupR` invStateMapping)) . Data.IntSet.toList $ stateSet1
+    , pcStateSet2 =
+          Prelude.map (fromJust . (`lookupR` invStateMapping)) . Data.IntSet.toList $ stateSet2
+    }
