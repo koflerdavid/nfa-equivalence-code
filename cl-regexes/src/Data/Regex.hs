@@ -7,7 +7,10 @@ module Data.Regex
     , normalised
     ) where
 
+import qualified Control.Applicative
+import           Control.Monad
 import           Control.Monad.Trans.Writer.Lazy
+import           Data.Semigroup
 import qualified Data.Set                        as Set
 import           Prelude                         hiding ( concat )
 
@@ -28,21 +31,21 @@ alphabet regex = execWriter (computeAlphabet regex)
   where
     computeAlphabet r =
         case r of
-            Epsilon         -> return ()
-            Empty           -> return ()
-            Atom c          -> tell (Set.singleton c)
-            KleeneStar inner  -> computeAlphabet inner
-            KleenePlus inner  -> computeAlphabet inner
-            Alternative s t -> computeAlphabet s >> computeAlphabet t
-            Sequence s t    -> computeAlphabet s >> computeAlphabet t
+            Epsilon          -> return ()
+            Empty            -> return ()
+            Atom c           -> tell (Set.singleton c)
+            KleeneStar inner -> computeAlphabet inner
+            KleenePlus inner -> computeAlphabet inner
+            Alternative s t  -> computeAlphabet s >> computeAlphabet t
+            Sequence s t     -> computeAlphabet s >> computeAlphabet t
 
 -- | Determines if the regular expression matches any string.
 empty :: Regex c -> Bool
 empty Epsilon           = False
 empty Empty             = True
 empty (Atom _)          = False
-empty (KleeneStar _)      = False -- The empty string is always a match
-empty (KleenePlus r)      = empty r -- Depends on the inner string.
+empty (KleeneStar _)    = False -- The empty string is always a match
+empty (KleenePlus r)    = empty r -- Depends on the inner string.
 empty (Alternative r s) = empty r && empty s
 empty (Sequence r s)    = empty r || empty s
 
@@ -52,8 +55,8 @@ matchesEmptyWord regex =
         Atom _          -> False
         Epsilon         -> True
         Empty           -> False
-        KleeneStar _      -> True
-        KleenePlus r      -> matchesEmptyWord r
+        KleeneStar _    -> True
+        KleenePlus r    -> matchesEmptyWord r
         Alternative r s -> matchesEmptyWord r || matchesEmptyWord s
         Sequence r s    -> matchesEmptyWord r && matchesEmptyWord s
 
@@ -76,8 +79,7 @@ normalised regex
     | empty regex = Empty -- Captures Empty -!> Empty, among others
 normalised Epsilon = Epsilon
 normalised regex
-    | matchesOnlyEmptyWord regex =
-        Epsilon -- Captures Epsilon -!> Epsilon, among others
+    | matchesOnlyEmptyWord regex = Epsilon -- Captures Epsilon -!> Epsilon, among others
 normalised regex@(Atom _) = regex
 
 normalised (Alternative first second) =
@@ -123,3 +125,55 @@ normalised' r =
         Alternative Epsilon inner@(KleeneStar _) -> inner -- 1 + a* -> a*
         Alternative Epsilon (KleenePlus inner) -> KleeneStar inner -- 1 + a+ -> a*
         _ -> r
+
+instance Semigroup (Regex c) where
+    (<>) = Sequence
+    stimes = stimesMonoid
+
+instance Monoid (Regex c) where
+    mappend = (<>)
+    mempty = Epsilon
+
+instance Functor Regex where
+    fmap f r =
+        case r of
+            Empty             -> Empty
+            Epsilon           -> Epsilon
+            Atom c            -> Atom (f c)
+            KleeneStar inner  -> KleeneStar (fmap f inner)
+            KleenePlus inner  -> KleenePlus (fmap f inner)
+            Sequence r1 r2    -> Sequence (fmap f r1) (fmap f r2)
+            Alternative r1 r2 -> Alternative (fmap f r1) (fmap f r2)
+    (<$) c _ = Atom c
+
+instance Applicative Regex where
+    pure = Atom
+    (<*>) rF a =
+        case rF of
+            Empty               -> Empty
+            Epsilon             -> Epsilon
+            Atom f              -> fmap f a
+            KleeneStar f        -> KleeneStar (f <*> a)
+            KleenePlus f        -> KleenePlus (f <*> a)
+            Alternative rF1 rF2 -> Alternative (rF1 <*> a) (rF2 <*> a)
+            Sequence rF1 rF2    -> Sequence (rF1 <*> a) (rF2 <*> a)
+
+instance Control.Applicative.Alternative Regex where
+    empty = Empty
+    (<|>) = Alternative
+
+instance Monad Regex where
+    return = pure
+    r >>= f =
+        case r of
+            Empty             -> Empty
+            Epsilon           -> Epsilon
+            Atom a            -> f a
+            KleeneStar inner  -> KleeneStar (inner >>= f)
+            KleenePlus inner  -> KleenePlus (inner >>= f)
+            Sequence r1 r2    -> Sequence (r1 >>= f) (r2 >>= f)
+            Alternative r1 r2 -> Alternative (r1 >>= f) (r2 >>= f)
+
+instance MonadPlus Regex where
+    mzero = Empty
+    mplus = Alternative

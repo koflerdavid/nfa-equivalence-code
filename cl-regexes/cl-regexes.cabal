@@ -32,7 +32,8 @@ library
                     , Language.RegexParser.Tokeniser
 
   -- base-4.8 is required for Bifunctors
-  build-depends:      base               >= 4.8 && < 5
+  -- base-4.10 is required for Semigroups
+  build-depends:      base               >= 4.10 && < 5
                     , bimap
                     , cl-automata        >= 2.0
                     , cl-data-structures >= 2.0
@@ -61,12 +62,14 @@ test-suite cl-regexes-test
                     , tasty-discover
                     , tasty-hspec
                     , tasty-quickcheck
+                    , test-invariant
                     , text
 
   other-modules:      Algorithm.Regex.DerivationSpec
                     , Algorithm.Regex.EquivalenceSpec
                     , CommonInstances
                     , Compiler.RegexSpec
+                    , Data.Regex.InstancesTest
                     , Language.RegexParserSpec
                     , Language.RegexParser.InternalSpec
                     , Language.RegexParser.TokeniserSpec

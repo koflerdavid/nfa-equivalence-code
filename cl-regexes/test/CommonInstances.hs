@@ -27,11 +27,16 @@ instance IsString (Regex Char) where
             Right regex -> regex
 
 instance Arbitrary (Regex Char) where
-    arbitrary = sized regex
+    arbitrary = arbitraryRegexFromAlphabet $ ['A'..'Z'] ++ ['a'..'z']
+
+instance Arbitrary (Regex Int) where
+    arbitrary = arbitraryRegexFromAlphabet [0..10000]
+
+arbitraryRegexFromAlphabet :: [a] -> Gen (Regex a)
+arbitraryRegexFromAlphabet alphabet = sized regex
       where
-        alphabeticCharacters = ['A'..'Z'] ++ ['a'..'z']
         regex n
-            | 0 == n = oneof [Atom <$> elements alphabeticCharacters, pure Epsilon, pure Empty]
+            | 0 == n = oneof [Atom <$> elements alphabet, pure Epsilon, pure Empty]
             | otherwise =
                 oneof
                     [ KleeneStar <$> smallerThan n
