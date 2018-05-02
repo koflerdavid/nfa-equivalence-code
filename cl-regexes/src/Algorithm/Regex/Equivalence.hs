@@ -15,7 +15,10 @@ import Data.List                     as List
 import Data.Maybe                    ( maybeToList )
 
 equivalent :: Ord c => Regex c -> Regex c -> Bool
-equivalent regex1 regex2 = List.null (getDifferences regex1 regex2)
+-- Care has to be taken to use `null :: [a] -> Bool` instead
+-- of `null :: (a, b) -> Bool`, which checks the second component of the tuple.
+-- That is an oversight that was not caught by GHC!
+equivalent regex1 regex2 = List.null . fst $ getDifferences regex1 regex2
 
 type Witness c = ([c], Regex c, Regex c)
 

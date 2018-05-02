@@ -13,13 +13,14 @@ Portability: portable (Haskell 2010)
 -}
 module Algorithm.Regex.EquivalenceSpec
     ( prop_distinguishAtoms
+    , prop_sameRegexesShallBeEquivalent
     , prop_sameRegexesShallHaveNoDifferences
     , spec_differentRegexesShallBeDifferent
     ) where
 
 import CommonInstances             ()
 
-import Algorithm.Regex.Equivalence ( getDifferences )
+import Algorithm.Regex.Equivalence ( equivalent, getDifferences )
 import Data.Regex                  ( Regex(..) )
 
 import Control.Monad               ( forM_ )
@@ -45,3 +46,6 @@ prop_distinguishAtoms c1 c2 =
 
 prop_sameRegexesShallHaveNoDifferences :: Regex Char -> Property
 prop_sameRegexesShallHaveNoDifferences r = fst (getDifferences r r) === []
+
+prop_sameRegexesShallBeEquivalent :: Regex Char -> Bool
+prop_sameRegexesShallBeEquivalent r = equivalent r r
