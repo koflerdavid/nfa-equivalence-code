@@ -1,12 +1,17 @@
 module Algorithm.DfaEquivalenceSpec
-    ( spec_dfaEquivalence
+    ( prop_acceptingAndNotAcceptingDfaStatesAreNotEqual
+    , prop_eachStateIsEqualToItself
+    , spec_dfaEquivalence
     ) where
 
-import Algorithm.DfaEquivalence
-import Data.Dfa
+import           Algorithm.DfaEquivalence
+import           Data.Dfa
+import           Data.FiniteAutomaton
 
-import Control.Monad            ( forM_ )
-import Test.Hspec
+import           Control.Monad            ( forM_ )
+import qualified Data.Set                 as Set
+import           Test.Hspec
+import           Test.QuickCheck
 
 spec_dfaEquivalence :: Spec
 spec_dfaEquivalence = do
@@ -21,7 +26,7 @@ spec_dfaEquivalence = do
                             , ((startState, 'b'), acceptingState)
                             ]
                     dfa2 = buildDfaUnsafe [acceptingState] [((startState, 'a'), acceptingState)]
-                    Just startState'  = toDfaState dfa1 startState
+                    Just startState' = toDfaState dfa1 startState
                     Just startState'' = toDfaState dfa2 startState
                 dfaEquivalent (startState', dfa1) (startState'', dfa2) `shouldBe` False
 
@@ -39,7 +44,7 @@ spec_dfaEquivalence = do
                             [ ((secondState, 'a'), firstState)
                             , ((firstState, 'a'), firstState)
                             ]
-                    Just firstState'  = toDfaState dfa1 firstState
+                    Just firstState' = toDfaState dfa1 firstState
                     Just secondState' = toDfaState dfa2 secondState
                 dfaEquivalent (firstState', dfa1) (secondState', dfa2) `shouldBe` True
 
@@ -123,3 +128,40 @@ spec_dfaEquivalence = do
                     Just state1 = toDfaState dfa 1
                     Just state3 = toDfaState dfa 3
                 in dfaStatesEquivalent dfa state1 state3 `shouldBe` True
+
+prop_eachStateIsEqualToItself :: Dfa Char -> Property
+prop_eachStateIsEqualToItself dfa =
+    checkForVariant "dfaStatesEquivalentHkNaive" (dfaStatesEquivalentHkNaive dfa) .&&.
+    checkForVariant "dfaStatesEquivalentHk" (dfaStatesEquivalentHk dfa)
+  where
+    checkForVariant name equivalent =
+        counterexample name $
+            conjoin $
+                map (checkState equivalent) allStates
+
+    checkState equivalent q =
+        counterexample (show q) $
+            equivalent q q
+
+    allStates = Set.toList (faStates dfa)
+
+prop_acceptingAndNotAcceptingDfaStatesAreNotEqual :: Dfa Char -> Property
+prop_acceptingAndNotAcceptingDfaStatesAreNotEqual dfa =
+        not (null acceptingStates) ==>
+            checkForVariant "dfaStatesEquivalentHkNaive" (dfaStatesEquivalentHkNaive dfa) .&&.
+            checkForVariant "dfaStatesEquivalentHk" (dfaStatesEquivalentHk dfa)
+    where
+        checkForVariant name equivalent =
+            counterexample name $
+                conjoin $
+                    map (checkStates (not . uncurry equivalent)) allStatePairs
+
+        checkStates notEquivalent pair@(p, q)  =
+            counterexample (show p ++ " === " ++ show q) $
+                notEquivalent pair
+
+        allStatePairs = [(accepting, notAccepting)
+                            | accepting <- Set.toList acceptingStates
+                            , notAccepting <- Set.toList notAcceptingStates ]
+        acceptingStates = faAcceptingStates dfa
+        notAcceptingStates = faStates dfa Set.\\ acceptingStates

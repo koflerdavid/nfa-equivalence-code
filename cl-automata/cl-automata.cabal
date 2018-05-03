@@ -35,7 +35,7 @@ library
                     , Language.Automata.HkntParser.Internal
                     , Language.Automata.HkntParser.Tokeniser
 
--- base-4.8 is required for Bifunctors
+  -- base-4.8 is required for Bifunctors
   build-depends:      base               >= 4.8 && < 5
                     , bimap
                     , cl-data-structures >= 2.0
@@ -80,6 +80,7 @@ test-suite cl-automata-test
                     , Data.EpsilonNfaSpec
                     , Data.EpsilonNfa.InternalSpec
                     , Data.NfaSpec
+                    , Data.Nfa.Test
                     , HkntSamples
                     , Language.Automata.HkntParserSpec
                     , Language.Automata.HkntParser.InternalSpec
